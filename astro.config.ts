@@ -15,9 +15,10 @@ import { themeConfig } from './src/config'
 import { imageConfig } from './src/utils/image-config'
 import path from 'path'
 import netlify from '@astrojs/netlify'
+import vercel from '@astrojs/vercel'
 
 export default defineConfig({
-  adapter: netlify(), // Set adapter for deployment
+  adapter: vercel(), // Set adapter for deployment
   site: themeConfig.site.website,
   image: {
     service: {
