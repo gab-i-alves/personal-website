@@ -3,7 +3,7 @@ title: Planejando um TCC de Tecnologia na Área de Saúde
 pubDate: '2025-07-22'
 ---
 
-Este post detalha o processo de planeamento estratégico que a nossa equipe utilizou para definir a primeira grande entrega (`Release v0.5`) do ParkinsonCheck, o nosso projeto de TCC. 
+Este post detalha o processo de planeamento estratégico que a nossa equipe utilizou para definir a primeira grande entrega (`Release v0.5`) do ParkinsonCheck, o nosso projeto de TCC.
 
 ---
 
@@ -13,7 +13,7 @@ O objetivo é documentar a nossa abordagem à divisão de trabalho, à estrutura
 
 ## O Desafio e a Estratégia de Mitigação
 
-O ParkinsonCheck é um sistema que integra um *frontend em Angular*, *um backend em FastAPI* e *modelos de Machine Learning*. Dada esta complexidade, a nossa primeira decisão foi adotar uma abordagem ágil para mitigar riscos e permitir a adaptação contínua.
+O ParkinsonCheck é um sistema que integra um _frontend em Angular_, _um backend em FastAPI_ e _modelos de Machine Learning_. Dada esta complexidade, a nossa primeira decisão foi adotar uma abordagem ágil para mitigar riscos e permitir a adaptação contínua.
 
 Para isso, definimos um objetivo claro e mensurável para a nossa primeira release:
 
@@ -33,9 +33,11 @@ A equipe foi organizada para alinhar as responsabilidades primárias com as comp
 
 - _Gabriela_: Responsável pela Garantia de Qualidade (QA) através de testes funcionais e pela manutenção da documentação técnica.
 
+![Quadro de Tarefas da Segunda Sprint da Primeira Release](./_assets/trello-board-example.png)
+
 ## O Caso da Sprint 3: Gestão de Risco na Prática
 
-O nosso plano de 5 sprints foi desenhado para construir a aplicação de forma incremental. Durante a análise de esforço, identificámos a Sprint 3 como o nosso maior ponto de risco.
+O nosso plano de 5 sprints foi desenhado para construir a aplicação de forma incremental. Durante a análise de esforço, identificamos a Sprint 3 como o nosso maior ponto de risco.
 
 A sprint continha a tarefa de implementar a funcionalidade de "desenhar digitalmente" via webcam com OpenCV.js, uma tarefa de alta incerteza técnica. A nossa análise mostrou que a carga de trabalho estimada para esta e outras tarefas excedia a capacidade da sprint, ameaçando o cronograma.
 
@@ -48,4 +50,3 @@ Esta decisão de rebalancear o escopo permitiu-nos alocar a capacidade de desenv
 ## Próximos Passos
 
 Este plano serve como a nossa base de execução para as próximas cinco semanas. O progresso será monitorizado através do nosso board no Trello e das nossas reuniões diárias. Nos próximos checkpoints, partilharei os resultados técnicos, os desafios encontrados e as lições aprendidas durante a implementação deste plano.
-
