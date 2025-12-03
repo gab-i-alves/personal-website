@@ -14,11 +14,13 @@ import remarkTOC from './src/plugins/remark-toc.mjs'
 import { themeConfig } from './src/config'
 import { imageConfig } from './src/utils/image-config'
 import path from 'path'
-import netlify from '@astrojs/netlify'
-import vercel from '@astrojs/vercel'
+import node from '@astrojs/node'
 
 export default defineConfig({
-  adapter: vercel(), // Set adapter for deployment
+  output: 'server',
+  adapter: node({
+    mode: 'standalone'
+  }),
   site: themeConfig.site.website,
   image: {
     service: {

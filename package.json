@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "start": "node ./dist/server/entry.mjs",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "eslint .",
@@ -17,9 +18,8 @@
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.1",
-    "@astrojs/netlify": "^6.5.1",
+    "@astrojs/node": "^9.5.1",
     "@astrojs/sitemap": "^3.4.1",
-    "@astrojs/vercel": "^8.2.3",
     "@playform/inline": "^0.1.2",
     "astro": "^5.12.0",
     "astro-og-canvas": "^0.7.0",
