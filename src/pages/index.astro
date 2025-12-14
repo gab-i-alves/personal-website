@@ -2,6 +2,10 @@
 import IndexLayout from '@/layouts/IndexLayout.astro'
 import About from '@/components/widgets/About.astro'
 import PostList from '@/components/widgets/PostList.astro'
+import Kanban from '@/components/widgets/Kanban.astro'
+import Achievements from '@/components/widgets/Achievements.astro'
+import Currently from '@/components/widgets/Currently.astro'
+import Bookmarks from '@/components/widgets/Bookmarks.astro'
 import { themeConfig } from '@/config'
 import { getSortedFilteredPosts } from '@/utils/draft'
 
@@ -10,7 +14,21 @@ const posts = await getSortedFilteredPosts()
 
 <IndexLayout title={themeConfig.site.title} description={themeConfig.site.description}>
   <About />
+
   <main>
+    <h3>now</h3>
+    <Currently />
+
+    <h3>posts</h3>
     <PostList posts={posts} />
+
+    <h3>tasks</h3>
+    <Kanban />
+
+    <h3>achievements</h3>
+    <Achievements />
+
+    <h3>bookmarks</h3>
+    <Bookmarks />
   </main>
 </IndexLayout>

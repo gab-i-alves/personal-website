@@ -1,0 +1,102 @@
+---
+// Edit bookmarks directly here
+const categories = [
+  {
+    name: 'design',
+    links: [
+      { title: 'kurnowhere fonts', url: 'https://kurnowhere.com/fonts' },
+      { title: 'gorillasun blog', url: 'https://www.gorillasun.de/blog' },
+      { title: 'graffioh blog', url: 'https://graffioh.com/blog' }
+    ]
+  },
+  {
+    name: 'learning',
+    links: [
+      { title: 'rabbit hole learning', url: 'https://seated.ro/posts/rabbit-hole-learning.html' },
+      { title: 'reading research papers', url: 'https://masonjwang.com/writing/reading-research' },
+      { title: 'Attention Is All You Need', url: 'https://arxiv.org/abs/1706.03762' }
+    ]
+  },
+  {
+    name: 'tools',
+    links: [
+      { title: 'awesome OSS', url: 'https://github.com/sereneblue/awesome-oss' },
+      { title: 'lelouch.dev', url: 'https://lelouch.dev/blog' }
+    ]
+  },
+  {
+    name: 'reading/want to',
+    links: [
+      { title: 'Maintenance', url: 'https://press.stripe.com/maintenance-part-one' },
+      {
+        title: '996 is not your competition',
+        url: 'https://writing.nikunjk.com/p/996-is-not-your-competition'
+      }
+    ]
+  }
+]
+---
+
+<div class="bookmarks">
+  {
+    categories.map((cat) => (
+      <div class="bookmark-category">
+        <h3 class="category-name">{cat.name}</h3>
+        <ul class="bookmark-list">
+          {cat.links.map((link) => (
+            <li>
+              <a href={link.url} target="_blank" rel="noopener noreferrer">
+                {link.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .bookmarks {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem 2rem;
+  }
+
+  @media (max-width: 480px) {
+    .bookmarks {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .category-name {
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-regular);
+    color: var(--text-tertiary);
+    margin: 0 0 0.5rem 0;
+  }
+
+  .bookmark-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .bookmark-list a {
+    font-size: var(--font-size-s);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.15s ease-out;
+  }
+
+  .bookmark-list a:hover {
+    color: var(--text-secondary);
+  }
+
+  .bookmarks:not(:empty) {
+    margin-bottom: 1.25rem;
+  }
+</style>

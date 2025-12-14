@@ -1,0 +1,84 @@
+---
+// Edit achievements directly here
+const achievements = [
+  { title: 'Night Owl', desc: 'coded past 3am', unlocked: true },
+  { title: 'Spider Master', desc: '25+ scrapy spiders', unlocked: true },
+  { title: 'TCC Defender', desc: 'defended thesis', unlocked: true },
+  { title: 'DevOps', desc: 'implememented a ci/cd workflow', unlocked: false }
+]
+---
+
+<ul class="achievements">
+  {
+    achievements.map((a) => (
+      <li class:list={['achievement', { locked: !a.unlocked }]}>
+        <span class="achievement-icon">{a.unlocked ? '✓' : '○'}</span>
+        <div class="achievement-info">
+          <span class="achievement-title">{a.title}</span>
+          <span class="achievement-desc">{a.unlocked ? a.desc : '???'}</span>
+        </div>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .achievements {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  @media (max-width: 480px) {
+    .achievements {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .achievement {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.5rem 0.75rem;
+    background-color: var(--astro-code-background);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+
+  .achievement.locked {
+    opacity: 0.4;
+  }
+
+  .achievement-icon {
+    font-size: var(--font-size-s);
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    width: 1rem;
+    text-align: center;
+  }
+
+  .achievement-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    min-width: 0;
+  }
+
+  .achievement-title {
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+  }
+
+  .achievement-desc {
+    font-size: 0.6875rem;
+    color: var(--text-tertiary);
+  }
+
+  .achievement:not(:empty) {
+    margin-bottom: 1.25rem;
+  }
+</style>

@@ -1,0 +1,80 @@
+---
+import IndexLayout from '@/layouts/IndexLayout.astro'
+import BackButton from '@/components/ui/BackButton.astro'
+import Kanban from '@/components/widgets/Kanban.astro'
+import Achievements from '@/components/widgets/Achievements.astro'
+import Currently from '@/components/widgets/Currently.astro'
+import Bookmarks from '@/components/widgets/Bookmarks.astro'
+import { themeConfig } from '@/config'
+---
+
+<IndexLayout title={`now · ${themeConfig.site.title}`} description="What I'm doing now">
+  <div class="now-page">
+    <BackButton />
+
+    <header class="now-header">
+      <h1>now</h1>
+      <p class="last-updated">updated dec 2024</p>
+    </header>
+
+    <section class="now-section">
+      <Currently />
+    </section>
+
+    <section class="now-section">
+      <h2>tasks</h2>
+      <Kanban />
+    </section>
+
+    <section class="now-section">
+      <h2>achievements</h2>
+      <Achievements />
+    </section>
+
+    <section class="now-section">
+      <h2>bookmarks</h2>
+      <Bookmarks />
+    </section>
+  </div>
+</IndexLayout>
+
+<style>
+  .now-page {
+    margin-bottom: 4rem;
+  }
+
+  .now-header {
+    margin-bottom: 3rem;
+  }
+
+  .now-header h1 {
+    font-size: var(--font-size-m);
+    font-weight: var(--font-weight-bold);
+    margin: 0 0 0.25rem 0;
+  }
+
+  .last-updated {
+    font-size: var(--font-size-s);
+    color: var(--text-secondary);
+    margin: 0;
+  }
+
+  .now-section {
+    margin-bottom: 3rem;
+  }
+
+  .now-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .now-section h2 {
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-regular);
+    color: var(--text-secondary);
+    text-transform: lowercase;
+    letter-spacing: 0.05em;
+    margin: 0 0 1rem 0;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+</style>
