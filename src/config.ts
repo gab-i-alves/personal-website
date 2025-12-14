@@ -6,13 +6,13 @@ export const themeConfig: ThemeConfig = {
     website: 'https://gabi-alves.com/', // Site domain
     title: 'GABI ALVES', // Site title
     author: 'GABI ALVES', // Author name
-    description: 'Minimal blog built for ??', // Site description
+    description: 'Minimal blog built for sharing stuff', // Site description
     language: 'en-US' // Default language
   },
 
   // GENERAL SETTINGS ////////////////////////////////////////////////////////////////////////////////////
   general: {
-    contentWidth: '35rem', // Content area width
+    contentWidth: '65rem', // Content area width
     centeredLayout: true, // Use centered layout (false for left-aligned)
     themeToggle: true, // Show theme toggle button (uses system theme by default)
     postListDottedDivider: false, // Show dotted divider in post list
