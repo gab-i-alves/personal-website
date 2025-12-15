@@ -25,7 +25,7 @@ This post is my public commitment to actually reading these over the coming week
 
 ---
 
-## Category 1: Theory
+## Category 1: Theory Fundamentals
 
 ### 1. Thinking in Systems: A Primer (Donella Meadows)
 
@@ -51,7 +51,7 @@ Russell Ackoff is the "Grandfather" of the field. He's famous for breaking the i
 
 ---
 
-## Pillar 2: The Engineering Bridge
+## Category 2: The Engineering Bridge
 
 How does this abstract theory actually apply to deploying code and managing databases?
 
@@ -79,7 +79,7 @@ A legendary paper in computer science that tackles a simple question: Why is sof
 
 ---
 
-## Pillar 3: The Human System
+## Category 3: The Human System
 
 The most complex part of any technical system is usually the people building it.
 
