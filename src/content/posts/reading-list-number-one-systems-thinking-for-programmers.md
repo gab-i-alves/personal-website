@@ -1,5 +1,5 @@
 ---
-title: Reading List nº1: Systems Thinking for Programmers
+title: Reading List nº1 - Systems Thinking for Programmers
 pubDate: '2025-12-14'
 ---
 
