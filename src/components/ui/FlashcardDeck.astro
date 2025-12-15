@@ -1,0 +1,315 @@
+---
+interface Card {
+  front: string
+  back: string
+}
+
+interface Props {
+  id?: string
+  cards?: Card[]
+  source?: string // New prop for raw CSV text
+  delimiter?: string
+}
+
+const { id = 'flashcard-deck', cards: propCards, source, delimiter = '\t' } = Astro.props
+
+let cards: Card[] = propCards || []
+
+// Parse CSV if source is provided
+if (source && cards.length === 0) {
+  cards = source
+    .trim()
+    .split('\n')
+    .map((line) => {
+      // Split by delimiter (default is Tab for "flashcards.csv")
+      // We assume the first column is Front, second is Back
+      const parts = line.split(delimiter)
+      if (parts.length < 2) return null
+
+      return {
+        front: parts[0].trim(),
+        back: parts.slice(1).join(delimiter).trim() // Re-join in case answer contains the delimiter
+      }
+    })
+    .filter((card) => card !== null) as Card[]
+}
+---
+
+<div class="flashcard-component" id={id} data-cards={JSON.stringify(cards)}>
+  <div class="flashcard-container">
+    <div class="flashcard">
+      <div class="card-face card-front">
+        <div class="card-content"></div>
+        <span class="hint">click to reveal</span>
+      </div>
+      <div class="card-face card-back">
+        <div class="card-content"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="nav-btn prev-btn" aria-label="Previous card">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 16 16"
+        width="16"
+        height="16"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"
+        ></path>
+      </svg>
+    </button>
+
+    <div class="progress-container">
+      <span class="progress-text">1 / {cards.length}</span>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" style={`width: ${100 / cards.length}%`}></div>
+      </div>
+    </div>
+
+    <button class="nav-btn next-btn" aria-label="Next card">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 16 16"
+        width="16"
+        height="16"
+        fill="currentColor"
+      >
+        <path
+          fill-rule="evenodd"
+          d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z"
+        ></path>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  function initFlashcards() {
+    const decks = document.querySelectorAll('.flashcard-component')
+
+    decks.forEach((deck) => {
+      if (deck.hasAttribute('data-initialized')) return
+      deck.setAttribute('data-initialized', 'true')
+
+      const cardsData = JSON.parse(deck.getAttribute('data-cards') || '[]')
+      if (cardsData.length === 0) return // Don't crash if empty
+
+      const cardElement = deck.querySelector('.flashcard') as HTMLElement
+      const frontContent = deck.querySelector('.card-front .card-content')
+      const backContent = deck.querySelector('.card-back .card-content')
+      const prevBtn = deck.querySelector('.prev-btn')
+      const nextBtn = deck.querySelector('.next-btn')
+      const progressText = deck.querySelector('.progress-text')
+      const progressFill = deck.querySelector('.progress-bar-fill') as HTMLElement
+
+      let currentIndex = 0
+      let isFlipped = false
+
+      function updateCard() {
+        if (frontContent) frontContent.textContent = cardsData[currentIndex].front
+        if (backContent) backContent.textContent = cardsData[currentIndex].back
+
+        // Reset state
+        isFlipped = false
+        cardElement.classList.remove('is-flipped')
+
+        // Update progress
+        if (progressText) {
+          progressText.textContent = `${currentIndex + 1} / ${cardsData.length}`
+        }
+        if (progressFill) {
+          progressFill.style.width = `${((currentIndex + 1) / cardsData.length) * 100}%`
+        }
+
+        // Update navigation UI
+        if (prevBtn) {
+          ;(prevBtn as HTMLButtonElement).disabled = currentIndex === 0
+          ;(prevBtn as HTMLElement).style.opacity = currentIndex === 0 ? '0.3' : '1'
+        }
+        if (nextBtn) {
+          ;(nextBtn as HTMLButtonElement).disabled = currentIndex === cardsData.length - 1
+          ;(nextBtn as HTMLElement).style.opacity =
+            currentIndex === cardsData.length - 1 ? '0.3' : '1'
+        }
+      }
+
+      cardElement.addEventListener('click', () => {
+        isFlipped = !isFlipped
+        cardElement.classList.toggle('is-flipped')
+      })
+
+      prevBtn?.addEventListener('click', () => {
+        if (currentIndex > 0) {
+          currentIndex--
+          updateCard()
+        }
+      })
+
+      nextBtn?.addEventListener('click', () => {
+        if (currentIndex < cardsData.length - 1) {
+          currentIndex++
+          updateCard()
+        }
+      })
+
+      updateCard()
+    })
+  }
+
+  document.addEventListener('astro:page-load', initFlashcards)
+  document.addEventListener('DOMContentLoaded', initFlashcards)
+</script>
+
+<style>
+  .flashcard-component {
+    margin: 2rem 0;
+    width: 100%;
+    user-select: none;
+  }
+
+  .flashcard-container {
+    width: 100%;
+    height: 14rem;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+
+  .flashcard {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    cursor: pointer;
+  }
+
+  .card-face {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background-color: var(--astro-code-background);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    box-sizing: border-box;
+    transition:
+      opacity 0.2s ease-out,
+      transform 0.2s ease-out;
+  }
+
+  .card-front {
+    opacity: 1;
+    z-index: 2;
+    color: var(--text-primary);
+  }
+
+  .card-back {
+    opacity: 0;
+    z-index: 1;
+    background: color-mix(in srgb, var(--selection) 50%, var(--bg));
+    color: var(--text-primary);
+    pointer-events: none;
+  }
+
+  .flashcard.is-flipped .card-front {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.98);
+  }
+
+  .flashcard.is-flipped .card-back {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+  }
+
+  .card-content {
+    font-size: var(--font-size-l);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+  }
+
+  .hint {
+    position: absolute;
+    bottom: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    opacity: 0.6;
+    transition: opacity 0.2s ease-out;
+  }
+
+  .flashcard:hover .hint {
+    opacity: 1;
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .nav-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition:
+      background 0.2s ease-out,
+      color 0.2s ease-out;
+    padding: 0;
+  }
+
+  .nav-btn:hover:not(:disabled) {
+    background-color: var(--selection);
+    color: var(--text-primary);
+  }
+
+  .nav-btn:disabled {
+    cursor: not-allowed;
+  }
+
+  .progress-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .progress-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+  }
+
+  .progress-bar-bg {
+    width: 100%;
+    max-width: 12rem;
+    height: 2px;
+    background-color: var(--border);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background-color: var(--text-primary);
+    transition: width 0.3s ease-out;
+  }
+</style>
