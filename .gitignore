@@ -27,3 +27,5 @@ pnpm-debug.log*
 # Netlify build output
 .netlify/
 
+# Vercel build output
+.vercel/
