@@ -1,0 +1,122 @@
+---
+import FormattedDate from '@/components/widgets/FormattedDate.astro'
+import type { CollectionEntry } from 'astro:content'
+
+interface Props {
+  logs: CollectionEntry<'dailyLogs'>[]
+}
+
+const { logs } = Astro.props
+---
+
+<ul>
+  {
+    logs.map((log, index) => (
+      <li>
+        <a href={`/daily-logs/${log.id.replace('.md', '')}/`}>
+          <div class="log-item">
+            <p class="log-number">log #{String(logs.length - index).padStart(3, '0')}</p>
+            <div class="metadata">
+              {log.data.mood && <span class="mood">{log.data.mood}</span>}
+              {log.data.tags && log.data.tags.length > 0 && (
+                <span class="tags">
+                  {log.data.tags.map((tag) => `#${tag}`).join(' ')}
+                </span>
+              )}
+            </div>
+            <p class="date font-features">
+              <FormattedDate date={log.data.date} context="list" />
+            </p>
+          </div>
+        </a>
+      </li>
+    ))
+  }
+</ul>
+<div class="placeholder"></div>
+
+<style>
+  ul {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  a {
+    color: var(--text-primary);
+    display: block;
+    text-decoration: none;
+    transition: opacity 0.1s ease-out;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    ul:hover a {
+      opacity: 0.4;
+    }
+
+    ul:hover a:hover {
+      opacity: 1;
+    }
+
+    ul:hover a:hover .date {
+      color: var(--text-secondary);
+      opacity: 1;
+    }
+  }
+
+  .log-item {
+    height: 2.75rem;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .log-number {
+    margin: 0;
+    flex-shrink: 0;
+    min-width: 4.5rem;
+  }
+
+  .metadata {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .mood {
+    font-size: var(--font-size-s);
+    color: var(--text-secondary);
+    opacity: 0.75;
+    flex-shrink: 0;
+  }
+
+  .tags {
+    font-size: var(--font-size-s);
+    color: var(--text-tertiary);
+    opacity: 0.75;
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .date {
+    margin: 0;
+    color: var(--text-secondary);
+    opacity: 0.75;
+    letter-spacing: var(--spacing-s);
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  .placeholder {
+    height: 3rem;
+  }
+</style>

@@ -1,0 +1,23 @@
+---
+import IndexLayout from '@/layouts/IndexLayout.astro'
+import Achievements from '@/components/widgets/Achievements.astro'
+import { themeConfig } from '@/config'
+---
+
+<IndexLayout title={`Achievements · ${themeConfig.site.title}`} description={themeConfig.site.description} addTopMargin={true}>
+  <p class="description">to motive myself</p>
+  <Achievements />
+</IndexLayout>
+
+<style>
+  h1 {
+    font-size: var(--font-size-m);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 2rem;
+  }
+  .description {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    margin-bottom: 2rem;
+  }
+</style>

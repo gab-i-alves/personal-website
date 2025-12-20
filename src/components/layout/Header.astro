@@ -1,11 +1,21 @@
 ---
 import { themeConfig } from '@/config'
 import ThemeToggle from '@/components/ui/ThemeToggle.astro'
+
+const currentPath = Astro.url.pathname
 ---
 
 <header>
   <nav>
-    <a href="/">{themeConfig.site.title}</a>
+    <a href="/" class="site-title">{themeConfig.site.title}</a>
+    <div class="nav-links">
+      <a href="/now" aria-current={currentPath === '/now' ? 'page' : undefined}>now</a>
+      <a href="/posts" aria-current={currentPath.startsWith('/posts') ? 'page' : undefined}>posts</a>
+      <a href="/tasks" aria-current={currentPath === '/tasks' ? 'page' : undefined}>tasks</a>
+      <a href="/achievements" aria-current={currentPath === '/achievements' ? 'page' : undefined}>achievements</a>
+      <a href="/bookmarks" aria-current={currentPath === '/bookmarks' ? 'page' : undefined}>bookmarks</a>
+      <a href="/daily-logs" aria-current={currentPath.startsWith('/daily-logs') ? 'page' : undefined}>daily log</a>
+    </div>
     <ThemeToggle />
   </nav>
 </header>
@@ -17,12 +27,43 @@ import ThemeToggle from '@/components/ui/ThemeToggle.astro'
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 2rem;
   }
-  header a {
+  .site-title {
     font-weight: var(--font-weight-bold);
     color: var(--text-primary);
     text-decoration: none;
     min-width: 3rem;
     display: inline-block;
+    flex-shrink: 0;
+  }
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    flex: 1;
+    justify-content: center;
+  }
+  .nav-links a {
+    font-size: var(--font-size-s);
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.1s ease-out;
+    white-space: nowrap;
+  }
+  .nav-links a:hover,
+  .nav-links a[aria-current='page'] {
+    color: var(--text-primary);
+  }
+  @media (max-width: 768px) {
+    nav {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    .nav-links {
+      justify-content: flex-start;
+      gap: 1rem;
+    }
   }
 </style>

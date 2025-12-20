@@ -190,6 +190,65 @@ const embedHandlers = {
         </div>
       </a>
     `
+  },
+
+  // Text alignment directives
+  center: (node) => {
+    if (!node.children || node.children.length === 0) return false
+
+    const processChild = (child) => {
+      if (child.type === 'text') return child.value
+      if (child.type === 'strong') {
+        const content = child.children?.map(processChild).join('') || ''
+        return `<strong>${content}</strong>`
+      }
+      if (child.type === 'emphasis') {
+        const content = child.children?.map(processChild).join('') || ''
+        return `<em>${content}</em>`
+      }
+      if (child.type === 'link') {
+        const content = child.children?.map(processChild).join('') || ''
+        return `<a href="${child.url}">${content}</a>`
+      }
+      if (child.type === 'inlineCode') {
+        return `<code>${child.value}</code>`
+      }
+      return ''
+    }
+
+    const textContent = node.children.map(processChild).join('')
+    if (!textContent) return false
+
+    return `<div class="text-center">${textContent}</div>`
+  },
+
+  right: (node) => {
+    if (!node.children || node.children.length === 0) return false
+
+    const processChild = (child) => {
+      if (child.type === 'text') return child.value
+      if (child.type === 'strong') {
+        const content = child.children?.map(processChild).join('') || ''
+        return `<strong>${content}</strong>`
+      }
+      if (child.type === 'emphasis') {
+        const content = child.children?.map(processChild).join('') || ''
+        return `<em>${content}</em>`
+      }
+      if (child.type === 'link') {
+        const content = child.children?.map(processChild).join('') || ''
+        return `<a href="${child.url}">${content}</a>`
+      }
+      if (child.type === 'inlineCode') {
+        return `<code>${child.value}</code>`
+      }
+      return ''
+    }
+
+    const textContent = node.children.map(processChild).join('')
+    if (!textContent) return false
+
+    return `<div class="text-right">${textContent}</div>`
   }
 }
 

@@ -1,64 +1,28 @@
 ---
 import IndexLayout from '@/layouts/IndexLayout.astro'
-import About from '@/components/widgets/About.astro'
 import PostList from '@/components/widgets/PostList.astro'
-import Kanban from '@/components/widgets/Kanban.astro'
-import Achievements from '@/components/widgets/Achievements.astro'
 import Currently from '@/components/widgets/Currently.astro'
-import Bookmarks from '@/components/widgets/Bookmarks.astro'
+import DailyLogList from '@/components/widgets/DailyLogList.astro'
 import { themeConfig } from '@/config'
 import { getSortedFilteredPosts } from '@/utils/draft'
+import { getCollection, getEntry, render } from 'astro:content'
 
-const posts = await getSortedFilteredPosts()
+const allPosts = await getSortedFilteredPosts()
+const recentPosts = allPosts.slice(0, 3)
+
+const allLogs = await getCollection('dailyLogs')
+const recentLogs = allLogs
+  .filter((log) => !log.id.startsWith('_'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 3)
+
+const aboutEntry = await getEntry('about', 'about')
+if (!aboutEntry) throw new Error('About content not found')
+const { Content: AboutContent } = await render(aboutEntry)
 ---
 
 <IndexLayout title={themeConfig.site.title} description={themeConfig.site.description}>
-  <div class="dashboard-grid">
-    <div class="col-left">
-      <About />
-
-      <h3>now</h3>
-      <Currently />
-
-      <h3>posts</h3>
-      <PostList posts={posts} />
-    </div>
-
-    <div class="col-right">
-      <h3>tasks</h3>
-      <Kanban />
-
-      <h3>achievements</h3>
-      <Achievements />
-
-      <h3>bookmarks</h3>
-      <Bookmarks />
-    </div>
+  <div class="about prose">
+    <AboutContent />
   </div>
 </IndexLayout>
-
-<style>
-  .dashboard-grid {
-    display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
-    gap: 3rem;
-    align-items: start;
-  }
-
-  .col-left,
-  .col-right {
-    min-width: 0;
-  }
-
-  h3 {
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-    font-size: var(--font-size-m);
-    font-weight: var(--font-weight-bold);
-  }
-
-  .col-left > h3,
-  .col-right > h3:not(:first-child) {
-    margin-top: 2.5rem;
-  }
-</style>

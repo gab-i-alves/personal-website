@@ -1,0 +1,39 @@
+---
+import { type CollectionEntry, getCollection } from 'astro:content'
+import PostLayout from '@/layouts/PostLayout.astro'
+import { render } from 'astro:content'
+
+export async function getStaticPaths() {
+  const logs = await getCollection('dailyLogs')
+  const filteredLogs = logs.filter((log) => !log.id.startsWith('_'))
+  const sortedLogs = filteredLogs.sort((a, b) => a.data.date.valueOf() - b.data.date.valueOf())
+
+  return sortedLogs.map((log, index) => ({
+    params: { slug: log.id.replace('.md', '') },
+    props: { log, logNumber: index + 1, totalLogs: sortedLogs.length }
+  }))
+}
+
+type Props = {
+  log: CollectionEntry<'dailyLogs'>
+  logNumber: number
+  totalLogs: number
+}
+
+const { log, logNumber } = Astro.props
+const { Content, remarkPluginFrontmatter } = await render(log)
+
+const readingTime = remarkPluginFrontmatter.readingTime
+const toc = remarkPluginFrontmatter.toc || []
+
+const postData = {
+  title: `log #${String(logNumber).padStart(3, '0')}`,
+  pubDate: log.data.date,
+  readingTime,
+  toc
+}
+---
+
+<PostLayout {...postData}>
+  <Content />
+</PostLayout>

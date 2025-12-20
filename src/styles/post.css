@@ -50,7 +50,7 @@
   color: var(--primary);
   text-decoration: underline;
   text-decoration-color: var(--text-tertiary);
-  transition: text-decoration-color 0.2s ease-out;
+  transition: text-decoration-color 0.1s ease-out;
 }
 
 .prose a:hover {
@@ -443,7 +443,7 @@
   color: var(--text-secondary);
   opacity: 0.875;
   text-decoration: none;
-  transition: color 0.2s ease-out;
+  transition: color 0.1s ease-out;
   padding-right: 0.5em;
 }
 
@@ -554,4 +554,15 @@
 /* Spotify */
 .prose iframe[src*='spotify.com'] {
   aspect-ratio: auto;
+}
+
+/* Text alignment directives */
+.prose .text-center {
+  text-align: center;
+  margin: 1.75em 0;
+}
+
+.prose .text-right {
+  text-align: right;
+  margin: 1.75em 0;
 }

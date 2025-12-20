@@ -1,11 +1,9 @@
 ---
 // Edit current status directly here
 const currently = [
-  { icon: '▶', label: 'watching', value: 'Pluribus' },
-  { icon: '♫', label: 'listening', value: 'Turnstile' },
-  { icon: '◉', label: 'reading', value: 'Anna Kariênina' },
-  { icon: '⚡', label: 'working on', value: 'This blog' },
-  { icon: '◎', label: 'studying', value: 'Agile and CI/CD tools' }
+  { label: 'reading', value: 'thinking in systems: a primer by donella meadows' },
+  { label: 'working on', value: 'improving this website and setting a habit of daily log' },
+  { label: 'studying', value: 'systems thinking and agile implementation with jira' }
 ]
 ---
 
@@ -13,7 +11,6 @@ const currently = [
   {
     currently.map((item) => (
       <li class="currently-item">
-        <span class="currently-icon">{item.icon}</span>
         <span class="currently-label">{item.label}</span>
         <span class="currently-value">{item.value}</span>
       </li>
@@ -62,6 +59,6 @@ const currently = [
   }
 
   .currently:not(:empty) {
-    margin-bottom: 1.25rem;
+    margin-bottom: 4rem;
   }
 </style>

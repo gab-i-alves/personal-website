@@ -1,0 +1,36 @@
+---
+import IndexLayout from '@/layouts/IndexLayout.astro'
+import DailyLogList from '@/components/widgets/DailyLogList.astro'
+import { themeConfig } from '@/config'
+import { getCollection } from 'astro:content'
+
+const logs = await getCollection('dailyLogs')
+const sortedLogs = logs
+  .filter((log) => !log.id.startsWith('_'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+---
+
+<IndexLayout
+  title={`Daily Log · ${themeConfig.site.title}`}
+  description="Daily accountability logs"
+  addTopMargin={true}
+>
+  <p class="description">
+    daily accountability tracker. what I worked on, learned, and struggled with.
+  </p>
+  <DailyLogList logs={sortedLogs} />
+</IndexLayout>
+
+<style>
+  h1 {
+    font-size: var(--font-size-m);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 1rem;
+  }
+
+  .description {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    margin-bottom: 2rem;
+  }
+</style>

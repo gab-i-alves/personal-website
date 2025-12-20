@@ -1,0 +1,31 @@
+---
+import IndexLayout from '@/layouts/IndexLayout.astro'
+import PostList from '@/components/widgets/PostList.astro'
+import { themeConfig } from '@/config'
+import { getSortedFilteredPosts } from '@/utils/draft'
+
+const posts = await getSortedFilteredPosts()
+---
+
+<IndexLayout title={`Posts · ${themeConfig.site.title}`} description={themeConfig.site.description} addTopMargin={true}>
+  
+  <p class="description">
+    updates on projects worthy telling, reading lists, study materials, notes (flashcards coming soon)
+  </p>
+
+  <PostList posts={posts} />
+</IndexLayout>
+
+<style>
+  h1 {
+    font-size: var(--font-size-m);
+    font-weight: var(--font-weight-bold);
+    margin-bottom: 2rem;
+  }
+
+  .description {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    margin-bottom: 2rem;
+  }
+</style>
