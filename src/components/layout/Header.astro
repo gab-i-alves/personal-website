@@ -12,7 +12,7 @@ const currentPath = Astro.url.pathname
       <a href="/now" aria-current={currentPath === '/now' ? 'page' : undefined}>now</a>
       <a href="/posts" aria-current={currentPath.startsWith('/posts') ? 'page' : undefined}>posts</a>
       <a href="/tasks" aria-current={currentPath === '/tasks' ? 'page' : undefined}>tasks</a>
-      <a href="/achievements" aria-current={currentPath === '/achievements' ? 'page' : undefined}>achievements</a>
+
       <a href="/bookmarks" aria-current={currentPath === '/bookmarks' ? 'page' : undefined}>bookmarks</a>
       <a href="/daily-logs" aria-current={currentPath.startsWith('/daily-logs') ? 'page' : undefined}>daily log</a>
     </div>
@@ -50,10 +50,17 @@ const currentPath = Astro.url.pathname
     text-decoration: none;
     transition: color 0.1s ease-out;
     white-space: nowrap;
+    padding: 0.5rem 0.25rem;
   }
-  .nav-links a:hover,
+  .nav-links a:hover {
+    color: var(--text-primary);
+  }
   .nav-links a[aria-current='page'] {
     color: var(--text-primary);
+    font-weight: var(--font-weight-bold);
+    text-decoration: underline;
+    text-underline-offset: 0.25rem;
+    text-decoration-thickness: 1.5px;
   }
   @media (max-width: 768px) {
     nav {

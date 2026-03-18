@@ -6,8 +6,11 @@ const achievements = [
   { title: 'TCC Defender', desc: 'defended thesis', unlocked: true },
   { title: 'DevOps', desc: 'implememented a ci/cd workflow', unlocked: false }
 ]
+const unlockedCount = achievements.filter((a) => a.unlocked).length
+const totalCount = achievements.length
 ---
 
+<p class="achievement-progress">{unlockedCount} of {totalCount} unlocked</p>
 <ul class="achievements">
   {
     achievements.map((a) => (
@@ -80,5 +83,11 @@ const achievements = [
 
   .achievement:not(:empty) {
     margin-bottom: 1.25rem;
+  }
+
+  .achievement-progress {
+    font-size: var(--font-size-s);
+    color: var(--text-secondary);
+    margin: 0 0 0.75rem 0;
   }
 </style>

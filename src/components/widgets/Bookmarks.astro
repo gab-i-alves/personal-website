@@ -14,7 +14,7 @@ const categories = [
     links: [
       { title: 'rabbit hole learning', url: 'https://seated.ro/posts/rabbit-hole-learning.html' },
       { title: 'reading research papers', url: 'https://masonjwang.com/writing/reading-research' },
-      { title: 'Attention Is All You Need', url: 'https://arxiv.org/abs/1706.03762' }
+      { title: 'attention is all you need', url: 'https://arxiv.org/abs/1706.03762' }
     ]
   },
   {
@@ -27,11 +27,25 @@ const categories = [
   {
     name: 'reading/want to',
     links: [
-      { title: 'Maintenance', url: 'https://press.stripe.com/maintenance-part-one' },
+      { title: 'maintenance', url: 'https://press.stripe.com/maintenance-part-one' },
       {
         title: '996 is not your competition',
         url: 'https://writing.nikunjk.com/p/996-is-not-your-competition'
       }
+    ]
+  },
+  {
+    name: 'bioinformatics',
+    links: [
+      { title: 'rosalind', url: 'https://rosalind.info/problems/locations/' },
+      { title: 'bioinformatics algorithms', url: 'https://www.bioinformaticsalgorithms.org/' }
+    ]
+  },
+  {
+    name: 'engineering management',
+    links: [
+      { title: 'irrational exuberance', url: 'https://lethain.com/' },
+      { title: 'the pragmatic engineer', url: 'https://blog.pragmaticengineer.com/' }
     ]
   }
 ]
@@ -90,6 +104,8 @@ const categories = [
     color: var(--text-primary);
     text-decoration: none;
     transition: color 0.15s ease-out;
+    padding: 0.25rem 0;
+    display: inline-block;
   }
 
   .bookmark-list a:hover {

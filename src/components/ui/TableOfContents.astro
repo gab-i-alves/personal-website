@@ -300,9 +300,11 @@ const { toc = [] }: TOCProps = Astro.props
     text-decoration: none;
     position: relative;
     padding-left: 0;
-    height: 1.125rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    height: auto;
     width: 100%;
-    min-height: 1rem;
+    min-height: 2rem;
     font-size: 0;
     line-height: 1.125rem;
     text-indent: 2rem;
@@ -314,6 +316,7 @@ const { toc = [] }: TOCProps = Astro.props
       font-size 0.2s ease-out,
       text-indent 0.2s ease-out;
     cursor: pointer;
+    box-sizing: border-box;
   }
 
   .toc-link::after {

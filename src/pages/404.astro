@@ -4,10 +4,43 @@ import IndexLayout from '@/layouts/IndexLayout.astro'
 ---
 
 <IndexLayout title={`404 - ${themeConfig.site.title}`} description="Not Found">
-  <style>
-    .error-container {
-      color: var(--text-secondary);
-    }
-  </style>
-  <p class="error-container">Page Not Found...</p>
+  <div class="error-container">
+    <p class="error-message">Page not found</p>
+    <p class="error-hint">The page you are looking for does not exist or has been moved.</p>
+    <nav class="error-nav">
+      <a href="/">Home</a>
+      <a href="/posts">Posts</a>
+    </nav>
+  </div>
 </IndexLayout>
+
+<style>
+  .error-container {
+    color: var(--text-secondary);
+    margin-top: 2rem;
+  }
+  .error-message {
+    font-size: var(--font-size-l);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+  }
+  .error-hint {
+    margin: 0 0 1.5rem 0;
+  }
+  .error-nav {
+    display: flex;
+    gap: 1rem;
+  }
+  .error-nav a {
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 0.2rem;
+    text-decoration-thickness: 1px;
+    transition: color 0.15s ease-out;
+    padding: 0.25rem 0;
+  }
+  .error-nav a:hover {
+    color: var(--text-secondary);
+  }
+</style>
