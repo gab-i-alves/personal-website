@@ -1,0 +1,90 @@
+---
+import ClippingCard from './ClippingCard.astro'
+import type { BookmarkCategory } from '@/data/bookmarks'
+
+interface Props {
+  categories: BookmarkCategory[]
+}
+
+const { categories } = Astro.props
+---
+
+<div class="bookmark-index">
+  {categories.map((cat) => (
+    <section class="bookmark-section">
+      <header class="bookmark-section-header">
+        <h2 class="bookmark-section-name">{cat.name}</h2>
+        <span class="bookmark-section-count">
+          {String(cat.links.length).padStart(2, '0')}
+        </span>
+      </header>
+      <div class="bookmark-list">
+        {cat.links.map((link) => (
+          <ClippingCard title={link.title} url={link.url} />
+        ))}
+      </div>
+    </section>
+  ))}
+</div>
+
+<style>
+  .bookmark-index {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1rem 2rem 4rem;
+  }
+
+  .bookmark-section {
+    margin-bottom: 3.5rem;
+  }
+
+  .bookmark-section:last-child {
+    margin-bottom: 0;
+  }
+
+  .bookmark-section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-bottom: 0.6rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(252, 214, 230, 0.12);
+  }
+
+  .bookmark-section-name {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--text);
+    opacity: 0.85;
+    margin: 0;
+  }
+
+  .bookmark-section-count {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.7rem;
+    font-weight: 400;
+    color: var(--text);
+    opacity: 0.4;
+    letter-spacing: 0.06em;
+  }
+
+  .bookmark-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (max-width: 600px) {
+    .bookmark-index {
+      padding: 0.75rem 1.25rem 3rem;
+    }
+
+    .bookmark-section {
+      margin-bottom: 2.5rem;
+    }
+  }
+</style>

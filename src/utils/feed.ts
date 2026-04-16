@@ -16,7 +16,7 @@ export async function generateRSS(context: APIContext) {
     <title>${themeConfig.site.title}</title>
     <link>${context.site}</link>
     <description>${themeConfig.site.description}</description>
-    <language>zh-CN</language>
+    <language>en-US</language>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
     <atom:link href="${context.site}/rss.xml" rel="self" type="application/rss+xml" />
     ${sortedPosts

@@ -1,0 +1,90 @@
+---
+interface Chapter {
+  title: string
+  slug: string
+}
+
+interface Props {
+  chapters: Chapter[]
+}
+
+const { chapters } = Astro.props
+---
+
+<nav class="chapter-bar">
+  {chapters.map((ch, i) => (
+    <a href={`/${ch.slug}`} class="chapter-link">
+      <span class="chapter-num">{String(i + 1).padStart(2, '0')}</span>
+      <span class="chapter-title">{ch.title}</span>
+    </a>
+  ))}
+</nav>
+
+<style>
+  .chapter-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 1rem 2rem;
+    background: rgba(48, 42, 42, 0.95);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid rgba(252, 214, 230, 0.06);
+    z-index: 20;
+  }
+
+  .chapter-link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: var(--text);
+    opacity: 0.4;
+    transition:
+      opacity var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+    font-size: 0.75rem;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .chapter-link:hover {
+      opacity: 1;
+    }
+  }
+
+  .chapter-link:active {
+    transform: translateY(1px);
+    opacity: 0.85;
+  }
+
+  .chapter-num {
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    opacity: 0.5;
+  }
+
+  .chapter-title {
+    font-family: var(--sans);
+    font-weight: 350;
+    letter-spacing: 0.02em;
+    max-width: 15ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 768px) {
+    .chapter-bar {
+      gap: 1rem;
+      padding: 0.75rem 1rem;
+    }
+
+    .chapter-title {
+      display: none;
+    }
+  }
+</style>

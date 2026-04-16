@@ -1,0 +1,69 @@
+---
+interface Props {
+  variant?: 'dark' | 'paper'
+}
+
+const { variant = 'dark' } = Astro.props
+const year = new Date().getFullYear()
+---
+
+<footer class={`site-footer ${variant}`}>
+  <span class="signature">gabi alves &middot; {year}</span>
+  <span class="dot">&middot;</span>
+  <a href="/atom.xml" class="footer-link">feed</a>
+  <span class="dot">&middot;</span>
+  <a href="https://github.com/gab-i-alves" class="footer-link" target="_blank" rel="noopener">github</a>
+</footer>
+
+<style>
+  .site-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 3rem 1rem 2rem;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 350;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+    position: relative;
+    z-index: 2;
+  }
+
+  .site-footer.dark {
+    color: var(--text);
+    opacity: 0.35;
+  }
+
+  .site-footer.paper {
+    color: var(--paper-text);
+    opacity: 0.4;
+  }
+
+  .signature {
+    font-style: italic;
+  }
+
+  .dot {
+    opacity: 0.5;
+  }
+
+  .footer-link {
+    color: inherit;
+    text-decoration: none;
+    transition:
+      opacity var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .footer-link:hover {
+      opacity: 1;
+    }
+  }
+
+  .footer-link:active {
+    transform: scale(var(--press-scale));
+  }
+</style>

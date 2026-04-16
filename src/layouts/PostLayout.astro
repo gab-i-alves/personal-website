@@ -1,27 +1,35 @@
 ---
 import '@/styles/global.css'
 import type { PostLayoutProps } from '@/types'
+import { getCollection } from 'astro:content'
 import FormattedDate from '@/components/widgets/FormattedDate.astro'
 import FootnoteScroll from '@/components/widgets/FootnoteScroll.astro'
 import BaseHead from '@/components/layout/BaseHead.astro'
-import Footer from '@/components/layout/Footer.astro'
-import BackButton from '@/components/ui/BackButton.astro'
-import TableOfContents from '@/components/ui/TableOfContents.astro'
-import GradientMask from '@/components/ui/GradientMask.astro'
 import ImageViewer from '@/components/ui/ImageViewer.astro'
-import GitHubCard from '@/components/ui/GitHubCard.astro'
-import LinkCard from '@/components/ui/LinkCard.astro'
-import ImageOptimizer from '@/components/ui/ImageOptimizer.astro'
-import XPOST from '@/components/ui/XPOST.astro'
 import CopyCode from '@/components/ui/CopyCode.astro'
+import Stars from '@/components/effects/Stars.astro'
+import ContentProtect from '@/components/effects/ContentProtect.astro'
+import BackLink from '@/components/layout/BackLink.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 
 import { themeConfig } from '@/config'
 
-const { title, pubDate, readingTime, toc } = Astro.props as PostLayoutProps
+const { title, pubDate, readingTime } = Astro.props as PostLayoutProps
 
 const postSlug = Astro.url.pathname.split('/').filter(Boolean).pop() || ''
 const ogImage = `/open-graph/${postSlug}.png`
+
+// Build prev/next from sorted posts collection
+const allPosts = await getCollection('posts')
+const sortedPosts = allPosts
+  .filter((p) => !p.id.startsWith('_'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
+
+const currentIdx = sortedPosts.findIndex((p) => p.id === postSlug)
+const total = sortedPosts.length
+const prevPost = currentIdx > 0 ? sortedPosts[currentIdx - 1] : null
+const nextPost = currentIdx >= 0 && currentIdx < total - 1 ? sortedPosts[currentIdx + 1] : null
+const pageNumber = currentIdx >= 0 ? currentIdx + 1 : 1
 ---
 
 <BaseLayout
@@ -35,48 +43,314 @@ const ogImage = `/open-graph/${postSlug}.png`
     ogImage={ogImage}
     slot="head"
   />
-  <div class="post-container">
-    <main>
-      <div class="prose">
-        <GradientMask />
-        <BackButton />
-        {themeConfig.post.toc && <TableOfContents toc={toc} />}
-        <div class="title">
-          <h1>{title}</h1>
-          <div class="date">
-            <FormattedDate date={pubDate} context="post" />
-            {
-              themeConfig.post.readingTime && readingTime && (
-                <span class="reading-time">
-                  <span class="separator">·</span>
-                  {readingTime.text}
-                </span>
-              )
-            }
-          </div>
+
+  <Stars count={40} maxOpacity={0.25} />
+  <BackLink href="/posts" label="back to articles" />
+
+  <div class="magazine-wrapper">
+    <article class="magazine-page prose">
+      <header class="article-title-block">
+        <div class="article-meta">
+          <FormattedDate date={pubDate} context="post" />
+          {themeConfig.post.readingTime && readingTime && (
+            <span class="reading-time">
+              <span class="separator">&middot;</span>
+              {readingTime.text}
+            </span>
+          )}
+          <span class="separator">&middot;</span>
+          <span class="page-of">page {pageNumber} of {total}</span>
         </div>
+        <h1 class="article-heading">{title}</h1>
+      </header>
+
+      <div class="article-body">
         <slot />
       </div>
-    </main>
-    <FootnoteScroll />
-    <CopyCode />
-    <GitHubCard />
-    <LinkCard />
-    <XPOST />
-    <ImageOptimizer />
-    {themeConfig.post.imageViewer && <ImageViewer />}
-    {themeConfig.general.footer && <Footer />}
+
+      <footer class="article-pager">
+        {prevPost ? (
+          <a class="pager-link prev" href={`/${prevPost.id}`}>
+            <span class="pager-label">&larr; previous</span>
+            <span class="pager-title">{prevPost.data.title}</span>
+          </a>
+        ) : <span class="pager-link disabled"><span class="pager-label">&larr; previous</span></span>}
+
+        <a class="pager-toc" href="/posts">contents</a>
+
+        {nextPost ? (
+          <a class="pager-link next" href={`/${nextPost.id}`}>
+            <span class="pager-label">next &rarr;</span>
+            <span class="pager-title">{nextPost.data.title}</span>
+          </a>
+        ) : <span class="pager-link disabled"><span class="pager-label">next &rarr;</span></span>}
+      </footer>
+    </article>
   </div>
+
+  <ContentProtect />
+  <FootnoteScroll />
+  <CopyCode />
+  {themeConfig.post.imageViewer && <ImageViewer />}
 </BaseLayout>
 
-<style>
-  .post-container {
+<style is:global>
+  .magazine-wrapper {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    flex: 1;
+    align-items: center;
+    padding: 5rem 2rem 3rem;
+    position: relative;
+    z-index: 1;
   }
 
-  .post-container main {
-    flex: 1;
+  .magazine-page {
+    background: var(--paper);
+    color: var(--paper-text);
+    width: 100%;
+    max-width: 1100px;
+    border-radius: 3px;
+    padding: 4.5rem 4.5rem 3rem;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.15);
+    position: relative;
+  }
+
+  /* Title block spans both columns */
+  .article-title-block {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid rgba(42, 36, 32, 0.12);
+  }
+
+  .article-meta {
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--paper-dim);
+    margin-bottom: 1.25rem;
+  }
+
+  .article-meta .separator { margin: 0 0.4em; opacity: 0.5; }
+  .article-meta .reading-time, .article-meta .page-of { color: var(--paper-dim); }
+
+  .article-heading {
+    font-family: var(--display) !important;
+    font-size: clamp(2rem, 4vw, 3.4rem) !important;
+    font-weight: normal !important;
+    line-height: 1.05 !important;
+    color: var(--paper-text);
+    margin: 0 !important;
+    letter-spacing: 0.01em;
+    text-wrap: balance;
+  }
+
+  /* Two-column body — column-fill: balance distributes evenly */
+  .article-body {
+    column-count: 2;
+    column-gap: 4rem;
+    column-rule: 1px solid rgba(42, 36, 32, 0.12);
+    color: var(--paper-text);
+  }
+
+  .article-body p {
+    text-align: justify;
+    hyphens: auto;
+    margin: 0 0 1em 0;
+    line-height: 1.7;
+    font-size: 0.92rem;
+    font-family: var(--sans);
+    font-weight: 400;
+  }
+
+  /* Drop cap on first paragraph */
+  .article-body > p:first-of-type::first-letter,
+  .article-body > h1:first-child + p::first-letter,
+  .article-body > h2:first-child + p::first-letter {
+    font-family: var(--display);
+    font-size: 4em;
+    float: left;
+    line-height: 0.85;
+    padding: 0.05em 0.12em 0 0;
+    color: var(--paper-text);
+    font-weight: normal;
+  }
+
+  .article-body h1,
+  .article-body h2,
+  .article-body h3,
+  .article-body h4 {
+    font-family: var(--sans) !important;
+    font-weight: 600;
+    margin: 1.5em 0 0.5em 0;
+    break-after: avoid;
+    line-height: 1.3;
+  }
+
+  .article-body h1 { font-size: 1.05rem; }
+  .article-body h2 { font-size: 0.98rem; text-transform: uppercase; letter-spacing: 0.08em; }
+  .article-body h3 { font-size: 0.92rem; }
+
+  .article-body em {
+    font-family: var(--sans);
+    font-style: italic;
+  }
+
+  .article-body blockquote {
+    break-inside: avoid;
+    border-left: 2px solid rgba(42, 36, 32, 0.25);
+    padding-left: 1rem;
+    margin: 1em 0;
+    font-style: italic;
+    color: var(--paper-dim);
+  }
+
+  .article-body img {
+    max-width: 100%;
+    break-inside: avoid;
+    border-radius: 2px;
+    margin: 0.5em 0;
+  }
+
+  .article-body pre {
+    break-inside: avoid;
+    font-size: 0.78rem;
+    background: var(--paper-code-bg);
+    padding: 0.85rem 1rem;
+    border-radius: 2px;
+    overflow-x: auto;
+  }
+
+  .article-body code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+  }
+
+  .article-body a {
+    color: var(--paper-text);
+    text-decoration: underline;
+    text-decoration-color: rgba(42, 36, 32, 0.3);
+    text-underline-offset: 2px;
+    transition: text-decoration-color var(--dur-normal) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .article-body a:hover {
+      text-decoration-color: rgba(42, 36, 32, 0.7);
+    }
+  }
+
+  .article-body .footnotes {
+    margin-top: 2em;
+    padding-top: 1em;
+    border-top: 1px solid rgba(42, 36, 32, 0.15);
+    font-size: 0.78rem;
+  }
+
+  .article-body .title { display: none; }
+
+  /* Pager (prev/next/contents) — spans both columns */
+  .article-pager {
+    column-span: all;
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(42, 36, 32, 0.15);
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 2rem;
+    align-items: start;
+  }
+
+  .pager-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: var(--paper-text);
+    font-family: var(--sans);
+    transition:
+      transform var(--dur-fast) var(--ease-out),
+      opacity var(--dur-normal) var(--ease-out);
+  }
+
+  .pager-link.prev { text-align: left; }
+  .pager-link.next { text-align: right; }
+
+  .pager-link.disabled {
+    opacity: 0.25;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  .pager-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--paper-dim);
+  }
+
+  .pager-title {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 450;
+    line-height: 1.35;
+    color: var(--paper-text);
+    letter-spacing: -0.005em;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pager-link:not(.disabled):hover .pager-label {
+      color: var(--paper-text);
+    }
+  }
+
+  .pager-link:not(.disabled):active {
+    transform: scale(0.985);
+  }
+
+  .pager-toc {
+    align-self: center;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--paper-dim);
+    text-decoration: none;
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(42, 36, 32, 0.2);
+    border-radius: 2px;
+    transition:
+      border-color var(--dur-normal) var(--ease-out),
+      background-color var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .pager-toc:hover {
+      border-color: rgba(42, 36, 32, 0.5);
+      background-color: rgba(42, 36, 32, 0.04);
+    }
+  }
+
+  .pager-toc:active {
+    transform: scale(0.97);
+  }
+
+  @media (max-width: 768px) {
+    .magazine-wrapper { padding: 4rem 1rem 2rem; }
+    .magazine-page { padding: 2.5rem 1.75rem 2rem; }
+
+    /* Single column on mobile — magazine becomes a single newspaper column */
+    .article-body { column-count: 1; }
+
+    .article-pager {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+      text-align: center;
+    }
+    .pager-link.prev, .pager-link.next { text-align: center; }
   }
 </style>

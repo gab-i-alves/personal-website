@@ -21,6 +21,15 @@ const about = defineCollection({
   schema: z.object({})
 })
 
+const changelog = defineCollection({
+  loader: glob({ base: './src/content/changelog', pattern: '**/*.{md,mdx}' }),
+  schema: () =>
+    z.object({
+      date: z.coerce.date(),
+      version: z.string().optional()
+    })
+})
+
 const dailyLogs = defineCollection({
   // Load Markdown and MDX files in the `src/content/daily-logs/` directory.
   loader: glob({ base: './src/content/daily-logs', pattern: '**/*.{md,mdx}' }),
@@ -29,8 +38,9 @@ const dailyLogs = defineCollection({
     z.object({
       date: z.coerce.date(),
       mood: z.string().optional(),
-      tags: z.array(z.string()).optional()
+      tags: z.array(z.string()).optional(),
+      photo: z.string().optional()
     })
 })
 
-export const collections = { posts, about, dailyLogs }
+export const collections = { posts, about, dailyLogs, changelog }

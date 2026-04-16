@@ -1,0 +1,677 @@
+---
+interface LogEntry {
+  slug: string
+  date: string
+  mood?: string
+  tags?: string[]
+  photo?: string
+  body: string
+}
+
+interface Props {
+  logs: LogEntry[]
+}
+
+const { logs } = Astro.props
+const logsJson = JSON.stringify(logs)
+---
+
+<div class="calendar-wrapper" id="calendar-root">
+  <!-- Header -->
+  <div class="cal-header">
+    <div class="cal-header-left">
+      <span class="month-number" id="month-number"></span>
+      <span class="month-name" id="month-name"></span>
+    </div>
+    <div class="cal-header-right">
+      <span class="year" id="year-display"></span>
+    </div>
+  </div>
+
+  <!-- Nav arrows -->
+  <div class="nav-arrow prev" id="nav-prev">
+    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
+  </div>
+  <div class="nav-arrow next" id="nav-next">
+    <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18" /></svg>
+  </div>
+
+  <!-- Weekday headers -->
+  <div class="weekdays">
+    <div class="weekday">seg</div>
+    <div class="weekday">ter</div>
+    <div class="weekday">qua</div>
+    <div class="weekday">qui</div>
+    <div class="weekday">sex</div>
+    <div class="weekday">sab</div>
+    <div class="weekday">dom</div>
+  </div>
+
+  <!-- Calendar grid -->
+  <div class="cal-grid" id="cal-grid"></div>
+</div>
+
+<!-- Notebook modal -->
+<div class="log-panel-overlay" id="log-overlay"></div>
+<div class="log-panel" id="log-panel">
+  <div class="notebook-page">
+    <button class="panel-close" id="panel-close">&times;</button>
+    <div class="panel-date" id="panel-date"></div>
+    <div class="panel-weekday" id="panel-weekday"></div>
+    <div class="panel-content" id="panel-content"></div>
+
+    <!-- Page fold navigation -->
+    <div class="page-fold page-fold-left" id="fold-prev" title="anterior"></div>
+    <div class="page-fold page-fold-right" id="fold-next" title="proximo"></div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ logsJson }}>
+;(function() {
+  const logs = JSON.parse(logsJson)
+  const monthNames = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
+  const weekdayNames = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado']
+
+  let currentYear, currentMonth
+
+  // Always open on the current month — even if there are no logs there yet,
+  // so the user always lands on "today" first.
+  const now = new Date()
+  currentYear = now.getFullYear()
+  currentMonth = now.getMonth()
+
+  function getLogForDate(y, m, d) {
+    return logs.find(function(l) {
+      return l.year === y && l.month === m && l.day === d
+    })
+  }
+
+  function render() {
+    document.getElementById('month-number').textContent = String(currentMonth + 1).padStart(2, '0')
+    document.getElementById('month-name').textContent = monthNames[currentMonth]
+    document.getElementById('year-display').textContent = currentYear
+
+    var grid = document.getElementById('cal-grid')
+    grid.innerHTML = ''
+
+    var firstDay = new Date(currentYear, currentMonth, 1).getDay()
+    // Convert Sunday=0 to Monday-first (Mon=0, Sun=6)
+    var startOffset = firstDay === 0 ? 6 : firstDay - 1
+    var daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+    var today = new Date()
+
+    // Empty cells
+    for (var i = 0; i < startOffset; i++) {
+      var empty = document.createElement('div')
+      empty.className = 'day-cell empty'
+      grid.appendChild(empty)
+    }
+
+    // Day cells
+    for (var d = 1; d <= daysInMonth; d++) {
+      var cell = document.createElement('div')
+      cell.className = 'day-cell'
+      var log = getLogForDate(currentYear, currentMonth, d)
+
+      if (log) {
+        cell.classList.add('has-log')
+        cell.dataset.slug = log.slug
+      }
+
+      if (today.getFullYear() === currentYear && today.getMonth() === currentMonth && today.getDate() === d) {
+        cell.classList.add('today')
+      }
+
+      var num = document.createElement('div')
+      num.className = 'day-number'
+      num.textContent = d
+      cell.appendChild(num)
+
+      if (log && log.mood) {
+        var dot = document.createElement('div')
+        dot.className = 'mood-indicator ' + log.mood
+        cell.appendChild(dot)
+      }
+
+      if (log) {
+        cell.addEventListener('click', (function(theLog) {
+          return function() { openPanel(theLog) }
+        })(log))
+      }
+
+      grid.appendChild(cell)
+    }
+  }
+
+  // Panel
+  var currentLogIndex = -1
+
+  function openPanel(log) {
+    currentLogIndex = logs.indexOf(log)
+    // Build a local Date to compute the weekday — this is safe because
+    // the constructor accepts integer args and produces a local date with
+    // no timezone shift on the day field.
+    var dt = new Date(log.year, log.month, log.day)
+    document.getElementById('panel-date').textContent = log.day + ' ' + monthNames[log.month]
+    document.getElementById('panel-weekday').textContent = weekdayNames[dt.getDay()]
+    document.getElementById('panel-content').innerHTML = log.body
+    document.getElementById('log-overlay').classList.add('open')
+    document.getElementById('log-panel').classList.add('open')
+  }
+
+  function closePanel() {
+    document.getElementById('log-overlay').classList.remove('open')
+    document.getElementById('log-panel').classList.remove('open')
+  }
+
+  document.getElementById('panel-close').addEventListener('click', closePanel)
+  document.getElementById('log-overlay').addEventListener('click', closePanel)
+
+  document.getElementById('fold-prev').addEventListener('click', function() {
+    if (currentLogIndex < logs.length - 1) openPanel(logs[currentLogIndex + 1])
+  })
+  document.getElementById('fold-next').addEventListener('click', function() {
+    if (currentLogIndex > 0) openPanel(logs[currentLogIndex - 1])
+  })
+
+  // Month navigation
+  document.getElementById('nav-prev').addEventListener('click', function() {
+    currentMonth--
+    if (currentMonth < 0) { currentMonth = 11; currentYear-- }
+    render()
+  })
+  document.getElementById('nav-next').addEventListener('click', function() {
+    currentMonth++
+    if (currentMonth > 11) { currentMonth = 0; currentYear++ }
+    render()
+  })
+
+  // Keyboard
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closePanel()
+    if (e.key === 'ArrowLeft') document.getElementById('nav-prev').click()
+    if (e.key === 'ArrowRight') document.getElementById('nav-next').click()
+  })
+
+  render()
+})()
+</script>
+
+<style is:global>
+  .calendar-wrapper {
+    --cell-size: calc((100vw - 9rem - 18px) / 7);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 5rem 4.5rem 1.5rem;
+    position: relative;
+  }
+
+  /* Header */
+  .cal-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+  }
+
+  .cal-header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+  }
+
+  .month-number {
+    font-family: var(--display);
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    font-weight: normal;
+    line-height: 1;
+    color: var(--text);
+    opacity: 0.9;
+  }
+
+  .month-name {
+    font-family: var(--display);
+    font-size: clamp(1.5rem, 2.5vw, 2.2rem);
+    font-weight: normal;
+    letter-spacing: 0.06em;
+    color: var(--text);
+    opacity: 0.45;
+    margin-bottom: 0.7rem;
+  }
+
+  .year {
+    font-family: var(--display);
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    font-weight: normal;
+    line-height: 1;
+    color: var(--text);
+    opacity: 0.25;
+  }
+
+  /* Nav arrows — kept below BackLink area so they don't overlap the
+     "← back" link at the top-left corner. */
+  .nav-arrow {
+    position: fixed;
+    top: 6rem;
+    bottom: 0;
+    width: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    color: var(--text);
+    opacity: 0.35;
+    transition:
+      opacity var(--dur-normal) var(--ease-out),
+      background var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+    user-select: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .nav-arrow:hover {
+      opacity: 0.95;
+      background: rgba(252, 214, 230, 0.04);
+    }
+  }
+
+  .nav-arrow:active {
+    transform: scale(0.92);
+    opacity: 0.85;
+  }
+
+  .nav-arrow.prev { left: 0; }
+  .nav-arrow.next { right: 0; }
+
+  .nav-arrow svg {
+    width: 28px;
+    height: 28px;
+    stroke: currentColor;
+    stroke-width: 1.5;
+    fill: none;
+  }
+
+  /* Weekdays */
+  .weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, var(--cell-size));
+    justify-content: center;
+    margin-bottom: 0.35rem;
+  }
+
+  .weekday {
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--text);
+    opacity: 0.55;
+    padding: 0.5rem 0;
+  }
+
+  /* Grid */
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, var(--cell-size));
+    grid-auto-rows: var(--cell-size);
+    justify-content: center;
+    gap: 3px;
+  }
+
+  /* Day cells */
+  .day-cell {
+    position: relative;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border: 1px solid rgba(252, 214, 230, 0.04);
+    border-radius: 3px;
+    overflow: hidden;
+    transition:
+      border-color var(--dur-normal) var(--ease-out),
+      background-color var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  .day-cell.empty { border-color: transparent; }
+
+  /* Cells with logs always show a subtle hint, not just on hover */
+  .day-cell.has-log {
+    cursor: pointer;
+    border-color: rgba(252, 214, 230, 0.18);
+    background: rgba(252, 214, 230, 0.025);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .day-cell.has-log:hover {
+      border-color: rgba(252, 214, 230, 0.4);
+      background: rgba(252, 214, 230, 0.06);
+    }
+  }
+
+  .day-cell.has-log:active {
+    transform: scale(0.985);
+  }
+
+  .day-cell.today {
+    border-color: rgba(252, 214, 230, 0.5);
+    border-width: 2px;
+  }
+
+  .day-number {
+    position: absolute;
+    top: 0.45rem;
+    left: 1rem;
+    font-family: var(--display);
+    font-size: 1.8rem;
+    font-weight: normal;
+    color: var(--text);
+    opacity: 0.5;
+    z-index: 3;
+  }
+
+  .day-cell.has-log .day-number { opacity: 0.95; }
+
+  /* Mood indicators */
+  .mood-indicator {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+
+  .mood-indicator.productive { background: #a8e6cf; }
+  .mood-indicator.focused { background: #88c8f7; }
+  .mood-indicator.creative { background: #dda0dd; }
+  .mood-indicator.kinda { background: #f7dc6f; }
+
+  /* Panel overlay */
+  .log-panel-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(30, 24, 24, 0.6);
+    z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    backdrop-filter: blur(2px);
+  }
+
+  .log-panel-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Notebook panel */
+  .log-panel {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    width: min(700px, 92vw);
+    max-height: 88vh;
+    z-index: 51;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity var(--dur-slow) var(--ease-elegant),
+      transform var(--dur-slow) var(--ease-elegant);
+  }
+
+  .log-panel.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .notebook-page {
+    background: var(--paper);
+    color: var(--paper-text);
+    border-radius: 2px;
+    padding: 3.5rem 3.5rem 2.5rem 5rem;
+    position: relative;
+    overflow-y: auto;
+    max-height: 88vh;
+    box-shadow: 4px 4px 20px rgba(0,0,0,0.4), 0 0 60px rgba(0,0,0,0.15);
+    background-image:
+      repeating-linear-gradient(
+        transparent,
+        transparent 2.35rem,
+        rgba(180, 170, 155, 0.3) 2.35rem,
+        rgba(180, 170, 155, 0.3) 2.4rem
+      );
+    background-size: 100% 2.4rem;
+    background-position: 0 3.5rem;
+    line-height: 2.4rem;
+  }
+
+  /* Red margin line */
+  .notebook-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 4rem;
+    width: 1.5px;
+    background: rgba(200, 80, 80, 0.3);
+    z-index: 1;
+  }
+
+  /* Spiral holes */
+  .notebook-page::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0.75rem;
+    bottom: 0;
+    width: 14px;
+    background-image: radial-gradient(circle 4px at center, rgba(48,42,42,0.15) 3.5px, transparent 4px);
+    background-size: 14px 2rem;
+    background-position: 0 1rem;
+    z-index: 1;
+  }
+
+  .panel-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--paper-text);
+    opacity: 0.25;
+    transition:
+      opacity var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+    font-size: 1.3rem;
+    border: none;
+    background: none;
+    z-index: 5;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .panel-close:hover { opacity: 0.7; }
+  }
+
+  .panel-close:active {
+    transform: scale(0.9);
+    opacity: 0.55;
+  }
+
+  .panel-date {
+    font-family: var(--display);
+    font-size: 3.5rem;
+    color: var(--paper-text);
+    line-height: 2.4rem;
+    padding-top: 0.6rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .panel-weekday {
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    color: #888;
+    margin-bottom: 1.5rem;
+    line-height: 2.4rem;
+  }
+
+  .panel-content {
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 2.4rem;
+    color: var(--paper-text);
+    font-family: var(--sans);
+  }
+
+  .panel-content p {
+    margin: 0 0 1.2rem 0;
+    line-height: 2.4rem;
+  }
+
+  .panel-content h1,
+  .panel-content h2,
+  .panel-content h3,
+  .panel-content h4 {
+    font-family: var(--sans);
+    color: var(--paper-text);
+    margin: 1.2rem 0 0.6rem 0;
+    line-height: 2.4rem;
+  }
+
+  .panel-content h1 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  .panel-content h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  .panel-content h3 {
+    font-size: 0.92rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgba(42, 36, 32, 0.7);
+  }
+  .panel-content h4 {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: rgba(42, 36, 32, 0.6);
+  }
+
+  .panel-content ul,
+  .panel-content ol {
+    padding-left: 1.4rem;
+    margin: 0 0 1.2rem 0;
+  }
+
+  .panel-content li {
+    line-height: 2.4rem;
+    margin-bottom: 0;
+  }
+
+  .panel-content a {
+    color: var(--paper-text);
+    text-decoration: underline;
+    text-decoration-color: rgba(42, 36, 32, 0.4);
+    text-underline-offset: 2px;
+  }
+
+  .panel-content em { font-style: italic; }
+  .panel-content strong { font-weight: 600; color: var(--paper-text); }
+
+  .panel-content blockquote {
+    border-left: 2px solid rgba(42, 36, 32, 0.3);
+    padding-left: 1rem;
+    margin: 1rem 0;
+    font-style: italic;
+    color: rgba(42, 36, 32, 0.7);
+  }
+
+  .panel-content code {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    background: rgba(42, 36, 32, 0.08);
+    padding: 0.05rem 0.3rem;
+    border-radius: 2px;
+    font-size: 0.88em;
+  }
+
+  .panel-content hr {
+    border: none;
+    border-top: 1px solid rgba(42, 36, 32, 0.2);
+    margin: 1.5rem 0;
+  }
+
+  .panel-content img {
+    max-width: 100%;
+    border-radius: 2px;
+    margin: 1rem 0;
+  }
+
+  /* Page folds */
+  .page-fold {
+    position: absolute;
+    bottom: 0;
+    width: 50px;
+    height: 50px;
+    cursor: pointer;
+    overflow: hidden;
+    z-index: 6;
+  }
+
+  .page-fold-left,
+  .page-fold-right {
+    transition: border-bottom-color var(--dur-normal) var(--ease-out);
+  }
+
+  .page-fold-left {
+    left: 0;
+    border-right: 50px solid transparent;
+    border-bottom: 50px solid rgba(42, 36, 32, 0.06);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .page-fold-left:hover {
+      border-bottom-color: rgba(42, 36, 32, 0.18);
+    }
+  }
+
+  .page-fold-left:active {
+    border-bottom-color: rgba(42, 36, 32, 0.28);
+  }
+
+  .page-fold-right {
+    right: 0;
+    border-left: 50px solid transparent;
+    border-bottom: 50px solid rgba(42, 36, 32, 0.06);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .page-fold-right:hover {
+      border-bottom-color: rgba(42, 36, 32, 0.18);
+    }
+  }
+
+  .page-fold-right:active {
+    border-bottom-color: rgba(42, 36, 32, 0.28);
+  }
+
+  @media (max-width: 768px) {
+    .calendar-wrapper {
+      --cell-size: calc((100vw - 2rem - 18px) / 7);
+      padding: 1rem;
+    }
+
+    .day-number { font-size: 1.2rem; left: 0.4rem; top: 0.3rem; }
+    .notebook-page { padding: 2.5rem 2rem 2rem 3.5rem; }
+  }
+</style>

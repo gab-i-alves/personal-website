@@ -1,31 +1,195 @@
 ---
-import IndexLayout from '@/layouts/IndexLayout.astro'
-import PostList from '@/components/widgets/PostList.astro'
+import '@/styles/global.css'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import BaseHead from '@/components/layout/BaseHead.astro'
+import Stars from '@/components/effects/Stars.astro'
+import ContentProtect from '@/components/effects/ContentProtect.astro'
+import FormattedDate from '@/components/widgets/FormattedDate.astro'
+import BackLink from '@/components/layout/BackLink.astro'
+import SiteFooter from '@/components/layout/SiteFooter.astro'
 import { themeConfig } from '@/config'
 import { getSortedFilteredPosts } from '@/utils/draft'
 
 const posts = await getSortedFilteredPosts()
 ---
 
-<IndexLayout title={`Posts · ${themeConfig.site.title}`} description={themeConfig.site.description} addTopMargin={true}>
-  
-  <p class="description">
-    updates on projects worthy telling, reading lists, study materials, notes
-  </p>
+<BaseLayout title={`Articles · ${themeConfig.site.title}`} description={themeConfig.site.description}>
+  <BaseHead title={`Articles · ${themeConfig.site.title}`} description={themeConfig.site.description} slot="head" />
 
-  <PostList posts={posts} />
-</IndexLayout>
+  <Stars count={60} maxOpacity={0.4} />
+  <BackLink />
 
-<style>
-  h1 {
-    font-size: var(--font-size-m);
-    font-weight: var(--font-weight-bold);
-    margin-bottom: 2rem;
+  <div class="toc-wrapper">
+    <header class="toc-header">
+      <span class="toc-eyebrow">a personal magazine</span>
+      <h1 class="toc-title">articles</h1>
+      <p class="toc-subtitle">essays on systems, software and what i'm learning</p>
+    </header>
+
+    <ol class="toc-list">
+      {posts.map((post, i) => (
+        <li class="toc-entry">
+          <a href={`/${post.id}`} class="toc-link">
+            <span class="toc-num">{String(i + 1).padStart(2, '0')}</span>
+            <div class="toc-text">
+              <span class="toc-headline">{post.data.title}</span>
+              {post.data.description && <span class="toc-desc">{post.data.description}</span>}
+            </div>
+            <span class="toc-date">
+              <FormattedDate date={post.data.pubDate} context="list" />
+            </span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </div>
+
+  <SiteFooter />
+  <ContentProtect />
+</BaseLayout>
+
+<style is:global>
+  .toc-wrapper {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 6rem 2rem 2rem;
+    position: relative;
+    z-index: 1;
   }
 
-  .description {
-    color: var(--text-secondary);
-    font-size: var(--font-size-s);
-    margin-bottom: 2rem;
+  .toc-header {
+    text-align: center;
+    margin-bottom: 5rem;
+  }
+
+  .toc-eyebrow {
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.28em;
+    color: var(--text);
+    opacity: 0.4;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  .toc-title {
+    font-family: var(--display);
+    font-size: var(--display-xl);
+    font-weight: normal;
+    letter-spacing: 0.03em;
+    line-height: 1;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .toc-subtitle {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    margin: 1.25rem 0 0 0;
+    font-style: italic;
+  }
+
+  .toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: toc;
+  }
+
+  .toc-entry {
+    border-top: 1px solid var(--border);
+  }
+
+  .toc-entry:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .toc-link {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.5rem;
+    align-items: baseline;
+    padding: 1.75rem 0.5rem;
+    text-decoration: none;
+    color: var(--text);
+    transition:
+      background-color var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out),
+      padding var(--dur-normal) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .toc-link:hover {
+      background-color: rgba(252, 214, 230, 0.03);
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
+  }
+
+  .toc-link:active {
+    transform: scale(0.995);
+  }
+
+  .toc-num {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text);
+    opacity: 0.4;
+    letter-spacing: 0.08em;
+    min-width: 2ch;
+  }
+
+  .toc-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .toc-headline {
+    font-family: var(--sans);
+    font-size: clamp(1rem, 1.4vw, 1.2rem);
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--text);
+    letter-spacing: -0.005em;
+  }
+
+  .toc-desc {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 350;
+    line-height: 1.55;
+    color: var(--text-dim);
+    letter-spacing: 0.01em;
+  }
+
+  .toc-date {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text);
+    opacity: 0.4;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    align-self: baseline;
+  }
+
+  @media (max-width: 600px) {
+    .toc-wrapper {
+      padding: 4rem 1.25rem 2rem;
+    }
+    .toc-link {
+      grid-template-columns: auto 1fr;
+      grid-template-rows: auto auto;
+      gap: 0.6rem 1rem;
+    }
+    .toc-date {
+      grid-column: 2;
+      grid-row: 2;
+    }
   }
 </style>

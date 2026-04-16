@@ -2,15 +2,41 @@
 @import './post.css';
 
 :root {
-  /* Min Content Width */
-  --content-width: 25rem;
+  /* Color Palette — dark-only */
+  --bg: #302A2A;
+  --text: #FCD6E6;
+  --text-dim: rgba(252, 214, 230, 0.55);
+  --text-faint: rgba(252, 214, 230, 0.3);
+  --border: rgba(252, 214, 230, 0.08);
+  --selection: rgba(252, 214, 230, 0.12);
+  --code-bg: rgba(252, 214, 230, 0.06);
+  --mark: rgba(252, 214, 230, 0.15);
+
+  /* Paper (articles, notebook) */
+  --paper: #F5F0E8;
+  --paper-text: #2A2420;
+  --paper-dim: rgba(42, 36, 32, 0.5);
+  --paper-faint: rgba(42, 36, 32, 0.25);
+  --paper-border: rgba(42, 36, 32, 0.1);
+  --paper-code-bg: rgba(42, 36, 32, 0.06);
+
+  /* Backward-compat aliases (used by inherited components) */
+  --text-primary: var(--text);
+  --text-secondary: var(--text-dim);
+  --text-tertiary: var(--text-faint);
+  --primary: var(--text);
+  --serif: var(--display);
 
   /* Typography */
-  --sans:
-    Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
+  --display: 'Dreamer', Georgia, serif;
+  --sans: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
     Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  --serif: Besley, Baskerville, Georgia, Cambria, 'Times New Roman', Times, serif;
-  --mono: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  /* --mono is Inter too — for metadata/dates/versions where we want a thin,
+     numeric look. Tabular nums (`tnum`) align numbers like a real monospace.
+     ASCII-art that truly needs equal-width characters (Butterfly) keeps a
+     hard-coded monospace fallback. */
+  --mono: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+  --mono-feat: 'tnum' 1, 'zero' 1, 'cv01' 1;
 
   --font-size-s: 0.8125rem;
   --font-size-m: 0.9375rem;
@@ -23,78 +49,42 @@
   --spacing-s: -0.08em;
   --spacing-m: -0.02em;
 
-  /* Light Mode Colors (Default) */
-  --bg: #ffffff;
-  --text-primary: rgba(0, 0, 0, 0.85);
-  --text-secondary: rgba(0, 0, 0, 0.4);
-  --text-tertiary: rgba(0, 0, 0, 0.24);
-  --border: rgba(0, 0, 0, 0.1);
-  --selection: rgba(0, 0, 0, 0.08);
-  --code-bg: rgba(0, 0, 0, 0.04);
-  --mark: #f3ffc4;
+  /* Motion — easing curves (strong, from animations.dev) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-elegant: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-  /* Syntax Theme  */
-  --astro-code-foreground: rgba(0, 0, 0, 0.85);
-  --astro-code-background: rgba(0, 0, 0, 0.03);
-  --astro-code-token-constant: rgba(0, 0, 0, 0.85);
-  --astro-code-token-string: rgba(0, 0, 0, 0.85);
-  --astro-code-token-comment: rgba(0, 0, 0, 0.35);
-  --astro-code-token-keyword: rgba(0, 0, 0, 0.55);
-  --astro-code-token-parameter: rgba(0, 0, 0, 0.85);
-  --astro-code-token-function: rgba(0, 0, 0, 0.85);
-  --astro-code-token-string-expression: rgba(0, 0, 0, 0.55);
-  --astro-code-token-punctuation: rgba(0, 0, 0, 0.55);
-  --astro-code-token-link: rgba(0, 0, 0, 0.55);
-}
+  /* Motion — durations */
+  --dur-fast: 160ms;
+  --dur-normal: 200ms;
+  --dur-slow: 350ms;
 
-/* Light Mode (Explicit) */
-html.light {
-  --bg: #ffffff;
-  --text-primary: rgba(0, 0, 0, 0.85);
-  --text-secondary: rgba(0, 0, 0, 0.4);
-  --text-tertiary: rgba(0, 0, 0, 0.24);
-  --border: rgba(0, 0, 0, 0.1);
-  --selection: rgba(0, 0, 0, 0.08);
-  --code-bg: rgba(0, 0, 0, 0.04);
-  --mark: #f3ffc4;
+  /* Press feedback */
+  --press-scale: 0.97;
 
-  /* Syntax Theme  */
-  --astro-code-foreground: rgba(0, 0, 0, 0.85);
-  --astro-code-background: rgba(0, 0, 0, 0.03);
-  --astro-code-token-constant: rgba(0, 0, 0, 0.85);
-  --astro-code-token-string: rgba(0, 0, 0, 0.85);
-  --astro-code-token-comment: rgba(0, 0, 0, 0.35);
-  --astro-code-token-keyword: rgba(0, 0, 0, 0.5);
-  --astro-code-token-parameter: rgba(0, 0, 0, 0.85);
-  --astro-code-token-function: rgba(0, 0, 0, 0.85);
-  --astro-code-token-string-expression: rgba(0, 0, 0, 0.55);
-  --astro-code-token-punctuation: rgba(0, 0, 0, 0.55);
-  --astro-code-token-link: rgba(0, 0, 0, 0.55);
-}
+  /* Page layout — cohesion across pages */
+  --page-padding-x: 4rem;
+  --page-padding-x-tablet: 3rem;
+  --page-padding-x-mobile: 1.75rem;
 
-/* Dark Mode (Explicit) */
-html.dark {
-  --bg: #1c1c1c;
-  --text-primary: rgba(255, 255, 255, 0.9);
-  --text-secondary: rgba(255, 255, 255, 0.4);
-  --text-tertiary: rgba(255, 255, 255, 0.24);
-  --border: rgba(255, 255, 255, 0.1);
-  --selection: rgba(255, 255, 255, 0.08);
-  --code-bg: rgba(255, 255, 255, 0.04);
-  --mark: #545b37;
+  /* Display heading sizes */
+  --display-xl: clamp(3rem, 6vw, 5.5rem);
+  --display-lg: clamp(2.5rem, 5vw, 4.5rem);
+  --display-md: clamp(1.8rem, 3.5vw, 3rem);
 
-  /* Syntax Theme  */
-  --astro-code-foreground: rgba(255, 255, 255, 0.9);
-  --astro-code-background: rgba(255, 255, 255, 0.03);
-  --astro-code-token-constant: rgba(255, 255, 255, 0.9);
-  --astro-code-token-string: rgba(255, 255, 255, 0.9);
-  --astro-code-token-comment: rgba(255, 255, 255, 0.35);
-  --astro-code-token-keyword: rgba(255, 255, 255, 0.55);
-  --astro-code-token-parameter: rgba(255, 255, 255, 0.9);
-  --astro-code-token-function: rgba(255, 255, 255, 0.9);
-  --astro-code-token-string-expression: rgba(255, 255, 255, 0.55);
-  --astro-code-token-punctuation: rgba(255, 255, 255, 0.55);
-  --astro-code-token-link: rgba(255, 255, 255, 0.55);
+  /* Syntax Theme (dark) */
+  --astro-code-foreground: rgba(252, 214, 230, 0.9);
+  --astro-code-background: rgba(252, 214, 230, 0.04);
+  --astro-code-token-constant: rgba(252, 214, 230, 0.9);
+  --astro-code-token-string: rgba(252, 214, 230, 0.9);
+  --astro-code-token-comment: rgba(252, 214, 230, 0.35);
+  --astro-code-token-keyword: rgba(252, 214, 230, 0.55);
+  --astro-code-token-parameter: rgba(252, 214, 230, 0.9);
+  --astro-code-token-function: rgba(252, 214, 230, 0.9);
+  --astro-code-token-string-expression: rgba(252, 214, 230, 0.55);
+  --astro-code-token-punctuation: rgba(252, 214, 230, 0.55);
+  --astro-code-token-link: rgba(252, 214, 230, 0.55);
 }
 
 html {
@@ -112,25 +102,14 @@ body {
   text-autospace: normal;
   text-rendering: optimizeLegibility;
   line-height: 1.75;
-  color: var(--text-primary);
+  color: var(--text);
   font-display: swap;
   word-wrap: break-word;
   overflow-wrap: break-word;
   margin: 0;
   min-height: 100vh;
-  display: flex;
-  flex-direction: column;
   box-sizing: border-box;
   letter-spacing: var(--spacing-m);
-  padding: 6rem 1.5rem 1.5rem 1.5rem;
-  overscroll-behavior-y: contain;
-  transition: background-color 0.1s ease-out;
-}
-
-@media (max-width: 768px) {
-  body {
-    padding: 4rem 1.35rem 1.35rem 1.35rem;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -147,7 +126,7 @@ body {
 }
 
 :focus {
-  outline: 2px solid var(--text-tertiary);
+  outline: 2px solid var(--text-faint);
   outline-offset: 2px;
 }
 
@@ -156,45 +135,24 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid var(--text-tertiary);
+  outline: 2px solid var(--text-faint);
   outline-offset: 2px;
 }
 
-body[data-width] {
-  max-width: var(--content-width);
-}
-
-body[data-centered='true'] {
-  margin: 0 auto;
-}
-
-main {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+a {
+  color: var(--text);
+  text-decoration: none;
 }
 
 .date {
   margin: 0;
   font-weight: var(--font-weight-light);
-  color: var(--text-secondary);
+  color: var(--text-dim);
   opacity: 0.75;
   flex-shrink: 0;
   letter-spacing: var(--spacing-s);
   font-variant-numeric: tabular-nums;
-  font-feature-settings:
-    'tnum' 1,
-    'zero' 0,
-    'cv01' 1,
-    'cv02' 1,
-    'calt' 1,
-    'ss03' 1,
-    'ordn' 1;
-}
-
-.date .month {
-  letter-spacing: var(--spacing-m);
+  font-feature-settings: 'tnum' 1, 'zero' 0, 'cv01' 1, 'cv02' 1, 'calt' 1, 'ss03' 1, 'ordn' 1;
 }
 
 .sr-only {
@@ -209,4 +167,41 @@ main {
   clip: rect(1px, 1px, 1px, 1px);
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* Display heading utility classes — use these for cohesion */
+.h-display-xl {
+  font-family: var(--display);
+  font-size: var(--display-xl);
+  font-weight: normal;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.h-display-lg {
+  font-family: var(--display);
+  font-size: var(--display-lg);
+  font-weight: normal;
+  line-height: 1.1;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+
+.h-display-md {
+  font-family: var(--display);
+  font-size: var(--display-md);
+  font-weight: normal;
+  line-height: 1.15;
+  letter-spacing: 0.03em;
+  color: var(--text);
+}
+
+.subtitle-soft {
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 300;
+  color: var(--text-dim);
+  letter-spacing: 0.04em;
+  margin-top: 0.75rem;
 }

@@ -32,8 +32,6 @@ const { toc = [] }: TOCProps = Astro.props
 <script
   is:inline
   define:vars={{
-    contentWidth: themeConfig.general.contentWidth,
-    centeredLayout: themeConfig.general.centeredLayout,
     toc: themeConfig.post.toc
   }}
 >
@@ -100,26 +98,18 @@ const { toc = [] }: TOCProps = Astro.props
 
     // Adjust TOC position
     function adjustPosition() {
-      if (!state.container || !centeredLayout || !state.hasContent) {
+      if (!state.container || !state.hasContent) {
         if (state.container) state.container.style.display = 'none'
         return
       }
 
       const pageWidth = window.innerWidth
-      const contentWidthValue = Math.max(parseFloat(contentWidth), 25)
-      const margin = (pageWidth - contentWidthValue * 16) / 2
-      const baseMinSpace = 11 * 16 // Base minimum space needed
-      const minSpace = toc ? baseMinSpace + 52 : baseMinSpace + 12
-
-      if (margin >= minSpace) {
+      if (pageWidth >= 1200) {
         state.container.style.display = 'block'
         state.container.classList.add('fixed-position')
-        const leftPosition = toc ? margin - 176 - 40 : margin - 176
-        state.container.style.left = `${leftPosition}px`
       } else {
         state.container.style.display = 'none'
         state.container.classList.remove('fixed-position')
-        state.container.style.left = ''
       }
     }
 
@@ -328,7 +318,7 @@ const { toc = [] }: TOCProps = Astro.props
     font-size: var(--font-size-s);
     letter-spacing: var(--spacing-m);
     line-height: 1.125rem;
-    color: var(--text-primary);
+    color: var(--paper-text);
     opacity: 0;
     transition:
       opacity 0.2s ease-out,
@@ -357,7 +347,7 @@ const { toc = [] }: TOCProps = Astro.props
   }
 
   .toc-link.active {
-    color: var(--text-primary);
+    color: var(--paper-text);
   }
 
   /* Horizontal line indicators */
@@ -371,7 +361,7 @@ const { toc = [] }: TOCProps = Astro.props
     top: 50%;
     width: 2.5rem;
     height: 1px;
-    background-color: var(--text-tertiary);
+    background-color: var(--paper-faint);
     transform: translateY(-50%);
     opacity: 0.4;
     transition: all 0.1s ease-out;
@@ -380,7 +370,7 @@ const { toc = [] }: TOCProps = Astro.props
   .toc-link:hover::before,
   .toc-link.active::before {
     opacity: 0.8;
-    background-color: var(--text-primary);
+    background-color: var(--paper-text);
   }
 
   /* Hide on mobile */

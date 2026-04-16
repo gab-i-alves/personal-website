@@ -1,0 +1,182 @@
+---
+import IndexLayout from '@/layouts/IndexLayout.astro'
+import Stars from '@/components/effects/Stars.astro'
+import ContentProtect from '@/components/effects/ContentProtect.astro'
+import { themeConfig } from '@/config'
+import { getCollection, render } from 'astro:content'
+
+const allEntries = await getCollection('changelog')
+const sortedEntries = allEntries.sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+)
+
+const entriesWithContent = await Promise.all(
+  sortedEntries.map(async (entry) => {
+    const { Content } = await render(entry)
+    return { entry, Content }
+  })
+)
+
+function formatDate(date: Date) {
+  return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')}`
+}
+---
+
+<IndexLayout title={`Changelog · ${themeConfig.site.title}`} description="What changed">
+  <Stars count={60} maxOpacity={0.5} />
+
+  <header class="changelog-header">
+    <h1 class="page-title">changelog</h1>
+    <p class="page-subtitle">small things that changed, in reverse chronological order</p>
+  </header>
+
+  <div class="changelog">
+    {entriesWithContent.map(({ entry, Content }, i) => (
+      <div class="entry">
+        <div class="entry-meta">
+          {entry.data.version && <span class="entry-version">{entry.data.version}</span>}
+          {entry.data.version && <span class="entry-sep">&middot;</span>}
+          <time class="entry-date">{formatDate(entry.data.date)}</time>
+        </div>
+        <div class="changes">
+          <Content />
+        </div>
+        {i < entriesWithContent.length - 1 && <hr class="entry-divider" />}
+      </div>
+    ))}
+  </div>
+
+  <ContentProtect />
+</IndexLayout>
+
+<style>
+  .changelog-header {
+    text-align: center;
+    margin-bottom: 4rem;
+  }
+
+  .page-title {
+    font-family: var(--display);
+    font-size: var(--display-lg);
+    font-weight: normal;
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .page-subtitle {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    margin: 1rem 0 0 0;
+    font-style: italic;
+  }
+
+  .entry {
+    margin-bottom: 2.5rem;
+  }
+
+  .entry-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .entry-version {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.7rem;
+    color: var(--text);
+    opacity: 0.55;
+    letter-spacing: 0.05em;
+  }
+
+  .entry-sep {
+    color: var(--text);
+    opacity: 0.25;
+  }
+
+  .entry-date {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.7rem;
+    opacity: 0.5;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .entry-divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0 0;
+  }
+</style>
+
+<style is:global>
+  /* Markdown rendered inside changelog entries */
+  .changes {
+    font-size: 0.92rem;
+    font-weight: 350;
+    line-height: 1.85;
+    opacity: 0.82;
+  }
+
+  .changes ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .changes li {
+    padding-left: 1.2rem;
+    position: relative;
+  }
+
+  .changes li::before {
+    content: '~';
+    position: absolute;
+    left: 0;
+    opacity: 0.35;
+    font-family: var(--mono);
+  }
+
+  .changes p {
+    margin: 0 0 0.5em 0;
+  }
+
+  .changes a {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: rgba(252, 214, 230, 0.3);
+    text-underline-offset: 2px;
+    transition: text-decoration-color var(--dur-normal) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .changes a:hover {
+      text-decoration-color: rgba(252, 214, 230, 0.7);
+    }
+  }
+
+  .changes em {
+    font-style: italic;
+    opacity: 0.9;
+  }
+
+  .changes code {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    background: rgba(252, 214, 230, 0.08);
+    padding: 0.05rem 0.3rem;
+    border-radius: 2px;
+    font-size: 0.88em;
+  }
+
+  .changes strong {
+    font-weight: 500;
+  }
+</style>

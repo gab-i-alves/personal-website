@@ -1,28 +1,121 @@
 ---
-import IndexLayout from '@/layouts/IndexLayout.astro'
-import PostList from '@/components/widgets/PostList.astro'
-import Currently from '@/components/widgets/Currently.astro'
-import DailyLogList from '@/components/widgets/DailyLogList.astro'
+import '@/styles/global.css'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import BaseHead from '@/components/layout/BaseHead.astro'
+import Stars from '@/components/effects/Stars.astro'
+import Butterfly from '@/components/effects/Butterfly.astro'
+import ContentProtect from '@/components/effects/ContentProtect.astro'
 import { themeConfig } from '@/config'
-import { getSortedFilteredPosts } from '@/utils/draft'
-import { getCollection, getEntry, render } from 'astro:content'
-
-const allPosts = await getSortedFilteredPosts()
-const recentPosts = allPosts.slice(0, 3)
-
-const allLogs = await getCollection('dailyLogs')
-const recentLogs = allLogs
-  .filter((log) => !log.id.startsWith('_'))
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
-  .slice(0, 3)
-
-const aboutEntry = await getEntry('about', 'about')
-if (!aboutEntry) throw new Error('About content not found')
-const { Content: AboutContent } = await render(aboutEntry)
 ---
 
-<IndexLayout title={themeConfig.site.title} description={themeConfig.site.description}>
-  <div class="about prose">
-    <AboutContent />
+<BaseLayout title={themeConfig.site.title} description={themeConfig.site.description}>
+  <BaseHead title={themeConfig.site.title} description={themeConfig.site.description} slot="head" />
+
+  <div class="landing">
+    <Stars count={80} maxOpacity={0.7} />
+
+    <div class="content">
+      <h1>Gabi Alves</h1>
+      <nav>
+        <a href="/now">right now</a>
+        <a href="/posts">read posts</a>
+        <a href="/bookmarks">see bookmarks</a>
+        <a href="/daily-logs">check daily logs</a>
+        <a href="/changelog">changelog</a>
+      </nav>
+    </div>
+
+    <Butterfly scale={0.7} right="6vw" opacity={0.5} />
+    <span class="signature">v0.6 &middot; 2026</span>
+    <ContentProtect />
   </div>
-</IndexLayout>
+</BaseLayout>
+
+<style is:global>
+  .landing {
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 18vw;
+  }
+
+  .landing .content {
+    position: relative;
+    z-index: 1;
+  }
+
+  .landing h1 {
+    font-family: var(--display);
+    color: var(--text);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: normal;
+    letter-spacing: 0.05em;
+    line-height: 1.1;
+    margin: 0;
+    padding: 0;
+  }
+
+  .landing nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+    margin-top: 1.75rem;
+  }
+
+  .landing .signature {
+    position: fixed;
+    bottom: 2rem;
+    right: 2.5rem;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text);
+    opacity: 0.3;
+    letter-spacing: 0.15em;
+    z-index: 5;
+    text-transform: lowercase;
+  }
+
+  .landing nav a {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 350;
+    color: var(--text);
+    opacity: 0.7;
+    text-decoration: none;
+    letter-spacing: 0.02em;
+    transition:
+      opacity var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+    transform-origin: left center;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .landing nav a:hover {
+      opacity: 1;
+    }
+  }
+
+  .landing nav a:active {
+    transform: scale(var(--press-scale));
+    opacity: 0.85;
+  }
+
+  @media (max-width: 768px) {
+    .landing {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+
+    .landing h1 {
+      font-size: clamp(3rem, 12vw, 6rem);
+      padding: 0;
+    }
+
+    .landing nav a {
+      font-size: 1rem;
+    }
+  }
+</style>

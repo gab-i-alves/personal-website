@@ -1,0 +1,47 @@
+---
+interface Props {
+  href?: string
+  label?: string
+}
+
+const { href = '/', label = 'back' } = Astro.props
+---
+
+<a href={href} class="back-link-global">&larr; {label}</a>
+
+<style is:global>
+  .back-link-global {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    font-size: var(--font-size-s);
+    font-family: var(--sans);
+    color: var(--text);
+    text-decoration: none;
+    opacity: 0.45;
+    letter-spacing: 0.04em;
+    transition:
+      opacity var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+    z-index: 30;
+    transform-origin: left center;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .back-link-global:hover {
+      opacity: 0.95;
+    }
+  }
+
+  .back-link-global:active {
+    transform: scale(var(--press-scale));
+    opacity: 0.85;
+  }
+
+  @media (max-width: 768px) {
+    .back-link-global {
+      top: 1.25rem;
+      left: 1.25rem;
+    }
+  }
+</style>

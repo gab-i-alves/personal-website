@@ -1,25 +1,63 @@
 ---
-import IndexLayout from '@/layouts/IndexLayout.astro'
-import Bookmarks from '@/components/widgets/Bookmarks.astro'
+import '@/styles/global.css'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import BaseHead from '@/components/layout/BaseHead.astro'
+import Stars from '@/components/effects/Stars.astro'
+import ContentProtect from '@/components/effects/ContentProtect.astro'
+import ScrapbookGrid from '@/components/bookmarks/ScrapbookGrid.astro'
+import BackLink from '@/components/layout/BackLink.astro'
+import SiteFooter from '@/components/layout/SiteFooter.astro'
+import { categories } from '@/data/bookmarks'
 import { themeConfig } from '@/config'
 ---
 
-<IndexLayout title={`Bookmarks · ${themeConfig.site.title}`} description={themeConfig.site.description} addTopMargin={true}>
+<BaseLayout title={`Bookmarks · ${themeConfig.site.title}`} description={themeConfig.site.description}>
+  <BaseHead title={`Bookmarks · ${themeConfig.site.title}`} description={themeConfig.site.description} slot="head" />
 
-  <p class="description">curated list with things I find interesting</p>
-  <Bookmarks />
-</IndexLayout>
+  <Stars count={60} maxOpacity={0.5} />
+  <BackLink />
 
-<style>
-  h1 {
-    font-size: var(--font-size-m);
-    font-weight: var(--font-weight-bold);
-    margin-bottom: 2rem;
+  <div class="page-header">
+    <div class="page-title">bookmarks</div>
+    <div class="page-subtitle">curated list with things I find interesting</div>
+  </div>
+
+  <ScrapbookGrid categories={categories} />
+  <SiteFooter />
+  <ContentProtect />
+</BaseLayout>
+
+<style is:global>
+  .page-header {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 5rem 2rem 3rem;
+    text-align: center;
+    position: relative;
+    z-index: 1;
   }
 
-  .description {
-    color: var(--text-secondary);
-    font-size: var(--font-size-s);
-    margin-bottom: 2rem;
+  .page-title {
+    font-family: var(--display);
+    font-size: var(--display-xl);
+    font-weight: normal;
+    line-height: 1;
+    color: var(--text);
+    opacity: 0.92;
+  }
+
+  .page-subtitle {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--text-dim);
+    opacity: 0.85;
+    margin-top: 1.25rem;
+    letter-spacing: 0.04em;
+    font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    .page-header { padding: 3rem 1.25rem 2rem; }
   }
 </style>

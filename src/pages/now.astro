@@ -1,27 +1,46 @@
 ---
 import IndexLayout from '@/layouts/IndexLayout.astro'
 import Currently from '@/components/widgets/Currently.astro'
+import Stars from '@/components/effects/Stars.astro'
+import ContentProtect from '@/components/effects/ContentProtect.astro'
 import { themeConfig } from '@/config'
 ---
 
-<IndexLayout title={`Now · ${themeConfig.site.title}`} description={themeConfig.site.description} addTopMargin={true}>
+<IndexLayout title={`Now · ${themeConfig.site.title}`} description={themeConfig.site.description}>
+  <Stars count={60} maxOpacity={0.5} />
 
-  <p class="description">
-    what I'm currently doing, updated whenever I feel like it.
-  </p>
+  <header class="now-header">
+    <h1 class="page-title">right now</h1>
+    <p class="page-subtitle">what i'm currently doing, updated whenever i feel like it</p>
+  </header>
+
   <Currently />
+  <ContentProtect />
 </IndexLayout>
 
 <style>
-  h1 {
-    font-size: var(--font-size-m);
-    font-weight: var(--font-weight-bold);
-    margin-bottom: 2rem;
+  .now-header {
+    text-align: center;
+    margin-bottom: 4rem;
   }
 
-  .description {
-    color: var(--text-secondary);
-    font-size: var(--font-size-s);
-    margin-bottom: 2rem;
+  .page-title {
+    font-family: var(--display);
+    font-size: var(--display-lg);
+    font-weight: normal;
+    letter-spacing: 0.03em;
+    line-height: 1.1;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .page-subtitle {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 300;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    margin: 1rem 0 0 0;
+    font-style: italic;
   }
 </style>
