@@ -1,63 +1,54 @@
-# Chiri 🌸
+# gabi-alves.com
 
-![screenshot-light](public/screenshots/screenshot-light.png)
-![screenshot-dark](public/screenshots/screenshot-dark.png)
+Personal website and blog. Dark-only, magazine-inspired, built with Astro.
 
-Chiri is a minimal blog theme built with [Astro](https://astro.build), offering customization options while preserving its clean aesthetic.
+![home](public/screenshots/home.png)
 
-Check the [demo](https://astro-chiri.netlify.app/) for more details.
+## Pages
 
-## Features
+**Articles** — essay index with numbered entries, Dreamer display font, stagger animation on load.
 
-- Built with Astro
-- Responsive
-- Light / Dark mode
-- MDX
-- KaTeX
-- Sitemap
-- OpenGraph
-- RSS
-- ...
+![articles](public/screenshots/articles.png)
 
-## Getting Started
+**Shelf** — reading notes on books, papers, videos. Table index with category filters, each entry links to a dedicated page with long-form markdown notes.
 
-1. [Fork](https://github.com/the3ash/astro-chiri/fork) this repository, or use this template to [create a new repository](https://github.com/new?template_name=astro-chiri&template_owner=the3ash).
+![shelf](public/screenshots/shelf.png)
+![shelf entry](public/screenshots/shelf-entry.png)
 
-2. Run the following commands:
+**Daily Logs** — calendar view with inline month navigation. Days with entries are highlighted; clicking opens a notebook-style modal. Supports photos as cell backgrounds.
 
-   ```bash
-   git clone <your-repo-url>
+![daily logs](public/screenshots/daily-logs.png)
 
-   cd <your-repo-name>
+**Bookmarks** — curated links grouped by category.
 
-   pnpm install
+**Now** — what I'm currently doing.
 
-   pnpm dev
-   ```
+## Design
 
-3. Edit `src/config.ts` and `src/content/about/about.md` to your liking.
+- Dark palette: `#302A2A` background, `#FCD6E6` text
+- Typography: Dreamer (display headings) + Inter (body)
+- ASCII butterfly with hover animation on the landing page
+- Star parallax background that reacts to cursor movement
+- Custom pink star cursor with particle trail
+- Motion system following Emil Kowalski's design principles: asymmetric enter/exit timing, `:active scale(0.97)` press feedback, hover gated by `@media(hover:hover)`, stagger delays on lists
+- View Transitions between pages (fade)
 
-4. Use `pnpm new <title>` to create new posts, or add your posts to `src/content/posts`.
+## Stack
 
-5. Deploy to Netlify, Vercel, or other platforms, refer to [Astro Deployment Guides](https://docs.astro.build/en/guides/deploy/) for more details.
-   - **Netlify**: `pnpm add @astrojs/netlify` and add `adapter: netlify()` in `astro.config.ts`.
-   - **Vercel**: `pnpm add @astrojs/vercel` and add `adapter: vercel()` in `astro.config.ts`.
-   - **Static (e.g. GitHub Pages)**: `pnpm add @astrojs/static` and add `adapter: static()` in `astro.config.ts`.
+- [Astro](https://astro.build) 5.x
+- MDX + KaTeX
+- Netlify / Vercel deploy
+- No JS framework, vanilla scripts
 
+## Content
 
-&emsp;[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start) [![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new)
+Posts live in `src/content/posts/`, shelf entries in `src/content/shelf/`, daily logs in `src/content/daily-logs/`. All use markdown with Zod-validated frontmatter.
 
-## Commands
-
-- `pnpm new <title>` - Create a new post (use `_title` for drafts)
-- `pnpm update-theme` - Update the theme to the latest version
-
-## References
-
-- https://paco.me/
-- https://benji.org/
-- https://shud.in/
-- https://retypeset.radishzz.cc/
+```bash
+npm install
+npm run dev
+npm run build
+```
 
 ## License
 
