@@ -378,10 +378,10 @@ function formatMedium(m: string) {
 </style>
 
 <script is:inline>
-  var entryCount = document.getElementById('entryCount')
-  var rows = document.querySelectorAll('.shelf-row')
-  var filterBtns = document.querySelectorAll('.filter-btn')
-  var activeFilter = 'all'
+  const entryCount = document.getElementById('entryCount')
+  const rows = document.querySelectorAll('.shelf-row')
+  const filterBtns = document.querySelectorAll('.filter-btn')
+  let activeFilter = 'all'
 
   filterBtns.forEach(function(btn) {
     btn.addEventListener('click', function() {
@@ -393,15 +393,15 @@ function formatMedium(m: string) {
   })
 
   function applyFilters() {
-    var visible = 0
+    let visible = 0
 
     rows.forEach(function(row) {
-      var category = row.dataset.category
-      var isFav = row.dataset.favorite === 'true'
+      const category = row.dataset.category
+      const isFav = row.dataset.favorite === 'true'
 
-      var match = activeFilter === 'all'
-        || (activeFilter === 'favorite' && isFav)
-        || category === activeFilter
+      const match = activeFilter === 'all'
+      || (activeFilter === 'favorite' && isFav)
+      || category === activeFilter
 
       if (match) {
         row.classList.remove('hidden')

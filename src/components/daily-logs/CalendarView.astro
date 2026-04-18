@@ -79,13 +79,13 @@ const logsJson = JSON.stringify(logs)
 
 <script is:inline define:vars={{ logsJson }}>
 ;(function() {
-  var logs = JSON.parse(logsJson)
-  var monthNames = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
-  var weekdayNames = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado']
+  const logs = JSON.parse(logsJson)
+  const monthNames = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
+  const weekdayNames = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado']
 
-  var now = new Date()
-  var currentYear = now.getFullYear()
-  var currentMonth = now.getMonth()
+  const now = new Date()
+  let currentYear = now.getFullYear()
+  let currentMonth = now.getMonth()
 
   function getLogForDate(y, m, d) {
     return logs.find(function(l) {
@@ -97,32 +97,32 @@ const logsJson = JSON.stringify(logs)
     document.getElementById('cal-month').textContent = monthNames[currentMonth]
     document.getElementById('cal-year').textContent = currentYear
 
-    var todayBtn = document.getElementById('nav-today')
+    const todayBtn = document.getElementById('nav-today')
     if (currentYear === now.getFullYear() && currentMonth === now.getMonth()) {
       todayBtn.classList.add('hidden')
     } else {
       todayBtn.classList.remove('hidden')
     }
 
-    var grid = document.getElementById('cal-grid')
+    const grid = document.getElementById('cal-grid')
     grid.innerHTML = ''
 
-    var firstDay = new Date(currentYear, currentMonth, 1).getDay()
-    var startOffset = firstDay === 0 ? 6 : firstDay - 1
-    var daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+    const firstDay = new Date(currentYear, currentMonth, 1).getDay()
+    const startOffset = firstDay === 0 ? 6 : firstDay - 1
+    const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
 
-    for (var i = 0; i < startOffset; i++) {
-      var empty = document.createElement('div')
+    for (let i = 0; i < startOffset; i++) {
+      const empty = document.createElement('div')
       empty.className = 'cal-cell cal-cell--empty'
       grid.appendChild(empty)
     }
 
-    for (var d = 1; d <= daysInMonth; d++) {
-      var cell = document.createElement('div')
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cell = document.createElement('div')
       cell.className = 'cal-cell'
       cell.style.animationDelay = (d * 15) + 'ms'
 
-      var log = getLogForDate(currentYear, currentMonth, d)
+      const log = getLogForDate(currentYear, currentMonth, d)
 
       if (log) {
         cell.classList.add('cal-cell--log')
@@ -130,7 +130,7 @@ const logsJson = JSON.stringify(logs)
 
         if (log.photo) {
           cell.classList.add('cal-cell--photo')
-          var img = document.createElement('img')
+          const img = document.createElement('img')
           img.className = 'cal-photo'
           img.src = log.photo
           img.alt = ''
@@ -143,7 +143,7 @@ const logsJson = JSON.stringify(logs)
         cell.classList.add('cal-cell--today')
       }
 
-      var num = document.createElement('span')
+      const num = document.createElement('span')
       num.className = 'cal-day'
       num.textContent = d
       cell.appendChild(num)
@@ -159,20 +159,20 @@ const logsJson = JSON.stringify(logs)
   }
 
   // Panel
-  var currentLogIndex = -1
+  let currentLogIndex = -1
 
   function openPanel(log) {
     currentLogIndex = logs.indexOf(log)
-    var dt = new Date(log.year, log.month, log.day)
+    const dt = new Date(log.year, log.month, log.day)
     document.getElementById('panel-date').textContent = log.day + ' ' + monthNames[log.month]
     document.getElementById('panel-weekday').textContent = weekdayNames[dt.getDay()]
 
     // Tags
-    var tagsEl = document.getElementById('panel-tags')
+    const tagsEl = document.getElementById('panel-tags')
     tagsEl.innerHTML = ''
     if (log.tags && log.tags.length) {
       log.tags.forEach(function(t) {
-        var span = document.createElement('span')
+        const span = document.createElement('span')
         span.className = 'panel-tag'
         span.textContent = t
         tagsEl.appendChild(span)
@@ -182,8 +182,8 @@ const logsJson = JSON.stringify(logs)
     document.getElementById('panel-content').innerHTML = log.body
 
     // Update nav button states
-    var prevBtn = document.getElementById('fold-prev')
-    var nextBtn = document.getElementById('fold-next')
+    const prevBtn = document.getElementById('fold-prev')
+    const nextBtn = document.getElementById('fold-next')
     prevBtn.disabled = currentLogIndex >= logs.length - 1
     nextBtn.disabled = currentLogIndex <= 0
 
@@ -192,8 +192,8 @@ const logsJson = JSON.stringify(logs)
   }
 
   function closePanel() {
-    var panel = document.getElementById('log-panel')
-    var overlay = document.getElementById('log-overlay')
+    const panel = document.getElementById('log-panel')
+    const overlay = document.getElementById('log-overlay')
     // Asymmetric: exit faster than enter (Emil principle)
     panel.style.transition = 'opacity 150ms var(--ease-out), transform 150ms var(--ease-out)'
     overlay.style.transition = 'opacity 150ms var(--ease-out)'
