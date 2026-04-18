@@ -3,7 +3,6 @@ import '@/styles/global.css'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import BaseHead from '@/components/layout/BaseHead.astro'
 import Stars from '@/components/effects/Stars.astro'
-import ContentProtect from '@/components/effects/ContentProtect.astro'
 import ScrapbookGrid from '@/components/bookmarks/ScrapbookGrid.astro'
 import BackLink from '@/components/layout/BackLink.astro'
 import SiteFooter from '@/components/layout/SiteFooter.astro'
@@ -24,7 +23,6 @@ import { themeConfig } from '@/config'
 
   <ScrapbookGrid categories={categories} />
   <SiteFooter />
-  <ContentProtect />
 </BaseLayout>
 
 <style is:global>

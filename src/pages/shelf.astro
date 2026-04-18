@@ -1,0 +1,416 @@
+---
+import '@/styles/global.css'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import BaseHead from '@/components/layout/BaseHead.astro'
+import Stars from '@/components/effects/Stars.astro'
+import BackLink from '@/components/layout/BackLink.astro'
+import SiteFooter from '@/components/layout/SiteFooter.astro'
+import { getCollection } from 'astro:content'
+import { themeConfig } from '@/config'
+
+const entries = await getCollection('shelf')
+
+const sorted = entries.sort((a, b) => {
+  const rA = a.data.rating ?? 0
+  const rB = b.data.rating ?? 0
+  if (rB !== rA) return rB - rA
+  return a.data.title.localeCompare(b.data.title)
+})
+
+const allCategories = [...new Set(sorted.map(e => e.data.category))]
+
+function formatMedium(m: string) {
+  return m.replace('-', ' ')
+}
+---
+
+<BaseLayout title={`Shelf · ${themeConfig.site.title}`} description="my notes on things i've read, watched, and listened to">
+  <BaseHead title={`Shelf · ${themeConfig.site.title}`} description="my notes on things i've read, watched, and listened to" slot="head" />
+
+  <Stars count={40} maxOpacity={0.3} />
+  <BackLink />
+
+  <div class="shelf-page">
+    <header class="shelf-header">
+      <h1 class="shelf-title">shelf</h1>
+      <p class="shelf-subtitle">notes on things i've read, watched, and listened to</p>
+    </header>
+
+    <!-- Filters -->
+    <div class="shelf-controls">
+      <div class="shelf-filters">
+        <button class="filter-btn active" data-filter="all">all</button>
+        <button class="filter-btn" data-filter="favorite">favorites</button>
+        {allCategories.map(cat => (
+          <button class="filter-btn" data-filter={cat}>{cat}</button>
+        ))}
+      </div>
+
+      <span class="entry-count" id="entryCount">{sorted.length} entries</span>
+    </div>
+
+    <!-- Table -->
+    <div class="shelf-table-wrap">
+      <table class="shelf-table">
+        <thead>
+          <tr>
+            <th class="col-title">title</th>
+            <th class="col-category">category</th>
+            <th class="col-medium">medium</th>
+            <th class="col-rating">rating</th>
+            <th class="col-tags">tags</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sorted.map((entry, i) => (
+            <tr
+              class="shelf-row"
+              data-category={entry.data.category}
+              data-favorite={entry.data.favorite}
+              data-tags={entry.data.tags.join(',')}
+              data-title={entry.data.title.toLowerCase()}
+              data-author={(entry.data.author || '').toLowerCase()}
+              style={`animation-delay: ${i * 30}ms`}
+            >
+              <td class="col-title">
+                <a href={`/shelf/${entry.id}`} class="row-link">
+                  <span class="row-title">{entry.data.title}</span>
+                  {entry.data.author && <span class="row-author">{entry.data.author}</span>}
+                </a>
+              </td>
+              <td class="col-category">
+                <span class={`pill pill-${entry.data.category}`}>{entry.data.category}</span>
+              </td>
+              <td class="col-medium">
+                <span class="pill pill-medium">{formatMedium(entry.data.medium)}</span>
+              </td>
+              <td class="col-rating">
+                {entry.data.rating ? (
+                  <span class="rating-value">{entry.data.rating}</span>
+                ) : (
+                  <span class="rating-empty">--</span>
+                )}
+              </td>
+              <td class="col-tags">
+                <div class="tag-list">
+                  {entry.data.favorite && <span class="tag tag-fav">fav</span>}
+                  {entry.data.tags.slice(0, 2).map(t => (
+                    <span class="tag">{t}</span>
+                  ))}
+                  {entry.data.tags.length > 2 && (
+                    <span class="tag-more">+{entry.data.tags.length - 2}</span>
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+
+    <SiteFooter />
+  </div>
+</BaseLayout>
+
+<style is:global>
+  /* ===== Page ===== */
+  .shelf-page {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .shelf-header {
+    padding: 3rem 0 2.5rem;
+    text-align: center;
+  }
+
+  .shelf-title {
+    font-family: var(--display);
+    font-size: var(--display-xl);
+    font-weight: normal;
+    line-height: 1;
+    color: var(--text);
+    opacity: 0.92;
+    margin: 0;
+  }
+
+  .shelf-subtitle {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--text-dim);
+    opacity: 0.85;
+    margin-top: 1.25rem;
+    letter-spacing: 0.04em;
+    font-style: italic;
+  }
+
+  /* ===== Controls ===== */
+  .shelf-controls {
+    margin-bottom: 1.5rem;
+  }
+
+  .shelf-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+  }
+
+  .filter-btn {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    padding: 0.35rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: background 160ms var(--ease-out), color 160ms var(--ease-out), border-color 160ms var(--ease-out), transform 100ms var(--ease-out);
+  }
+
+  .filter-btn:active {
+    transform: scale(0.97);
+  }
+
+  .filter-btn.active {
+    background: rgba(252, 214, 230, 0.1);
+    color: var(--text);
+    border-color: rgba(252, 214, 230, 0.2);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .filter-btn:hover {
+      border-color: rgba(252, 214, 230, 0.15);
+      color: var(--text);
+    }
+  }
+
+  .entry-count {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.72rem;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+
+  /* ===== Table ===== */
+  .shelf-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .shelf-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--sans);
+    table-layout: fixed;
+  }
+
+  .col-title { width: 38%; }
+  .col-category { width: 12%; }
+  .col-medium { width: 11%; }
+  .col-rating { width: 8%; }
+  .col-tags { width: 31%; }
+
+  .shelf-table thead th {
+    font-size: 0.68rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    color: var(--text-faint);
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 2;
+  }
+
+  .shelf-row {
+    transition: background 200ms var(--ease-out);
+    animation: rowFadeIn 300ms var(--ease-out) both;
+  }
+
+  @keyframes rowFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .shelf-row.hidden {
+    display: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .shelf-row:hover {
+      background: rgba(252, 214, 230, 0.04);
+    }
+  }
+
+  .shelf-row td {
+    padding: 0.65rem 0.75rem;
+    border-bottom: 1px solid rgba(252, 214, 230, 0.04);
+    vertical-align: middle;
+  }
+
+  /* Row link */
+  .row-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    text-decoration: none;
+    color: var(--text);
+  }
+
+  .row-title {
+    font-size: 0.88rem;
+    font-weight: 400;
+    line-height: 1.3;
+    transition: opacity var(--dur-normal) var(--ease-out);
+  }
+
+  .row-author {
+    font-size: 0.75rem;
+    color: var(--text-faint);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .row-link:hover .row-title {
+      opacity: 0.75;
+    }
+  }
+
+  /* Pills */
+  .pill {
+    display: inline-block;
+    font-size: 0.65rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .pill-fiction { background: rgba(180, 160, 220, 0.15); color: rgba(200, 180, 240, 0.85); }
+  .pill-nonfiction { background: rgba(160, 200, 180, 0.15); color: rgba(180, 220, 200, 0.85); }
+  .pill-advice { background: rgba(220, 190, 150, 0.15); color: rgba(240, 210, 170, 0.85); }
+  .pill-science { background: rgba(150, 190, 220, 0.15); color: rgba(170, 210, 240, 0.85); }
+  .pill-history { background: rgba(200, 170, 160, 0.15); color: rgba(220, 190, 180, 0.85); }
+  .pill-medium { background: rgba(252, 214, 230, 0.06); color: var(--text-dim); }
+
+  /* Rating */
+  .rating-value {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.82rem;
+    color: var(--text);
+    opacity: 0.8;
+  }
+
+  .rating-empty {
+    color: var(--text-faint);
+    font-size: 0.75rem;
+  }
+
+  /* Tags */
+  .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  .tag {
+    font-size: 0.62rem;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    background: rgba(252, 214, 230, 0.06);
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .tag-fav {
+    background: rgba(252, 180, 200, 0.15);
+    color: rgba(252, 200, 215, 0.9);
+  }
+
+  .tag-more {
+    font-size: 0.62rem;
+    color: var(--text-faint);
+    padding: 0.15rem 0.3rem;
+  }
+
+  /* ===== Responsive ===== */
+  @media (max-width: 768px) {
+    .shelf-page {
+      padding: 0 1.25rem 3rem;
+    }
+
+    .shelf-header {
+      padding: 2rem 0 1.5rem;
+    }
+
+    .col-category, .col-medium {
+      display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .col-tags {
+      display: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  var entryCount = document.getElementById('entryCount')
+  var rows = document.querySelectorAll('.shelf-row')
+  var filterBtns = document.querySelectorAll('.filter-btn')
+  var activeFilter = 'all'
+
+  filterBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      filterBtns.forEach(function(b) { b.classList.remove('active') })
+      btn.classList.add('active')
+      activeFilter = btn.dataset.filter
+      applyFilters()
+    })
+  })
+
+  function applyFilters() {
+    var visible = 0
+
+    rows.forEach(function(row) {
+      var category = row.dataset.category
+      var isFav = row.dataset.favorite === 'true'
+
+      var match = activeFilter === 'all'
+        || (activeFilter === 'favorite' && isFav)
+        || category === activeFilter
+
+      if (match) {
+        row.classList.remove('hidden')
+        visible++
+      } else {
+        row.classList.add('hidden')
+      }
+    })
+
+    entryCount.textContent = visible + ' entr' + (visible === 1 ? 'y' : 'ies')
+  }
+</script>

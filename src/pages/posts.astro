@@ -3,7 +3,6 @@ import '@/styles/global.css'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import BaseHead from '@/components/layout/BaseHead.astro'
 import Stars from '@/components/effects/Stars.astro'
-import ContentProtect from '@/components/effects/ContentProtect.astro'
 import FormattedDate from '@/components/widgets/FormattedDate.astro'
 import BackLink from '@/components/layout/BackLink.astro'
 import SiteFooter from '@/components/layout/SiteFooter.astro'
@@ -21,8 +20,7 @@ const posts = await getSortedFilteredPosts()
 
   <div class="toc-wrapper">
     <header class="toc-header">
-      <span class="toc-eyebrow">a personal magazine</span>
-      <h1 class="toc-title">articles</h1>
+<h1 class="toc-title">articles</h1>
       <p class="toc-subtitle">essays on systems, software and what i'm learning</p>
     </header>
 
@@ -45,7 +43,6 @@ const posts = await getSortedFilteredPosts()
   </div>
 
   <SiteFooter />
-  <ContentProtect />
 </BaseLayout>
 
 <style is:global>
@@ -60,18 +57,6 @@ const posts = await getSortedFilteredPosts()
   .toc-header {
     text-align: center;
     margin-bottom: 5rem;
-  }
-
-  .toc-eyebrow {
-    font-family: var(--sans);
-    font-size: 0.65rem;
-    font-weight: 400;
-    text-transform: uppercase;
-    letter-spacing: 0.28em;
-    color: var(--text);
-    opacity: 0.4;
-    display: block;
-    margin-bottom: 1rem;
   }
 
   .toc-title {
@@ -161,8 +146,8 @@ const posts = await getSortedFilteredPosts()
 
   .toc-desc {
     font-family: var(--sans);
-    font-size: 0.85rem;
-    font-weight: 350;
+    font-size: 0.9rem;
+    font-weight: 400;
     line-height: 1.55;
     color: var(--text-dim);
     letter-spacing: 0.01em;

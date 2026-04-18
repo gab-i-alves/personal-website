@@ -3,9 +3,9 @@ import '@/styles/global.css'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import BaseHead from '@/components/layout/BaseHead.astro'
 import Stars from '@/components/effects/Stars.astro'
-import ContentProtect from '@/components/effects/ContentProtect.astro'
 import CalendarView from '@/components/daily-logs/CalendarView.astro'
 import BackLink from '@/components/layout/BackLink.astro'
+import SiteFooter from '@/components/layout/SiteFooter.astro'
 import { themeConfig } from '@/config'
 import { getCollection, render } from 'astro:content'
 import { experimental_AstroContainer as AstroContainer } from 'astro/container'
@@ -17,10 +17,6 @@ const sortedLogs = allLogs
   .filter((log) => !log.id.startsWith('_'))
   .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
 
-// Pre-extract year/month/day as numbers so the client-side calendar never
-// has to parse an ISO string (which causes off-by-one timezone bugs).
-// Pre-render markdown to HTML at build time so the notebook modal can show
-// the real content without a client-side markdown parser.
 const logsWithBody = await Promise.all(sortedLogs.map(async (log) => {
   const d = log.data.date
   const { Content } = await render(log)
@@ -44,6 +40,58 @@ const logsWithBody = await Promise.all(sortedLogs.map(async (log) => {
   <Stars count={60} maxOpacity={0.4} />
   <BackLink />
 
-  <CalendarView logs={logsWithBody} />
-  <ContentProtect />
+  <div class="dailylogs-page">
+    <header class="dailylogs-header">
+      <h1 class="dailylogs-title">daily logs</h1>
+      <p class="dailylogs-subtitle">accountability notes</p>
+    </header>
+
+    <CalendarView logs={logsWithBody} />
+    <SiteFooter />
+  </div>
 </BaseLayout>
+
+<style is:global>
+  .dailylogs-page {
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .dailylogs-header {
+    padding: 3rem 0 2.5rem;
+    text-align: center;
+  }
+
+  .dailylogs-title {
+    font-family: var(--display);
+    font-size: var(--display-xl);
+    font-weight: normal;
+    line-height: 1;
+    color: var(--text);
+    opacity: 0.92;
+    margin: 0;
+  }
+
+  .dailylogs-subtitle {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 300;
+    color: var(--text-dim);
+    opacity: 0.85;
+    margin-top: 1.25rem;
+    letter-spacing: 0.04em;
+    font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    .dailylogs-page {
+      padding: 0 1.25rem 3rem;
+    }
+    .dailylogs-header {
+      padding: 2rem 0 1.5rem;
+    }
+  }
+</style>

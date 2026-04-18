@@ -1,7 +1,9 @@
 ---
 interface LogEntry {
   slug: string
-  date: string
+  year: number
+  month: number
+  day: number
   mood?: string
   tags?: string[]
   photo?: string
@@ -16,35 +18,32 @@ const { logs } = Astro.props
 const logsJson = JSON.stringify(logs)
 ---
 
-<div class="calendar-wrapper" id="calendar-root">
-  <!-- Header -->
-  <div class="cal-header">
-    <div class="cal-header-left">
-      <span class="month-number" id="month-number"></span>
-      <span class="month-name" id="month-name"></span>
-    </div>
-    <div class="cal-header-right">
-      <span class="year" id="year-display"></span>
-    </div>
-  </div>
+<div class="cal-container" id="calendar-root">
+  <!-- Month navigation -->
+  <div class="cal-nav">
+    <button class="cal-nav-btn" id="nav-prev" aria-label="previous month">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
 
-  <!-- Nav arrows -->
-  <div class="nav-arrow prev" id="nav-prev">
-    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
-  </div>
-  <div class="nav-arrow next" id="nav-next">
-    <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18" /></svg>
+    <div class="cal-month-label">
+      <span class="cal-month" id="cal-month"></span>
+      <span class="cal-year" id="cal-year"></span>
+    </div>
+
+    <button class="cal-nav-btn" id="nav-next" aria-label="next month">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <polyline points="9 6 15 12 9 18"/>
+      </svg>
+    </button>
+
+    <button class="cal-today-btn" id="nav-today">today</button>
   </div>
 
   <!-- Weekday headers -->
-  <div class="weekdays">
-    <div class="weekday">seg</div>
-    <div class="weekday">ter</div>
-    <div class="weekday">qua</div>
-    <div class="weekday">qui</div>
-    <div class="weekday">sex</div>
-    <div class="weekday">sab</div>
-    <div class="weekday">dom</div>
+  <div class="cal-weekdays">
+    <span>seg</span><span>ter</span><span>qua</span><span>qui</span><span>sex</span><span>sab</span><span>dom</span>
   </div>
 
   <!-- Calendar grid -->
@@ -55,30 +54,38 @@ const logsJson = JSON.stringify(logs)
 <div class="log-panel-overlay" id="log-overlay"></div>
 <div class="log-panel" id="log-panel">
   <div class="notebook-page">
-    <button class="panel-close" id="panel-close">&times;</button>
+    <button class="panel-close" id="panel-close">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
     <div class="panel-date" id="panel-date"></div>
     <div class="panel-weekday" id="panel-weekday"></div>
+    <div class="panel-tags" id="panel-tags"></div>
     <div class="panel-content" id="panel-content"></div>
 
-    <!-- Page fold navigation -->
-    <div class="page-fold page-fold-left" id="fold-prev" title="anterior"></div>
-    <div class="page-fold page-fold-right" id="fold-next" title="proximo"></div>
+    <div class="panel-nav">
+      <button class="panel-nav-btn" id="fold-prev">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="15 18 9 12 15 6"/></svg>
+        <span>older</span>
+      </button>
+      <button class="panel-nav-btn" id="fold-next">
+        <span>newer</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 6 15 12 9 18"/></svg>
+      </button>
+    </div>
   </div>
 </div>
 
 <script is:inline define:vars={{ logsJson }}>
 ;(function() {
-  const logs = JSON.parse(logsJson)
-  const monthNames = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
-  const weekdayNames = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado']
+  var logs = JSON.parse(logsJson)
+  var monthNames = ['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro']
+  var weekdayNames = ['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado']
 
-  let currentYear, currentMonth
-
-  // Always open on the current month — even if there are no logs there yet,
-  // so the user always lands on "today" first.
-  const now = new Date()
-  currentYear = now.getFullYear()
-  currentMonth = now.getMonth()
+  var now = new Date()
+  var currentYear = now.getFullYear()
+  var currentMonth = now.getMonth()
 
   function getLogForDate(y, m, d) {
     return logs.find(function(l) {
@@ -87,51 +94,59 @@ const logsJson = JSON.stringify(logs)
   }
 
   function render() {
-    document.getElementById('month-number').textContent = String(currentMonth + 1).padStart(2, '0')
-    document.getElementById('month-name').textContent = monthNames[currentMonth]
-    document.getElementById('year-display').textContent = currentYear
+    document.getElementById('cal-month').textContent = monthNames[currentMonth]
+    document.getElementById('cal-year').textContent = currentYear
+
+    var todayBtn = document.getElementById('nav-today')
+    if (currentYear === now.getFullYear() && currentMonth === now.getMonth()) {
+      todayBtn.classList.add('hidden')
+    } else {
+      todayBtn.classList.remove('hidden')
+    }
 
     var grid = document.getElementById('cal-grid')
     grid.innerHTML = ''
 
     var firstDay = new Date(currentYear, currentMonth, 1).getDay()
-    // Convert Sunday=0 to Monday-first (Mon=0, Sun=6)
     var startOffset = firstDay === 0 ? 6 : firstDay - 1
     var daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
-    var today = new Date()
 
-    // Empty cells
     for (var i = 0; i < startOffset; i++) {
       var empty = document.createElement('div')
-      empty.className = 'day-cell empty'
+      empty.className = 'cal-cell cal-cell--empty'
       grid.appendChild(empty)
     }
 
-    // Day cells
     for (var d = 1; d <= daysInMonth; d++) {
       var cell = document.createElement('div')
-      cell.className = 'day-cell'
+      cell.className = 'cal-cell'
+      cell.style.animationDelay = (d * 15) + 'ms'
+
       var log = getLogForDate(currentYear, currentMonth, d)
 
       if (log) {
-        cell.classList.add('has-log')
+        cell.classList.add('cal-cell--log')
         cell.dataset.slug = log.slug
+
+        if (log.photo) {
+          cell.classList.add('cal-cell--photo')
+          var img = document.createElement('img')
+          img.className = 'cal-photo'
+          img.src = log.photo
+          img.alt = ''
+          img.loading = 'lazy'
+          cell.appendChild(img)
+        }
       }
 
-      if (today.getFullYear() === currentYear && today.getMonth() === currentMonth && today.getDate() === d) {
-        cell.classList.add('today')
+      if (now.getFullYear() === currentYear && now.getMonth() === currentMonth && now.getDate() === d) {
+        cell.classList.add('cal-cell--today')
       }
 
-      var num = document.createElement('div')
-      num.className = 'day-number'
+      var num = document.createElement('span')
+      num.className = 'cal-day'
       num.textContent = d
       cell.appendChild(num)
-
-      if (log && log.mood) {
-        var dot = document.createElement('div')
-        dot.className = 'mood-indicator ' + log.mood
-        cell.appendChild(dot)
-      }
 
       if (log) {
         cell.addEventListener('click', (function(theLog) {
@@ -148,20 +163,46 @@ const logsJson = JSON.stringify(logs)
 
   function openPanel(log) {
     currentLogIndex = logs.indexOf(log)
-    // Build a local Date to compute the weekday — this is safe because
-    // the constructor accepts integer args and produces a local date with
-    // no timezone shift on the day field.
     var dt = new Date(log.year, log.month, log.day)
     document.getElementById('panel-date').textContent = log.day + ' ' + monthNames[log.month]
     document.getElementById('panel-weekday').textContent = weekdayNames[dt.getDay()]
+
+    // Tags
+    var tagsEl = document.getElementById('panel-tags')
+    tagsEl.innerHTML = ''
+    if (log.tags && log.tags.length) {
+      log.tags.forEach(function(t) {
+        var span = document.createElement('span')
+        span.className = 'panel-tag'
+        span.textContent = t
+        tagsEl.appendChild(span)
+      })
+    }
+
     document.getElementById('panel-content').innerHTML = log.body
+
+    // Update nav button states
+    var prevBtn = document.getElementById('fold-prev')
+    var nextBtn = document.getElementById('fold-next')
+    prevBtn.disabled = currentLogIndex >= logs.length - 1
+    nextBtn.disabled = currentLogIndex <= 0
+
     document.getElementById('log-overlay').classList.add('open')
     document.getElementById('log-panel').classList.add('open')
   }
 
   function closePanel() {
-    document.getElementById('log-overlay').classList.remove('open')
-    document.getElementById('log-panel').classList.remove('open')
+    var panel = document.getElementById('log-panel')
+    var overlay = document.getElementById('log-overlay')
+    // Asymmetric: exit faster than enter (Emil principle)
+    panel.style.transition = 'opacity 150ms var(--ease-out), transform 150ms var(--ease-out)'
+    overlay.style.transition = 'opacity 150ms var(--ease-out)'
+    panel.classList.remove('open')
+    overlay.classList.remove('open')
+    setTimeout(function() {
+      panel.style.transition = ''
+      overlay.style.transition = ''
+    }, 160)
   }
 
   document.getElementById('panel-close').addEventListener('click', closePanel)
@@ -174,7 +215,7 @@ const logsJson = JSON.stringify(logs)
     if (currentLogIndex > 0) openPanel(logs[currentLogIndex - 1])
   })
 
-  // Month navigation
+  // Month navigation — no animation on keyboard (Emil: never animate keyboard actions)
   document.getElementById('nav-prev').addEventListener('click', function() {
     currentMonth--
     if (currentMonth < 0) { currentMonth = 11; currentYear-- }
@@ -185,8 +226,12 @@ const logsJson = JSON.stringify(logs)
     if (currentMonth > 11) { currentMonth = 0; currentYear++ }
     render()
   })
+  document.getElementById('nav-today').addEventListener('click', function() {
+    currentYear = now.getFullYear()
+    currentMonth = now.getMonth()
+    render()
+  })
 
-  // Keyboard
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closePanel()
     if (e.key === 'ArrowLeft') document.getElementById('nav-prev').click()
@@ -198,197 +243,237 @@ const logsJson = JSON.stringify(logs)
 </script>
 
 <style is:global>
-  .calendar-wrapper {
-    --cell-size: calc((100vw - 9rem - 18px) / 7);
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    padding: 5rem 4.5rem 1.5rem;
-    position: relative;
+  /* ===== Calendar container ===== */
+  .cal-container {
+    width: 100%;
   }
 
-  /* Header */
-  .cal-header {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 0.75rem;
-  }
-
-  .cal-header-left {
-    display: flex;
-    align-items: baseline;
-    gap: 1.5rem;
-  }
-
-  .month-number {
-    font-family: var(--display);
-    font-size: clamp(3rem, 6vw, 5.5rem);
-    font-weight: normal;
-    line-height: 1;
-    color: var(--text);
-    opacity: 0.9;
-  }
-
-  .month-name {
-    font-family: var(--display);
-    font-size: clamp(1.5rem, 2.5vw, 2.2rem);
-    font-weight: normal;
-    letter-spacing: 0.06em;
-    color: var(--text);
-    opacity: 0.45;
-    margin-bottom: 0.7rem;
-  }
-
-  .year {
-    font-family: var(--display);
-    font-size: clamp(2.5rem, 5vw, 4.5rem);
-    font-weight: normal;
-    line-height: 1;
-    color: var(--text);
-    opacity: 0.25;
-  }
-
-  /* Nav arrows — kept below BackLink area so they don't overlap the
-     "← back" link at the top-left corner. */
-  .nav-arrow {
-    position: fixed;
-    top: 6rem;
-    bottom: 0;
-    width: 3rem;
+  /* ===== Month navigation ===== */
+  .cal-nav {
     display: flex;
     align-items: center;
     justify-content: center;
-    cursor: pointer;
-    z-index: 10;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .cal-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    background: transparent;
     color: var(--text);
-    opacity: 0.35;
+    opacity: 0.6;
+    cursor: pointer;
     transition:
       opacity var(--dur-normal) var(--ease-out),
       background var(--dur-normal) var(--ease-out),
+      border-color var(--dur-normal) var(--ease-out),
       transform var(--dur-fast) var(--ease-out);
-    user-select: none;
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .nav-arrow:hover {
-      opacity: 0.95;
-      background: rgba(252, 214, 230, 0.04);
+    .cal-nav-btn:hover {
+      opacity: 1;
+      background: rgba(252, 214, 230, 0.06);
+      border-color: rgba(252, 214, 230, 0.2);
     }
   }
 
-  .nav-arrow:active {
+  .cal-nav-btn:active {
     transform: scale(0.92);
     opacity: 0.85;
   }
 
-  .nav-arrow.prev { left: 0; }
-  .nav-arrow.next { right: 0; }
-
-  .nav-arrow svg {
-    width: 28px;
-    height: 28px;
-    stroke: currentColor;
-    stroke-width: 1.5;
-    fill: none;
-  }
-
-  /* Weekdays */
-  .weekdays {
-    display: grid;
-    grid-template-columns: repeat(7, var(--cell-size));
+  .cal-month-label {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    min-width: 14rem;
     justify-content: center;
-    margin-bottom: 0.35rem;
   }
 
-  .weekday {
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 400;
-    letter-spacing: 0.08em;
+  .cal-month {
+    font-family: var(--display);
+    font-size: clamp(1.6rem, 2.5vw, 2.2rem);
+    font-weight: normal;
+    line-height: 1;
     color: var(--text);
-    opacity: 0.55;
+    opacity: 0.92;
+  }
+
+  .cal-year {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.85rem;
+    color: var(--text);
+    opacity: 0.3;
+    letter-spacing: 0.06em;
+  }
+
+  .cal-today-btn {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    padding: 0.3rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition:
+      opacity var(--dur-normal) var(--ease-out),
+      background var(--dur-normal) var(--ease-out),
+      border-color var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  .cal-today-btn.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cal-today-btn:hover {
+      color: var(--text);
+      background: rgba(252, 214, 230, 0.06);
+      border-color: rgba(252, 214, 230, 0.2);
+    }
+  }
+
+  .cal-today-btn:active {
+    transform: scale(0.97);
+  }
+
+  /* ===== Weekday headers ===== */
+  .cal-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .cal-weekdays span {
+    text-align: center;
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    color: var(--text);
+    opacity: 0.35;
     padding: 0.5rem 0;
   }
 
-  /* Grid */
+  /* ===== Grid ===== */
   .cal-grid {
     display: grid;
-    grid-template-columns: repeat(7, var(--cell-size));
-    grid-auto-rows: var(--cell-size);
-    justify-content: center;
-    gap: 3px;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
   }
 
-  /* Day cells */
-  .day-cell {
+  /* ===== Day cells ===== */
+  .cal-cell {
+    aspect-ratio: 1;
     position: relative;
-    width: var(--cell-size);
-    height: var(--cell-size);
-    border: 1px solid rgba(252, 214, 230, 0.04);
-    border-radius: 3px;
+    border: 1px solid rgba(252, 214, 230, 0.05);
+    border-radius: 4px;
     overflow: hidden;
+    animation: cellFadeIn 250ms var(--ease-out) both;
     transition:
       border-color var(--dur-normal) var(--ease-out),
       background-color var(--dur-normal) var(--ease-out),
       transform var(--dur-fast) var(--ease-out);
   }
 
-  .day-cell.empty { border-color: transparent; }
-
-  /* Cells with logs always show a subtle hint, not just on hover */
-  .day-cell.has-log {
-    cursor: pointer;
-    border-color: rgba(252, 214, 230, 0.18);
-    background: rgba(252, 214, 230, 0.025);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .day-cell.has-log:hover {
-      border-color: rgba(252, 214, 230, 0.4);
-      background: rgba(252, 214, 230, 0.06);
+  @keyframes cellFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
     }
   }
 
-  .day-cell.has-log:active {
-    transform: scale(0.985);
+  .cal-cell--empty {
+    border-color: transparent;
+    animation: none;
   }
 
-  .day-cell.today {
-    border-color: rgba(252, 214, 230, 0.5);
+  .cal-cell--log {
+    cursor: pointer;
+    border-color: rgba(252, 214, 230, 0.15);
+    background: rgba(252, 214, 230, 0.03);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .cal-cell--log:hover {
+      border-color: rgba(252, 214, 230, 0.35);
+      background: rgba(252, 214, 230, 0.07);
+    }
+  }
+
+  .cal-cell--log:active {
+    transform: scale(0.97);
+  }
+
+  .cal-cell--today {
+    border-color: rgba(252, 214, 230, 0.45);
     border-width: 2px;
   }
 
-  .day-number {
+  /* Day number */
+  .cal-day {
     position: absolute;
-    top: 0.45rem;
-    left: 1rem;
+    top: 0.4rem;
+    left: 0.55rem;
     font-family: var(--display);
-    font-size: 1.8rem;
+    font-size: clamp(1rem, 1.8vw, 1.5rem);
     font-weight: normal;
     color: var(--text);
-    opacity: 0.5;
-    z-index: 3;
+    opacity: 0.4;
+    line-height: 1;
   }
 
-  .day-cell.has-log .day-number { opacity: 0.95; }
+  .cal-cell--log .cal-day {
+    opacity: 0.92;
+  }
 
-  /* Mood indicators */
-  .mood-indicator {
+  /* Photo cells */
+  .cal-cell--photo {
+    border-color: rgba(252, 214, 230, 0.25);
+  }
+
+  .cal-photo {
     position: absolute;
-    bottom: 0.5rem;
-    right: 0.5rem;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.35;
+    transition: opacity var(--dur-normal) var(--ease-out);
+    z-index: 0;
   }
 
-  .mood-indicator.productive { background: #a8e6cf; }
-  .mood-indicator.focused { background: #88c8f7; }
-  .mood-indicator.creative { background: #dda0dd; }
-  .mood-indicator.kinda { background: #f7dc6f; }
+  @media (hover: hover) and (pointer: fine) {
+    .cal-cell--photo:hover .cal-photo {
+      opacity: 0.55;
+    }
+  }
 
-  /* Panel overlay */
+  .cal-cell--photo .cal-day {
+    z-index: 2;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+  }
+
+  /* ===== Panel overlay ===== */
   .log-panel-overlay {
     position: fixed;
     inset: 0;
@@ -396,7 +481,7 @@ const logsJson = JSON.stringify(logs)
     z-index: 50;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.3s;
+    transition: opacity 250ms var(--ease-out);
     backdrop-filter: blur(2px);
   }
 
@@ -405,20 +490,20 @@ const logsJson = JSON.stringify(logs)
     pointer-events: auto;
   }
 
-  /* Notebook panel */
+  /* ===== Notebook panel ===== */
   .log-panel {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.96);
-    width: min(700px, 92vw);
+    width: min(660px, 92vw);
     max-height: 88vh;
     z-index: 51;
     opacity: 0;
     pointer-events: none;
     transition:
-      opacity var(--dur-slow) var(--ease-elegant),
-      transform var(--dur-slow) var(--ease-elegant);
+      opacity 300ms var(--ease-elegant),
+      transform 300ms var(--ease-elegant);
   }
 
   .log-panel.open {
@@ -430,8 +515,8 @@ const logsJson = JSON.stringify(logs)
   .notebook-page {
     background: var(--paper);
     color: var(--paper-text);
-    border-radius: 2px;
-    padding: 3.5rem 3.5rem 2.5rem 5rem;
+    border-radius: 3px;
+    padding: 3rem 3rem 1.5rem 4.5rem;
     position: relative;
     overflow-y: auto;
     max-height: 88vh;
@@ -444,23 +529,21 @@ const logsJson = JSON.stringify(logs)
         rgba(180, 170, 155, 0.3) 2.4rem
       );
     background-size: 100% 2.4rem;
-    background-position: 0 3.5rem;
+    background-position: 0 3rem;
     line-height: 2.4rem;
   }
 
-  /* Red margin line */
   .notebook-page::before {
     content: '';
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 4rem;
+    left: 3.5rem;
     width: 1.5px;
     background: rgba(200, 80, 80, 0.3);
     z-index: 1;
   }
 
-  /* Spiral holes */
   .notebook-page::after {
     content: '';
     position: absolute;
@@ -476,63 +559,89 @@ const logsJson = JSON.stringify(logs)
 
   .panel-close {
     position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
-    width: 2rem;
-    height: 2rem;
+    top: 0.6rem;
+    right: 0.6rem;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 2rem;
+    height: 2rem;
     cursor: pointer;
     color: var(--paper-text);
     opacity: 0.25;
-    transition:
-      opacity var(--dur-normal) var(--ease-out),
-      transform var(--dur-fast) var(--ease-out);
-    font-size: 1.3rem;
     border: none;
     background: none;
+    border-radius: 4px;
     z-index: 5;
+    transition:
+      opacity var(--dur-normal) var(--ease-out),
+      background var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .panel-close:hover { opacity: 0.7; }
+    .panel-close:hover {
+      opacity: 0.6;
+      background: rgba(42, 36, 32, 0.06);
+    }
   }
 
   .panel-close:active {
     transform: scale(0.9);
-    opacity: 0.55;
+    opacity: 0.5;
   }
 
   .panel-date {
     font-family: var(--display);
-    font-size: 3.5rem;
+    font-size: 2.8rem;
     color: var(--paper-text);
     line-height: 2.4rem;
     padding-top: 0.6rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.4rem;
   }
 
   .panel-weekday {
-    font-size: 0.9rem;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 400;
     letter-spacing: 0.1em;
-    color: #888;
+    color: rgba(42, 36, 32, 0.45);
     margin-bottom: 1.5rem;
     line-height: 2.4rem;
   }
 
+  .panel-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    margin-bottom: 1.25rem;
+    line-height: 1;
+  }
+
+  .panel-tags:empty {
+    display: none;
+  }
+
+  .panel-tag {
+    font-family: var(--sans);
+    font-size: 0.65rem;
+    font-weight: 400;
+    letter-spacing: 0.03em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 3px;
+    background: rgba(42, 36, 32, 0.08);
+    color: rgba(42, 36, 32, 0.6);
+  }
+
   .panel-content {
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 400;
     line-height: 2.4rem;
     color: var(--paper-text);
     font-family: var(--sans);
   }
 
-  .panel-content p {
-    margin: 0 0 1.2rem 0;
-    line-height: 2.4rem;
-  }
+  .panel-content p { margin: 0 0 1.2rem 0; line-height: 2.4rem; }
 
   .panel-content h1,
   .panel-content h2,
@@ -544,134 +653,97 @@ const logsJson = JSON.stringify(logs)
     line-height: 2.4rem;
   }
 
-  .panel-content h1 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    letter-spacing: -0.005em;
-  }
-  .panel-content h2 {
-    font-size: 1.05rem;
-    font-weight: 600;
-    letter-spacing: -0.005em;
-  }
-  .panel-content h3 {
-    font-size: 0.92rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: rgba(42, 36, 32, 0.7);
-  }
-  .panel-content h4 {
-    font-size: 0.88rem;
-    font-weight: 600;
-    color: rgba(42, 36, 32, 0.6);
-  }
+  .panel-content h1 { font-size: 1.15rem; font-weight: 600; }
+  .panel-content h2 { font-size: 1rem; font-weight: 600; }
+  .panel-content h3 { font-size: 0.88rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(42, 36, 32, 0.7); }
+  .panel-content h4 { font-size: 0.85rem; font-weight: 600; color: rgba(42, 36, 32, 0.6); }
 
-  .panel-content ul,
-  .panel-content ol {
-    padding-left: 1.4rem;
-    margin: 0 0 1.2rem 0;
-  }
-
-  .panel-content li {
-    line-height: 2.4rem;
-    margin-bottom: 0;
-  }
-
-  .panel-content a {
-    color: var(--paper-text);
-    text-decoration: underline;
-    text-decoration-color: rgba(42, 36, 32, 0.4);
-    text-underline-offset: 2px;
-  }
-
+  .panel-content ul, .panel-content ol { padding-left: 1.4rem; margin: 0 0 1.2rem 0; }
+  .panel-content li { line-height: 2.4rem; margin-bottom: 0; }
+  .panel-content a { color: var(--paper-text); text-decoration: underline; text-decoration-color: rgba(42, 36, 32, 0.4); text-underline-offset: 2px; }
   .panel-content em { font-style: italic; }
   .panel-content strong { font-weight: 600; color: var(--paper-text); }
+  .panel-content blockquote { border-left: 2px solid rgba(42, 36, 32, 0.3); padding-left: 1rem; margin: 1rem 0; font-style: italic; color: rgba(42, 36, 32, 0.7); }
+  .panel-content code { font-family: var(--mono); font-feature-settings: var(--mono-feat); background: rgba(42, 36, 32, 0.08); padding: 0.05rem 0.3rem; border-radius: 2px; font-size: 0.88em; }
+  .panel-content hr { border: none; border-top: 1px solid rgba(42, 36, 32, 0.2); margin: 1.5rem 0; }
+  .panel-content img { max-width: 100%; border-radius: 2px; margin: 1rem 0; }
 
-  .panel-content blockquote {
-    border-left: 2px solid rgba(42, 36, 32, 0.3);
-    padding-left: 1rem;
-    margin: 1rem 0;
-    font-style: italic;
-    color: rgba(42, 36, 32, 0.7);
+  /* Panel navigation (replaces page folds) */
+  .panel-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1.5rem;
+    margin-top: 1rem;
+    border-top: 1px solid rgba(42, 36, 32, 0.1);
   }
 
-  .panel-content code {
-    font-family: var(--mono);
-    font-feature-settings: var(--mono-feat);
-    background: rgba(42, 36, 32, 0.08);
-    padding: 0.05rem 0.3rem;
-    border-radius: 2px;
-    font-size: 0.88em;
-  }
-
-  .panel-content hr {
-    border: none;
-    border-top: 1px solid rgba(42, 36, 32, 0.2);
-    margin: 1.5rem 0;
-  }
-
-  .panel-content img {
-    max-width: 100%;
-    border-radius: 2px;
-    margin: 1rem 0;
-  }
-
-  /* Page folds */
-  .page-fold {
-    position: absolute;
-    bottom: 0;
-    width: 50px;
-    height: 50px;
+  .panel-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: rgba(42, 36, 32, 0.5);
+    background: none;
+    border: 1px solid rgba(42, 36, 32, 0.1);
+    border-radius: 100px;
+    padding: 0.3rem 0.7rem;
     cursor: pointer;
-    overflow: hidden;
-    z-index: 6;
+    transition:
+      color var(--dur-normal) var(--ease-out),
+      border-color var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
   }
 
-  .page-fold-left,
-  .page-fold-right {
-    transition: border-bottom-color var(--dur-normal) var(--ease-out);
-  }
-
-  .page-fold-left {
-    left: 0;
-    border-right: 50px solid transparent;
-    border-bottom: 50px solid rgba(42, 36, 32, 0.06);
+  .panel-nav-btn:disabled {
+    opacity: 0.25;
+    cursor: default;
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .page-fold-left:hover {
-      border-bottom-color: rgba(42, 36, 32, 0.18);
+    .panel-nav-btn:not(:disabled):hover {
+      color: rgba(42, 36, 32, 0.8);
+      border-color: rgba(42, 36, 32, 0.25);
     }
   }
 
-  .page-fold-left:active {
-    border-bottom-color: rgba(42, 36, 32, 0.28);
+  .panel-nav-btn:not(:disabled):active {
+    transform: scale(0.97);
   }
 
-  .page-fold-right {
-    right: 0;
-    border-left: 50px solid transparent;
-    border-bottom: 50px solid rgba(42, 36, 32, 0.06);
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .page-fold-right:hover {
-      border-bottom-color: rgba(42, 36, 32, 0.18);
-    }
-  }
-
-  .page-fold-right:active {
-    border-bottom-color: rgba(42, 36, 32, 0.28);
-  }
-
-  @media (max-width: 768px) {
-    .calendar-wrapper {
-      --cell-size: calc((100vw - 2rem - 18px) / 7);
-      padding: 1rem;
+  /* ===== Responsive ===== */
+  @media (max-width: 600px) {
+    .cal-nav {
+      gap: 0.6rem;
     }
 
-    .day-number { font-size: 1.2rem; left: 0.4rem; top: 0.3rem; }
-    .notebook-page { padding: 2.5rem 2rem 2rem 3.5rem; }
+    .cal-month-label {
+      min-width: 10rem;
+    }
+
+    .cal-month {
+      font-size: 1.4rem;
+    }
+
+    .cal-day {
+      font-size: 0.9rem;
+      top: 0.25rem;
+      left: 0.35rem;
+    }
+
+    .notebook-page {
+      padding: 2.5rem 2rem 1.5rem 3.5rem;
+    }
+
+    .notebook-page::before {
+      left: 2.8rem;
+    }
+
+    .panel-date {
+      font-size: 2.2rem;
+    }
   }
 </style>

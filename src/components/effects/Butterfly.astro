@@ -155,17 +155,11 @@ document.addEventListener('astro:page-load', initButterfly)
 
 <style>
   .butterfly {
-    position: fixed;
-    top: 50%;
-    right: var(--bf-right, 14rem);
-    transform: translateY(-50%) scale(var(--bf-scale, 1));
-    transform-origin: center right;
-    /* EXCEPTION: hard-coded monospace is required because the multi-line
-       ASCII art collapses in any proportional font. Courier New is bundled
-       with every OS, so this stays consistent cross-platform without an
-       extra font download. */
+    position: relative;
+    transform: scale(var(--bf-scale, 1));
+    transform-origin: center center;
     font-family: 'Courier New', monospace;
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.15;
     color: var(--text);
     opacity: var(--bf-opacity, 0.6);
@@ -179,13 +173,13 @@ document.addEventListener('astro:page-load', initButterfly)
     margin: 0;
     background: none;
     border: none;
+    flex-shrink: 0;
     transition: opacity var(--dur-slow) var(--ease-out);
   }
 
   @media (max-width: 1400px) {
     .butterfly {
-      font-size: 10px;
-      right: 3rem;
+      font-size: 9px;
       width: 60ch;
     }
   }

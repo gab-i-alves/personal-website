@@ -8,7 +8,6 @@ import BaseHead from '@/components/layout/BaseHead.astro'
 import ImageViewer from '@/components/ui/ImageViewer.astro'
 import CopyCode from '@/components/ui/CopyCode.astro'
 import Stars from '@/components/effects/Stars.astro'
-import ContentProtect from '@/components/effects/ContentProtect.astro'
 import BackLink from '@/components/layout/BackLink.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 
@@ -88,7 +87,6 @@ const pageNumber = currentIdx >= 0 ? currentIdx + 1 : 1
     </article>
   </div>
 
-  <ContentProtect />
   <FootnoteScroll />
   <CopyCode />
   {themeConfig.post.imageViewer && <ImageViewer />}

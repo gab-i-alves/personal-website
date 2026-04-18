@@ -21,15 +21,6 @@ const about = defineCollection({
   schema: z.object({})
 })
 
-const changelog = defineCollection({
-  loader: glob({ base: './src/content/changelog', pattern: '**/*.{md,mdx}' }),
-  schema: () =>
-    z.object({
-      date: z.coerce.date(),
-      version: z.string().optional()
-    })
-})
-
 const dailyLogs = defineCollection({
   // Load Markdown and MDX files in the `src/content/daily-logs/` directory.
   loader: glob({ base: './src/content/daily-logs', pattern: '**/*.{md,mdx}' }),
@@ -43,4 +34,22 @@ const dailyLogs = defineCollection({
     })
 })
 
-export const collections = { posts, about, dailyLogs, changelog }
+const shelf = defineCollection({
+  loader: glob({ base: './src/content/shelf', pattern: '**/*.{md,mdx}' }),
+  schema: () =>
+    z.object({
+      title: z.string(),
+      author: z.string().optional(),
+      category: z.enum(['fiction', 'nonfiction', 'advice', 'science', 'history']),
+      medium: z.enum(['book', 'essay', 'short-story', 'video', 'podcast', 'paper', 'blog-post', 'other']),
+      rating: z.number().min(1).max(10).optional(),
+      writingScore: z.number().min(1).max(10).optional(),
+      duration: z.string().optional(),
+      tags: z.array(z.string()).default([]),
+      favorite: z.boolean().default(false),
+      url: z.string().optional(),
+      dateRead: z.coerce.date().optional()
+    })
+})
+
+export const collections = { posts, about, dailyLogs, shelf }

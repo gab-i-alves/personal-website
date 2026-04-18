@@ -7,41 +7,66 @@ interface Props {
 const { href = '/', label = 'back' } = Astro.props
 ---
 
-<a href={href} class="back-link-global">&larr; {label}</a>
+<a href={href} class="back-link-global">
+  <svg class="back-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+  </svg>
+  <span>{label}</span>
+</a>
 
 <style is:global>
   .back-link-global {
-    position: fixed;
-    top: 2rem;
-    left: 2rem;
-    font-size: var(--font-size-s);
+    position: relative;
+    z-index: 30;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem 0 0 2rem;
+    padding: 0.5rem 0.85rem 0.5rem 0.65rem;
+    font-size: 0.85rem;
     font-family: var(--sans);
+    font-weight: 400;
     color: var(--text);
     text-decoration: none;
-    opacity: 0.45;
-    letter-spacing: 0.04em;
+    opacity: 0.6;
+    letter-spacing: 0.03em;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: transparent;
     transition:
       opacity var(--dur-normal) var(--ease-out),
+      background var(--dur-normal) var(--ease-out),
+      border-color var(--dur-normal) var(--ease-out),
       transform var(--dur-fast) var(--ease-out);
-    z-index: 30;
-    transform-origin: left center;
+  }
+
+  .back-arrow {
+    flex-shrink: 0;
+    transition: transform var(--dur-normal) var(--ease-out);
   }
 
   @media (hover: hover) and (pointer: fine) {
     .back-link-global:hover {
-      opacity: 0.95;
+      opacity: 1;
+      background: rgba(252, 214, 230, 0.05);
+      border-color: rgba(252, 214, 230, 0.15);
+    }
+
+    .back-link-global:hover .back-arrow {
+      transform: translateX(-3px);
     }
   }
 
   .back-link-global:active {
-    transform: scale(var(--press-scale));
+    transform: scale(0.97);
     opacity: 0.85;
   }
 
   @media (max-width: 768px) {
     .back-link-global {
-      top: 1.25rem;
-      left: 1.25rem;
+      margin: 1.25rem 0 0 1.25rem;
+      font-size: 0.8rem;
+      padding: 0.4rem 0.75rem 0.4rem 0.55rem;
     }
   }
 </style>

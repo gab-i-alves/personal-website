@@ -1,46 +1,154 @@
 ---
-import IndexLayout from '@/layouts/IndexLayout.astro'
-import Currently from '@/components/widgets/Currently.astro'
+import '@/styles/global.css'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import BaseHead from '@/components/layout/BaseHead.astro'
 import Stars from '@/components/effects/Stars.astro'
-import ContentProtect from '@/components/effects/ContentProtect.astro'
+import BackLink from '@/components/layout/BackLink.astro'
+import SiteFooter from '@/components/layout/SiteFooter.astro'
 import { themeConfig } from '@/config'
+
+const currently = [
+  { label: 'reading', value: 'Team Topologies: Organizing Business and Technology Teams for Fast Flow' },
+  { label: 'working on', value: 'post-grad thesis daily log habit' },
+  { label: 'studying', value: 'managing teams and stuff' }
+]
 ---
 
-<IndexLayout title={`Now · ${themeConfig.site.title}`} description={themeConfig.site.description}>
+<BaseLayout title={`Now · ${themeConfig.site.title}`} description="what i'm currently up to">
+  <BaseHead title={`Now · ${themeConfig.site.title}`} description="what i'm currently up to" slot="head" />
+
   <Stars count={60} maxOpacity={0.5} />
+  <BackLink />
 
-  <header class="now-header">
-    <h1 class="page-title">right now</h1>
-    <p class="page-subtitle">what i'm currently doing, updated whenever i feel like it</p>
-  </header>
+  <div class="now-page">
+    <header class="now-header">
+      <h1 class="now-title">right now</h1>
+      <p class="now-subtitle">what i'm currently doing, updated whenever i feel like it</p>
+    </header>
 
-  <Currently />
-  <ContentProtect />
-</IndexLayout>
+    <div class="now-entries">
+      {currently.map((item, i) => (
+        <div class="now-row" style={`animation-delay: ${i * 60}ms`}>
+          <span class="now-label">{item.label}</span>
+          <span class="now-value">{item.value}</span>
+        </div>
+      ))}
+    </div>
 
-<style>
-  .now-header {
-    text-align: center;
-    margin-bottom: 4rem;
+    <SiteFooter />
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .now-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    position: relative;
+    z-index: 1;
   }
 
-  .page-title {
+  .now-header {
+    padding: 5rem 0 3rem;
+    text-align: center;
+  }
+
+  .now-title {
     font-family: var(--display);
-    font-size: var(--display-lg);
+    font-size: var(--display-xl);
     font-weight: normal;
-    letter-spacing: 0.03em;
-    line-height: 1.1;
+    line-height: 1;
     color: var(--text);
+    opacity: 0.92;
     margin: 0;
   }
 
-  .page-subtitle {
+  .now-subtitle {
     font-family: var(--sans);
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     font-weight: 300;
     color: var(--text-dim);
+    opacity: 0.85;
+    margin-top: 1.25rem;
     letter-spacing: 0.04em;
-    margin: 1rem 0 0 0;
     font-style: italic;
+  }
+
+  /* Entry rows — same structure as bookmark sections */
+  .now-entries {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .now-row {
+    display: flex;
+    align-items: baseline;
+    gap: 1.5rem;
+    padding: 1.25rem 0.5rem;
+    border-top: 1px solid var(--border);
+    animation: nowFadeIn 350ms var(--ease-out) both;
+    transition: background-color var(--dur-normal) var(--ease-out);
+  }
+
+  .now-row:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  @keyframes nowFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .now-row:hover {
+      background-color: rgba(252, 214, 230, 0.03);
+    }
+  }
+
+  .now-label {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    color: var(--text);
+    opacity: 0.5;
+    flex-shrink: 0;
+    min-width: 7rem;
+  }
+
+  .now-value {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text);
+    line-height: 1.5;
+    letter-spacing: -0.005em;
+  }
+
+  @media (max-width: 600px) {
+    .now-page {
+      padding: 0 1.25rem 3rem;
+    }
+
+    .now-header {
+      padding: 3rem 0 2rem;
+    }
+
+    .now-row {
+      flex-direction: column;
+      gap: 0.35rem;
+      padding: 1rem 0.25rem;
+    }
+
+    .now-label {
+      min-width: unset;
+    }
   }
 </style>

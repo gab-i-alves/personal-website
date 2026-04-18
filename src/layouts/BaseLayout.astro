@@ -1,6 +1,7 @@
 ---
 import { themeConfig } from '@/config'
 import { ClientRouter } from 'astro:transitions'
+import Cursor from '@/components/effects/Cursor.astro'
 import type { LayoutProps } from '@/types'
 
 type Props = LayoutProps
@@ -17,5 +18,6 @@ const fadeAnimation = themeConfig.general.fadeAnimation
   </head>
   <body>
     <slot />
+    <Cursor />
   </body>
 </html>

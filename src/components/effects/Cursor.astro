@@ -1,0 +1,203 @@
+---
+---
+
+<div class="cursor-wrap" id="cursor-wrap">
+  <div class="cursor-star" id="cursor-star">✦</div>
+  <div class="cursor-ring" id="cursor-ring"></div>
+</div>
+<canvas class="cursor-trail" id="cursor-trail"></canvas>
+
+<script is:inline>
+function initCursor() {
+  var star = document.getElementById('cursor-star')
+  var ring = document.getElementById('cursor-ring')
+  var canvas = document.getElementById('cursor-trail')
+  if (!star || !ring || !canvas) return
+
+  var ctx = canvas.getContext('2d')
+
+  // Size canvas to viewport
+  function resize() {
+    canvas.width = window.innerWidth
+    canvas.height = window.innerHeight
+  }
+  resize()
+  window.addEventListener('resize', resize)
+
+  // State
+  var mx = window.innerWidth / 2
+  var my = window.innerHeight / 2
+  var sx = mx, sy = my // star position (spring)
+  var rx = mx, ry = my // ring position (slower spring)
+  var pressing = false
+  var particles = []
+  var frameCount = 0
+
+  // Track mouse
+  document.addEventListener('mousemove', function(e) {
+    mx = e.clientX
+    my = e.clientY
+  })
+
+  document.addEventListener('mousedown', function() { pressing = true })
+  document.addEventListener('mouseup', function() { pressing = false })
+
+  // Particle class
+  function spawnParticle(x, y) {
+    particles.push({
+      x: x,
+      y: y,
+      vx: (Math.random() - 0.5) * 1.5,
+      vy: (Math.random() - 0.5) * 1.5 - 0.5,
+      life: 1,
+      decay: 0.015 + Math.random() * 0.02,
+      size: 2 + Math.random() * 4,
+      char: ['✦', '·', '+', '*', '✧'][Math.floor(Math.random() * 5)]
+    })
+  }
+
+  function loop() {
+    requestAnimationFrame(loop)
+    frameCount++
+
+    // Spring interpolation (Emil: spring-like, not direct)
+    var starEase = 0.18
+    var ringEase = 0.08
+    sx += (mx - sx) * starEase
+    sy += (my - sy) * starEase
+    rx += (mx - rx) * ringEase
+    ry += (my - ry) * ringEase
+
+    // Position elements
+    star.style.translate = sx + 'px ' + sy + 'px'
+    ring.style.translate = rx + 'px ' + ry + 'px'
+
+    // Scale on press
+    if (pressing) {
+      star.style.scale = '0.7'
+      ring.style.scale = '0.85'
+    } else {
+      star.style.scale = '1'
+      ring.style.scale = '1'
+    }
+
+    // Rotate star slowly
+    star.style.rotate = (frameCount * 0.8) + 'deg'
+
+    // Spawn trail particles every 3 frames while moving
+    var speed = Math.sqrt((mx - sx) * (mx - sx) + (my - sy) * (my - sy))
+    if (speed > 2 && frameCount % 3 === 0) {
+      spawnParticle(sx, sy)
+    }
+
+    // Draw particles
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    for (var i = particles.length - 1; i >= 0; i--) {
+      var p = particles[i]
+      p.x += p.vx
+      p.y += p.vy
+      p.vy += 0.02 // light gravity
+      p.life -= p.decay
+
+      if (p.life <= 0) {
+        particles.splice(i, 1)
+        continue
+      }
+
+      ctx.save()
+      ctx.globalAlpha = p.life * 0.6
+      ctx.fillStyle = '#FCD6E6'
+      ctx.font = p.size + 'px Inter, sans-serif'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(p.char, p.x, p.y)
+      ctx.restore()
+    }
+  }
+
+  loop()
+
+  // Hide on mouse leave, show on enter
+  document.addEventListener('mouseleave', function() {
+    star.style.opacity = '0'
+    ring.style.opacity = '0'
+  })
+  document.addEventListener('mouseenter', function() {
+    star.style.opacity = '1'
+    ring.style.opacity = '1'
+  })
+}
+initCursor()
+document.addEventListener('astro:page-load', initCursor)
+</script>
+
+<style is:global>
+  .cursor-wrap {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .cursor-star {
+    position: fixed;
+    top: 0;
+    left: 0;
+    color: #FCD6E6;
+    font-size: 16px;
+    line-height: 1;
+    translate: 0 0;
+    margin-left: -8px;
+    margin-top: -8px;
+    transition: scale 160ms cubic-bezier(0.23, 1, 0.32, 1), opacity 200ms ease;
+    filter: drop-shadow(0 0 4px rgba(252, 214, 230, 0.4));
+    pointer-events: none;
+    z-index: 10001;
+  }
+
+  .cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(252, 214, 230, 0.25);
+    border-radius: 50%;
+    translate: 0 0;
+    margin-left: -16px;
+    margin-top: -16px;
+    transition: scale 200ms cubic-bezier(0.23, 1, 0.32, 1), opacity 200ms ease, border-color 200ms ease;
+    pointer-events: none;
+    z-index: 10000;
+  }
+
+  /* Grow ring on interactive elements */
+  a:hover ~ .cursor-wrap .cursor-ring,
+  button:hover ~ .cursor-wrap .cursor-ring {
+    scale: 1.4;
+    border-color: rgba(252, 214, 230, 0.5);
+  }
+
+  .cursor-trail {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9998;
+  }
+
+  /* Fallback: show native cursor on touch devices */
+  @media (pointer: coarse) {
+    html { cursor: auto !important; }
+    a, button, input, select, textarea { cursor: auto !important; }
+    .cursor-wrap, .cursor-trail { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cursor-wrap, .cursor-trail { display: none; }
+    html { cursor: crosshair !important; }
+  }
+</style>
