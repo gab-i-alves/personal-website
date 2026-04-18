@@ -9,12 +9,12 @@
 
 <script is:inline>
 function initCursor() {
-  var star = document.getElementById('cursor-star')
-  var ring = document.getElementById('cursor-ring')
-  var canvas = document.getElementById('cursor-trail')
+  const star = document.getElementById('cursor-star')
+  const ring = document.getElementById('cursor-ring')
+  const canvas = document.getElementById('cursor-trail')
   if (!star || !ring || !canvas) return
 
-  var ctx = canvas.getContext('2d')
+  const ctx = canvas.getContext('2d')
 
   // Size canvas to viewport
   function resize() {
@@ -25,13 +25,13 @@ function initCursor() {
   window.addEventListener('resize', resize)
 
   // State
-  var mx = window.innerWidth / 2
-  var my = window.innerHeight / 2
-  var sx = mx, sy = my // star position (spring)
-  var rx = mx, ry = my // ring position (slower spring)
-  var pressing = false
-  var particles = []
-  var frameCount = 0
+  let mx = window.innerWidth / 2
+  let my = window.innerHeight / 2
+  let sx = mx, sy = my // star position (spring)
+  let rx = mx, ry = my // ring position (slower spring)
+  let pressing = false
+  const particles = []
+  let frameCount = 0
 
   // Track mouse
   document.addEventListener('mousemove', function(e) {
@@ -61,8 +61,8 @@ function initCursor() {
     frameCount++
 
     // Spring interpolation (Emil: spring-like, not direct)
-    var starEase = 0.18
-    var ringEase = 0.08
+    const starEase = 0.18
+    const ringEase = 0.08
     sx += (mx - sx) * starEase
     sy += (my - sy) * starEase
     rx += (mx - rx) * ringEase
@@ -85,15 +85,15 @@ function initCursor() {
     star.style.rotate = (frameCount * 0.8) + 'deg'
 
     // Spawn trail particles every 3 frames while moving
-    var speed = Math.sqrt((mx - sx) * (mx - sx) + (my - sy) * (my - sy))
+    const speed = Math.sqrt((mx - sx) * (mx - sx) + (my - sy) * (my - sy))
     if (speed > 2 && frameCount % 3 === 0) {
       spawnParticle(sx, sy)
     }
 
     // Draw particles
     ctx.clearRect(0, 0, canvas.width, canvas.height)
-    for (var i = particles.length - 1; i >= 0; i--) {
-      var p = particles[i]
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i]
       p.x += p.vx
       p.y += p.vy
       p.vy += 0.02 // light gravity
