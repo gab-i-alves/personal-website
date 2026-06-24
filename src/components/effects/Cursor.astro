@@ -106,7 +106,7 @@ function initCursor() {
 
       ctx.save()
       ctx.globalAlpha = p.life * 0.6
-      ctx.fillStyle = '#FCD6E6'
+      ctx.fillStyle = '#ADA4CC'
       ctx.font = p.size + 'px Inter, sans-serif'
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
@@ -144,14 +144,14 @@ document.addEventListener('astro:page-load', initCursor)
     position: fixed;
     top: 0;
     left: 0;
-    color: #FCD6E6;
+    color: #ADA4CC;
     font-size: 16px;
     line-height: 1;
     translate: 0 0;
     margin-left: -8px;
     margin-top: -8px;
     transition: scale 160ms cubic-bezier(0.23, 1, 0.32, 1), opacity 200ms ease;
-    filter: drop-shadow(0 0 4px rgba(252, 214, 230, 0.4));
+    filter: drop-shadow(0 0 4px rgba(173, 164, 204, 0.4));
     pointer-events: none;
     z-index: 10001;
   }
@@ -162,7 +162,7 @@ document.addEventListener('astro:page-load', initCursor)
     left: 0;
     width: 32px;
     height: 32px;
-    border: 1px solid rgba(252, 214, 230, 0.25);
+    border: 1px solid rgba(173, 164, 204, 0.25);
     border-radius: 50%;
     translate: 0 0;
     margin-left: -16px;
@@ -176,7 +176,7 @@ document.addEventListener('astro:page-load', initCursor)
   a:hover ~ .cursor-wrap .cursor-ring,
   button:hover ~ .cursor-wrap .cursor-ring {
     scale: 1.4;
-    border-color: rgba(252, 214, 230, 0.5);
+    border-color: rgba(173, 164, 204, 0.5);
   }
 
   .cursor-trail {

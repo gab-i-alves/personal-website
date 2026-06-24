@@ -3,14 +3,14 @@
 
 :root {
   /* Color Palette — dark-only */
-  --bg: #302A2A;
-  --text: #FCD6E6;
-  --text-dim: rgba(252, 214, 230, 0.55);
-  --text-faint: rgba(252, 214, 230, 0.3);
-  --border: rgba(252, 214, 230, 0.08);
-  --selection: rgba(252, 214, 230, 0.12);
-  --code-bg: rgba(252, 214, 230, 0.06);
-  --mark: rgba(252, 214, 230, 0.15);
+  --bg: #403255;
+  --text: #ADA4CC;
+  --text-dim: rgba(173, 164, 204, 0.55);
+  --text-faint: rgba(173, 164, 204, 0.3);
+  --border: rgba(173, 164, 204, 0.08);
+  --selection: rgba(173, 164, 204, 0.12);
+  --code-bg: rgba(173, 164, 204, 0.06);
+  --mark: rgba(173, 164, 204, 0.15);
 
   /* Paper (articles, notebook) */
   --paper: #F5F0E8;
@@ -74,17 +74,17 @@
   --display-md: clamp(1.8rem, 3.5vw, 3rem);
 
   /* Syntax Theme (dark) */
-  --astro-code-foreground: rgba(252, 214, 230, 0.9);
-  --astro-code-background: rgba(252, 214, 230, 0.04);
-  --astro-code-token-constant: rgba(252, 214, 230, 0.9);
-  --astro-code-token-string: rgba(252, 214, 230, 0.9);
-  --astro-code-token-comment: rgba(252, 214, 230, 0.35);
-  --astro-code-token-keyword: rgba(252, 214, 230, 0.55);
-  --astro-code-token-parameter: rgba(252, 214, 230, 0.9);
-  --astro-code-token-function: rgba(252, 214, 230, 0.9);
-  --astro-code-token-string-expression: rgba(252, 214, 230, 0.55);
-  --astro-code-token-punctuation: rgba(252, 214, 230, 0.55);
-  --astro-code-token-link: rgba(252, 214, 230, 0.55);
+  --astro-code-foreground: rgba(173, 164, 204, 0.9);
+  --astro-code-background: rgba(173, 164, 204, 0.04);
+  --astro-code-token-constant: rgba(173, 164, 204, 0.9);
+  --astro-code-token-string: rgba(173, 164, 204, 0.9);
+  --astro-code-token-comment: rgba(173, 164, 204, 0.35);
+  --astro-code-token-keyword: rgba(173, 164, 204, 0.55);
+  --astro-code-token-parameter: rgba(173, 164, 204, 0.9);
+  --astro-code-token-function: rgba(173, 164, 204, 0.9);
+  --astro-code-token-string-expression: rgba(173, 164, 204, 0.55);
+  --astro-code-token-punctuation: rgba(173, 164, 204, 0.55);
+  --astro-code-token-link: rgba(173, 164, 204, 0.55);
 }
 
 html {
@@ -123,7 +123,7 @@ body {
 }
 
 ::selection {
-  background-color: rgba(252, 214, 230, 0.2);
+  background-color: rgba(173, 164, 204, 0.2);
 }
 
 /* View Transitions — fade between pages */
