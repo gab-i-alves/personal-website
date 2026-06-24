@@ -175,10 +175,10 @@ const description = overviewEntry!.data.description
 
   /* ===== Section heading between intro and listing ===== */
   .cur-section-title {
-    font-family: var(--display);
-    font-size: var(--display-md);
-    font-weight: normal;
-    letter-spacing: 0.02em;
+    font-family: var(--sans);
+    font-size: 1.55rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
     color: var(--text);
     margin: 3.5rem 0 0.6rem;
     padding-top: 2.5rem;
@@ -345,10 +345,11 @@ const description = overviewEntry!.data.description
   }
 
   .pane-name {
-    font-family: var(--display);
-    font-size: var(--display-md);
-    line-height: 1.1;
-    letter-spacing: 0.02em;
+    font-family: var(--sans);
+    font-size: 1.45rem;
+    font-weight: 600;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
     color: var(--text);
   }
 
@@ -392,14 +393,17 @@ const description = overviewEntry!.data.description
     letter-spacing: 0.01em;
   }
 
+  /* tidy reading column so prose doesn't wrap early in the wide page */
   .cur-overview {
     margin-top: 1.75rem;
+    max-width: 760px;
   }
 
   .cur-appendices {
     margin-top: 3.5rem;
     padding-top: 2.5rem;
     border-top: 1px solid var(--border);
+    max-width: 760px;
   }
 
   .pane-body {
@@ -410,11 +414,12 @@ const description = overviewEntry!.data.description
     margin-top: 0;
   }
 
+  /* the single h1 keeps the display ("fancy") font — only here */
   .cur-prose h1 {
     font-family: var(--display);
-    font-size: var(--display-lg);
+    font-size: var(--display-md);
     font-weight: normal;
-    line-height: 1.08;
+    line-height: 1.12;
     letter-spacing: 0.02em;
     color: var(--text);
     margin: 0;
@@ -432,11 +437,11 @@ const description = overviewEntry!.data.description
   }
 
   .cur-prose h2 {
-    font-family: var(--display);
-    font-size: 1.55rem;
-    font-weight: normal;
-    line-height: 1.2;
-    letter-spacing: 0.02em;
+    font-family: var(--sans);
+    font-size: 1.4rem;
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
     color: var(--text);
     margin: 3rem 0 1.3rem;
     padding-bottom: 0.8rem;
@@ -444,10 +449,10 @@ const description = overviewEntry!.data.description
   }
 
   .cur-prose h3 {
-    font-family: var(--display);
-    font-size: 1.18rem;
-    font-weight: normal;
-    letter-spacing: 0.01em;
+    font-family: var(--sans);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.005em;
     color: var(--text);
     margin: 2rem 0 0.9rem;
   }
@@ -462,7 +467,6 @@ const description = overviewEntry!.data.description
 
   .cur-prose p {
     margin: 1rem 0;
-    max-width: 72ch;
   }
 
   .cur-prose strong {
@@ -494,7 +498,6 @@ const description = overviewEntry!.data.description
   .cur-prose ol {
     margin: 1rem 0;
     padding-left: 1.4rem;
-    max-width: 72ch;
   }
 
   .cur-prose li {
