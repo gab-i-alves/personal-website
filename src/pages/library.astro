@@ -1,0 +1,257 @@
+---
+import '@/styles/global.css'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import BaseHead from '@/components/layout/BaseHead.astro'
+import Stars from '@/components/effects/Stars.astro'
+import BackLink from '@/components/layout/BackLink.astro'
+import SiteFooter from '@/components/layout/SiteFooter.astro'
+import { themeConfig } from '@/config'
+
+const description = 'a quiet shelf — hover to peek, click to open'
+---
+
+<BaseLayout title={`Library · ${themeConfig.site.title}`} description={description}>
+  <BaseHead title={`Library · ${themeConfig.site.title}`} description={description} slot="head" />
+
+  <Stars count={45} maxOpacity={0.35} />
+  <BackLink />
+
+  <div class="lib-page">
+    <header class="lib-header">
+      <h1 class="lib-title">library</h1>
+      <p class="lib-subtitle">a quiet shelf — hover to peek, click to open</p>
+    </header>
+
+    <div class="lib-stage">
+      <button class="lib-card" id="libCard" aria-expanded="false" aria-label="Open the book">
+        <span class="lib-flip">
+          <img
+            class="lib-face lib-face--shelf"
+            src="/images/shelf.svg"
+            alt="An illustrated bookshelf"
+            draggable="false"
+          />
+          <img
+            class="lib-face lib-face--book"
+            data-src="/images/book1.svg"
+            alt="An open book"
+            draggable="false"
+          />
+        </span>
+      </button>
+
+      <p class="lib-hint" id="libHint">
+        <span class="hint-dot" aria-hidden="true">&#9671;</span>
+        <span class="hint-text">click the shelf to open</span>
+      </p>
+    </div>
+
+    <SiteFooter />
+  </div>
+</BaseLayout>
+
+<style is:global>
+  .lib-page {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .lib-header {
+    padding: 3rem 0 2rem;
+    text-align: center;
+  }
+
+  .lib-title {
+    font-family: var(--display);
+    font-size: var(--display-xl);
+    font-weight: normal;
+    line-height: 1;
+    color: var(--text);
+    opacity: 0.92;
+    margin: 0;
+  }
+
+  .lib-subtitle {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+    margin: 1.25rem 0 0;
+  }
+
+  /* ===== Stage ===== */
+  .lib-stage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  /* The card holds the 3D scene. perspective gives the flip real depth. */
+  .lib-card {
+    appearance: none;
+    border: none;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-width: 680px;
+    aspect-ratio: 16 / 9;
+    perspective: 1600px;
+    display: block;
+  }
+
+  .lib-flip {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    /* Asymmetric: opening is slow + elegant, the hover lift is quick. */
+    transition: transform 750ms var(--ease-elegant);
+    will-change: transform;
+  }
+
+  .lib-face {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 12px;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    user-select: none;
+    -webkit-user-drag: none;
+    transition: filter var(--dur-slow) var(--ease-out);
+  }
+
+  /* Back face is pre-rotated so it reads correctly once the card flips. */
+  .lib-face--book {
+    transform: rotateY(180deg);
+  }
+
+  /* Hover (closed only): lift, scale, and a soft glow — Emil-style press hint. */
+  @media (hover: hover) and (pointer: fine) {
+    .lib-card:not(.is-open):hover .lib-flip {
+      transform: translateY(-8px) scale(1.025);
+    }
+    .lib-card:not(.is-open):hover .lib-face--shelf {
+      filter: drop-shadow(0 18px 36px rgba(0, 0, 0, 0.45))
+        drop-shadow(0 0 16px rgba(215, 208, 223, 0.18));
+    }
+  }
+
+  .lib-card:active:not(.is-open) .lib-flip {
+    transform: scale(0.99);
+  }
+
+  /* Open: flip to the book face. */
+  .lib-card.is-open .lib-flip {
+    transform: rotateY(180deg);
+  }
+
+  .lib-card.is-open .lib-face--book {
+    filter: drop-shadow(0 22px 44px rgba(0, 0, 0, 0.5));
+  }
+
+  /* ===== Hint ===== */
+  .lib-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: lowercase;
+    color: var(--text-faint);
+    margin: 0;
+    transition: color var(--dur-normal) var(--ease-out);
+  }
+
+  .lib-card:hover ~ .lib-hint {
+    color: var(--text-dim);
+  }
+
+  .hint-dot {
+    font-size: 0.6rem;
+    opacity: 0.7;
+  }
+
+  @media (max-width: 768px) {
+    .lib-page {
+      padding: 0 1.25rem 3rem;
+    }
+    .lib-header {
+      padding: 2rem 0 1.5rem;
+    }
+  }
+
+  /* Reduced motion: trade the 3D flip for a calm cross-fade. */
+  @media (prefers-reduced-motion: reduce) {
+    .lib-flip {
+      transition: none;
+    }
+    .lib-card.is-open .lib-flip {
+      transform: none;
+    }
+    .lib-face {
+      transition: opacity var(--dur-slow) var(--ease-out);
+      backface-visibility: visible;
+    }
+    .lib-face--book {
+      transform: none;
+      opacity: 0;
+    }
+    .lib-card.is-open .lib-face--shelf {
+      opacity: 0;
+    }
+    .lib-card.is-open .lib-face--book {
+      opacity: 1;
+    }
+  }
+</style>
+
+<script is:inline>
+  function initLibrary() {
+    const card = document.getElementById('libCard')
+    const hint = document.getElementById('libHint')
+    if (!card) return
+
+    const bookImg = card.querySelector('.lib-face--book')
+
+    // Defer the heavy book SVG until it's actually wanted.
+    function loadBook() {
+      if (bookImg && bookImg.dataset.src) {
+        bookImg.src = bookImg.dataset.src
+        delete bookImg.dataset.src
+      }
+    }
+
+    card.addEventListener('pointerenter', loadBook, { once: true })
+
+    function setHint(open) {
+      if (!hint) return
+      const text = hint.querySelector('.hint-text')
+      if (text) text.textContent = open ? 'click to close' : 'click the shelf to open'
+    }
+
+    card.addEventListener('click', function () {
+      loadBook()
+      const open = card.classList.toggle('is-open')
+      card.setAttribute('aria-expanded', open ? 'true' : 'false')
+      card.setAttribute('aria-label', open ? 'Close the book' : 'Open the book')
+      setHint(open)
+    })
+  }
+
+  initLibrary()
+  document.addEventListener('astro:page-load', initLibrary)
+</script>
