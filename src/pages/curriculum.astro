@@ -8,21 +8,13 @@ import SiteFooter from '@/components/layout/SiteFooter.astro'
 import { getCollection, getEntry, render } from 'astro:content'
 import { themeConfig } from '@/config'
 
-// Framework prose: top intro + footer references.
-const overviewEntry = await getEntry('program', 'overview')
-const appendicesEntry = await getEntry('program', 'appendices')
-const { Content: Overview } = await render(overviewEntry!)
-const { Content: Appendices } = await render(appendicesEntry!)
-
 const PHASE_RANK = { prop: 0, i: 1, ii: 2, iii: 3 }
-
 const PHASE_NAME = {
   prop: 'Propedêutica',
   i: 'Fase I — Fundamentos',
   ii: 'Fase II — Aprofundamento',
   iii: 'Fase III — Pesquisa'
 }
-
 const TRACK_NAME = {
   A: 'Sistemas de Dados & Engenharia',
   B: 'Neurociência Computacional',
@@ -31,26 +23,62 @@ const TRACK_NAME = {
   E: 'Sistemas, Cognição & Meta'
 }
 
+// --- header (program title + subtitle)
+const header = await getEntry('program', 'cabecalho')
+const { Content: Header } = await render(header!)
+
+// --- subjects (the listing)
 const courses = await getCollection('curriculum')
-const subjects = [...courses].sort((a, b) => {
+const subjectsSorted = [...courses].sort((a, b) => {
   const p = PHASE_RANK[a.data.phase] - PHASE_RANK[b.data.phase]
   return p !== 0 ? p : a.data.order - b.data.order
 })
+const subjectRendered = await Promise.all(subjectsSorted.map((s) => render(s)))
+const subjectItems = subjectsSorted.map((s, i) => ({
+  id: s.id,
+  kind: 'subject' as const,
+  code: s.data.code,
+  title: s.data.title,
+  heading: s.data.heading,
+  phase: s.data.phase,
+  track: s.data.track,
+  Content: subjectRendered[i].Content
+}))
 
-// Render every subject body once so each pane can show its full description.
-const rendered = await Promise.all(subjects.map((s) => render(s)))
+// --- framework prose, folded into the same rail (one entry each)
+const FW = [
+  { id: 'visao-geral', group: 'O programa', title: 'Visão geral', code: '§ 1', slug: '01-visao-geral' },
+  { id: 'as-fases', group: 'O programa', title: 'As fases', code: '§ 2–5', slug: '02-as-fases' },
+  { id: 'bibliografia', group: 'Referências', title: 'Bibliografia', code: '§ 6', slug: '03-bibliografia' },
+  { id: 'cursos', group: 'Referências', title: 'Cursos online', code: '§ 7', slug: '04-cursos' },
+  { id: 'apendices', group: 'Referências', title: 'Apêndices', code: 'A–C', slug: '05-apendices' }
+]
+const fwEntries = await Promise.all(FW.map((f) => getEntry('program', f.slug)))
+const fwRendered = await Promise.all(fwEntries.map((e) => render(e!)))
+const fwItems = FW.map((f, i) => ({
+  id: f.id,
+  kind: 'framework' as const,
+  code: f.code,
+  title: f.title,
+  Content: fwRendered[i].Content
+}))
 
-// Group the rail by phase, preserving the sorted order.
-const phaseOrder = ['prop', 'i', 'ii', 'iii'] as const
-const groups = phaseOrder
-  .map((phase) => ({
-    phase,
-    name: PHASE_NAME[phase],
-    items: subjects.filter((s) => s.data.phase === phase)
-  }))
-  .filter((g) => g.items.length > 0)
+// --- rail groups, in reading order; subjects sit in the middle as the focus
+const phaseGroups = (['prop', 'i', 'ii', 'iii'] as const).map((p) => ({
+  label: PHASE_NAME[p],
+  items: subjectItems.filter((it) => it.phase === p)
+}))
+const groups = [
+  { label: 'O programa', items: fwItems.filter((it) => ['visao-geral', 'as-fases'].includes(it.id)) },
+  ...phaseGroups,
+  { label: 'Referências', items: fwItems.filter((it) => ['bibliografia', 'cursos', 'apendices'].includes(it.id)) }
+].filter((g) => g.items.length > 0)
 
-const description = overviewEntry!.data.description
+const flatItems = groups.flatMap((g) => g.items)
+// open on the first subject so the listing — not a wall of text — leads
+const defaultId = subjectItems[0].id
+
+const description = 'um currículo autodirigido — as matérias que estou estudando, de propósito'
 ---
 
 <BaseLayout title={`Currículo · ${themeConfig.site.title}`} description={description}>
@@ -60,58 +88,56 @@ const description = overviewEntry!.data.description
   <BackLink />
 
   <div class="cur-page">
-    <p class="cur-eyebrow">currículo · programa autodirigido</p>
-
-    <!-- intro · the framework prose lives between the title and the listing -->
-    <section class="cur-prose cur-overview">
-      <Overview />
-    </section>
-
-    <h2 class="cur-section-title">As matérias</h2>
-    <p class="cur-section-hint">Selecione uma disciplina à esquerda para ver a ementa completa, os conteúdos, materiais, ferramentas e o checkpoint de avaliação.</p>
+    <header class="cur-head">
+      <Header />
+    </header>
 
     <div class="cur-layout">
-      <!-- master · subject rail, grouped by phase -->
+      <!-- master · everything is a rail entry: subjects + the program prose -->
       <nav class="rail" aria-label="Matérias">
         {groups.map((group) => (
           <div class="rail-group">
-            <p class="rail-group-label">{group.name}</p>
-            {group.items.map((course, gi) => (
+            <p class="rail-group-label">{group.label}</p>
+            {group.items.map((item) => (
               <button
                 type="button"
-                class="rail-item"
-                data-target={course.id}
-                aria-pressed={course.id === subjects[0].id ? 'true' : 'false'}
-                style={`animation-delay: ${gi * 35}ms`}
+                class={`rail-item rail-item--${item.kind}`}
+                data-target={item.id}
+                aria-pressed={item.id === defaultId ? 'true' : 'false'}
               >
-                <span class="rail-name">{course.data.title}</span>
-                <span class="rail-code">{course.data.code}</span>
+                <span class="rail-name">{item.title}</span>
+                <span class="rail-code">{item.code}</span>
               </button>
             ))}
           </div>
         ))}
       </nav>
 
-      <!-- detail · one pane per subject; only the active one is shown -->
+      <!-- detail · one pane per entry; only the active one shows -->
       <div class="detail">
-        {subjects.map((course, i) => {
-          const Body = rendered[i].Content
+        {flatItems.map((item) => {
+          const Body = item.Content
           return (
-            <article class="pane" data-pane={course.id} hidden={i !== 0}>
-              <div class="pane-head">
-                <h3 class="pane-title">
-                  <span class="pane-code">{course.data.code}</span>
-                  <span class="pane-sep">·</span>
-                  <span class="pane-name">{course.data.heading}</span>
-                </h3>
-              </div>
-
-              <p class="pane-meta">
-                <span class="pane-phase">{PHASE_NAME[course.data.phase]}</span>
-                {course.data.track && (
-                  <span class="pane-track">Trilha {course.data.track} · {TRACK_NAME[course.data.track]}</span>
-                )}
-              </p>
+            <article class="pane" data-pane={item.id} hidden={item.id !== defaultId}>
+              {item.kind === 'subject' ? (
+                <>
+                  <h2 class="pane-title">
+                    <span class="pane-code">{item.code}</span>
+                    <span class="pane-sep">·</span>
+                    <span class="pane-name">{item.heading}</span>
+                  </h2>
+                  <p class="pane-meta">
+                    <span class="pane-phase">{PHASE_NAME[item.phase!]}</span>
+                    {item.track && (
+                      <span class="pane-track">Trilha {item.track} · {TRACK_NAME[item.track]}</span>
+                    )}
+                  </p>
+                </>
+              ) : (
+                <h2 class="pane-title pane-title--fw">
+                  <span class="pane-name">{item.title}</span>
+                </h2>
+              )}
 
               <div class="cur-prose pane-body">
                 <Body />
@@ -122,11 +148,6 @@ const description = overviewEntry!.data.description
       </div>
     </div>
 
-    <!-- footer · references and appendices -->
-    <section class="cur-prose cur-appendices">
-      <Appendices />
-    </section>
-
     <SiteFooter />
   </div>
 </BaseLayout>
@@ -134,20 +155,24 @@ const description = overviewEntry!.data.description
 <script>
   const rail = document.querySelectorAll<HTMLButtonElement>('.rail-item')
   const panes = document.querySelectorAll<HTMLElement>('.pane')
+  const detail = document.querySelector<HTMLElement>('.detail')
 
-  function select(id: string) {
+  function select(id: string, scroll = false) {
     rail.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.target === id)))
     panes.forEach((p) => {
       p.hidden = p.dataset.pane !== id
     })
     if (history.replaceState) history.replaceState(null, '', `#${id}`)
+    // on narrow screens the rail stacks above the pane — jump down to it
+    if (scroll && detail && window.matchMedia('(max-width: 860px)').matches) {
+      detail.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   }
 
   rail.forEach((btn) => {
-    btn.addEventListener('click', () => select(btn.dataset.target!))
+    btn.addEventListener('click', () => select(btn.dataset.target!, true))
   })
 
-  // Deep-link: honor #subject-id on load.
   const fromHash = decodeURIComponent(location.hash.slice(1))
   if (fromHash && document.querySelector(`[data-pane="${CSS.escape(fromHash)}"]`)) {
     select(fromHash)
@@ -163,40 +188,34 @@ const description = overviewEntry!.data.description
     z-index: 1;
   }
 
-  .cur-eyebrow {
-    font-family: var(--mono);
-    font-feature-settings: var(--mono-feat);
-    font-size: 0.66rem;
-    letter-spacing: 0.18em;
-    text-transform: lowercase;
-    color: var(--text-faint);
-    margin: 2.5rem 0 0;
+  /* ===== Compact header — title keeps the display font, nothing else does ===== */
+  .cur-head {
+    padding: 2.5rem 0 2.25rem;
   }
 
-  /* ===== Section heading between intro and listing ===== */
-  .cur-section-title {
-    font-family: var(--sans);
-    font-size: 1.55rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
+  .cur-head h1 {
+    font-family: var(--display);
+    font-size: var(--display-md);
+    font-weight: normal;
+    line-height: 1.12;
+    letter-spacing: 0.02em;
     color: var(--text);
-    margin: 3.5rem 0 0.6rem;
-    padding-top: 2.5rem;
-    border-top: 1px solid var(--border);
+    margin: 0;
+    max-width: 24ch;
   }
 
-  .cur-section-hint {
+  .cur-head h3 {
     font-family: var(--sans);
-    font-size: 0.9rem;
+    font-size: 0.98rem;
     font-weight: 300;
     font-style: italic;
     color: var(--text-faint);
-    letter-spacing: 0.02em;
-    margin: 0 0 2rem;
-    max-width: 64ch;
+    letter-spacing: 0.03em;
+    margin: 1rem 0 0;
+    max-width: 70ch;
   }
 
-  /* ===== Master / detail layout ===== */
+  /* ===== Master / detail layout (default full width) ===== */
   .cur-layout {
     display: grid;
     grid-template-columns: 280px 1fr;
@@ -214,7 +233,7 @@ const description = overviewEntry!.data.description
   .rail-group {
     display: flex;
     flex-direction: column;
-    gap: 0.55rem;
+    gap: 0.5rem;
   }
 
   .rail-group-label {
@@ -229,33 +248,22 @@ const description = overviewEntry!.data.description
 
   .rail-item {
     display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
     text-align: left;
     width: 100%;
     box-sizing: border-box;
-    padding: 0.85rem 1rem;
+    padding: 0.7rem 0.95rem;
     cursor: pointer;
     color: var(--text);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 10px;
     background: rgba(215, 208, 223, 0.015);
-    animation: cardIn 350ms var(--ease-out) both;
     transition:
       background var(--dur-normal) var(--ease-out),
       border-color var(--dur-normal) var(--ease-out),
       transform var(--dur-fast) var(--ease-out);
-  }
-
-  @keyframes cardIn {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
   }
 
   @media (hover: hover) and (pointer: fine) {
@@ -275,11 +283,18 @@ const description = overviewEntry!.data.description
     background: rgba(215, 208, 223, 0.06);
   }
 
+  /* framework entries read as quieter than subjects */
+  .rail-item--framework .rail-name {
+    font-style: italic;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
   .rail-name {
     font-family: var(--sans);
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 500;
-    line-height: 1.25;
+    line-height: 1.3;
     letter-spacing: -0.005em;
     color: var(--text);
   }
@@ -287,9 +302,10 @@ const description = overviewEntry!.data.description
   .rail-code {
     font-family: var(--mono);
     font-feature-settings: var(--mono-feat);
-    font-size: 0.64rem;
-    letter-spacing: 0.12em;
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
     color: var(--text-faint);
+    white-space: nowrap;
   }
 
   /* ===== Detail pane ===== */
@@ -303,7 +319,7 @@ const description = overviewEntry!.data.description
     padding: 2rem 2.1rem 2.4rem;
     background: rgba(215, 208, 223, 0.012);
     min-height: 420px;
-    animation: paneIn 300ms var(--ease-out) both;
+    animation: paneIn 280ms var(--ease-out) both;
   }
 
   @keyframes paneIn {
@@ -313,14 +329,6 @@ const description = overviewEntry!.data.description
     to {
       opacity: 1;
     }
-  }
-
-  .pane-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
   }
 
   .pane-title {
@@ -361,7 +369,6 @@ const description = overviewEntry!.data.description
     margin: 1rem 0 0;
   }
 
-  .pane-phase,
   .pane-track {
     font-family: var(--sans);
     font-size: 0.74rem;
@@ -373,7 +380,6 @@ const description = overviewEntry!.data.description
   .pane-phase {
     font-family: var(--mono);
     font-feature-settings: var(--mono-feat);
-    font-style: normal;
     font-size: 0.6rem;
     letter-spacing: 0.08em;
     text-transform: lowercase;
@@ -383,8 +389,9 @@ const description = overviewEntry!.data.description
     background: rgba(252, 180, 200, 0.16);
   }
 
-  /* ===== Shared dark-theme prose (overview, panes, appendices) ===== */
-  .cur-prose {
+  /* ===== Prose inside panes (dark theme, readable sans) ===== */
+  .pane-body {
+    margin-top: 1.6rem;
     font-family: var(--sans);
     font-size: 0.95rem;
     font-weight: 300;
@@ -393,94 +400,59 @@ const description = overviewEntry!.data.description
     letter-spacing: 0.01em;
   }
 
-  /* tidy reading column so prose doesn't wrap early in the wide page */
-  .cur-overview {
-    margin-top: 1.75rem;
-    max-width: 760px;
-  }
-
-  .cur-appendices {
-    margin-top: 3.5rem;
-    padding-top: 2.5rem;
-    border-top: 1px solid var(--border);
-    max-width: 760px;
-  }
-
-  .pane-body {
-    margin-top: 1.6rem;
-  }
-
-  .cur-prose > :first-child {
+  .pane-body > :first-child {
     margin-top: 0;
   }
 
-  /* the single h1 keeps the display ("fancy") font — only here */
-  .cur-prose h1 {
-    font-family: var(--display);
-    font-size: var(--display-md);
-    font-weight: normal;
-    line-height: 1.12;
-    letter-spacing: 0.02em;
-    color: var(--text);
-    margin: 0;
-  }
-
-  /* the standalone h3 right under the h1 is the document subtitle */
-  .cur-overview h1 + h3 {
+  .pane-body h2 {
     font-family: var(--sans);
-    font-size: 1.02rem;
-    font-weight: 300;
-    font-style: italic;
-    color: var(--text-faint);
-    letter-spacing: 0.03em;
-    margin: 0.9rem 0 0;
-  }
-
-  .cur-prose h2 {
-    font-family: var(--sans);
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 600;
     line-height: 1.25;
     letter-spacing: -0.01em;
     color: var(--text);
-    margin: 3rem 0 1.3rem;
-    padding-bottom: 0.8rem;
+    margin: 2.2rem 0 1.1rem;
+    padding-bottom: 0.7rem;
     border-bottom: 1px solid var(--border);
   }
 
-  .cur-prose h3 {
+  .pane-body h2:first-child {
+    margin-top: 0;
+  }
+
+  .pane-body h3 {
     font-family: var(--sans);
-    font-size: 1.1rem;
+    font-size: 1.02rem;
     font-weight: 600;
     letter-spacing: -0.005em;
     color: var(--text);
-    margin: 2rem 0 0.9rem;
+    margin: 1.7rem 0 0.8rem;
   }
 
-  .cur-prose h4 {
+  .pane-body h4 {
     font-family: var(--sans);
     font-size: 0.9rem;
-    font-weight: 500;
+    font-weight: 600;
     color: var(--text);
-    margin: 1.6rem 0 0.7rem;
+    margin: 1.4rem 0 0.6rem;
   }
 
-  .cur-prose p {
-    margin: 1rem 0;
+  .pane-body p {
+    margin: 0.9rem 0;
   }
 
-  .cur-prose strong {
+  .pane-body strong {
     color: var(--text);
     font-weight: 500;
   }
 
-  .cur-prose em {
+  .pane-body em {
     font-style: italic;
     color: var(--text);
     opacity: 0.92;
   }
 
-  .cur-prose a {
+  .pane-body a {
     color: var(--text);
     text-decoration: underline;
     text-decoration-color: var(--text-faint);
@@ -489,34 +461,34 @@ const description = overviewEntry!.data.description
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .cur-prose a:hover {
+    .pane-body a:hover {
       text-decoration-color: var(--text);
     }
   }
 
-  .cur-prose ul,
-  .cur-prose ol {
-    margin: 1rem 0;
+  .pane-body ul,
+  .pane-body ol {
+    margin: 0.9rem 0;
     padding-left: 1.4rem;
   }
 
-  .cur-prose li {
+  .pane-body li {
     margin: 0.4rem 0;
     line-height: 1.65;
   }
 
-  .cur-prose li::marker {
+  .pane-body li::marker {
     color: var(--text-faint);
   }
 
-  .cur-prose ul ul,
-  .cur-prose ol ol,
-  .cur-prose ul ol,
-  .cur-prose ol ul {
+  .pane-body ul ul,
+  .pane-body ol ol,
+  .pane-body ul ol,
+  .pane-body ol ul {
     margin: 0.4rem 0;
   }
 
-  .cur-prose code {
+  .pane-body code {
     font-family: var(--mono);
     font-feature-settings: var(--mono-feat);
     font-size: 0.84em;
@@ -527,16 +499,16 @@ const description = overviewEntry!.data.description
     color: var(--text);
   }
 
-  .cur-prose pre {
+  .pane-body pre {
     background: rgba(215, 208, 223, 0.04);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 1.25rem 1.4rem;
-    margin: 1.5rem 0;
+    margin: 1.4rem 0;
     overflow-x: auto;
   }
 
-  .cur-prose pre code {
+  .pane-body pre code {
     background: none;
     border: none;
     padding: 0;
@@ -545,8 +517,8 @@ const description = overviewEntry!.data.description
     color: var(--text-dim);
   }
 
-  .cur-prose blockquote {
-    margin: 1.6rem 0;
+  .pane-body blockquote {
+    margin: 1.4rem 0;
     padding: 1.1rem 1.4rem;
     border: 1px solid var(--border);
     border-left: 2px solid rgba(252, 200, 215, 0.55);
@@ -555,29 +527,28 @@ const description = overviewEntry!.data.description
     color: var(--text-dim);
   }
 
-  .cur-prose blockquote p {
+  .pane-body blockquote p {
     margin: 0.5rem 0;
-    max-width: none;
   }
 
-  .cur-prose blockquote p:first-child {
+  .pane-body blockquote p:first-child {
     margin-top: 0;
   }
 
-  .cur-prose blockquote p:last-child {
+  .pane-body blockquote p:last-child {
     margin-bottom: 0;
   }
 
-  .cur-prose table {
+  .pane-body table {
     width: 100%;
     border-collapse: collapse;
-    margin: 1.5rem 0;
+    margin: 1.4rem 0;
     font-size: 0.85rem;
     display: block;
     overflow-x: auto;
   }
 
-  .cur-prose thead th {
+  .pane-body thead th {
     font-family: var(--mono);
     font-feature-settings: var(--mono-feat);
     font-size: 0.64rem;
@@ -591,7 +562,7 @@ const description = overviewEntry!.data.description
     white-space: nowrap;
   }
 
-  .cur-prose tbody td {
+  .pane-body tbody td {
     padding: 0.7rem 0.9rem;
     border-bottom: 1px solid var(--border);
     color: var(--text-dim);
@@ -599,14 +570,14 @@ const description = overviewEntry!.data.description
     line-height: 1.5;
   }
 
-  .cur-prose tbody tr:last-child td {
+  .pane-body tbody tr:last-child td {
     border-bottom: none;
   }
 
-  .cur-prose hr {
+  .pane-body hr {
     border: none;
     border-top: 1px solid var(--border);
-    margin: 2.5rem 0;
+    margin: 2rem 0;
   }
 
   /* ===== Responsive ===== */
@@ -629,11 +600,11 @@ const description = overviewEntry!.data.description
     .cur-page {
       padding: 0 1.25rem 3rem;
     }
+    .cur-head {
+      padding: 1.75rem 0 1.75rem;
+    }
     .pane {
       padding: 1.5rem 1.4rem 1.8rem;
-    }
-    .cur-prose h2 {
-      font-size: 1.35rem;
     }
   }
 </style>
