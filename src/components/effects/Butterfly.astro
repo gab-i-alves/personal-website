@@ -11,8 +11,12 @@ const { scale = 1, right = '14rem', opacity = 0.6 } = Astro.props
 <pre class="butterfly" id="butterfly" style={`--bf-scale: ${scale}; --bf-right: ${right}; --bf-opacity: ${opacity};`}></pre>
 
 <script is:inline>
-function initButterfly() {
-  const frames = [
+function initAsciiArt() {
+  const butterflyArt = {
+    name: 'butterfly',
+    sequence: [0, 1, 2, 3, 2, 1],
+    durations: [300, 150, 120, 200, 120, 150],
+    frames: [
 `  :--===--:.                                                         .::-===-:.
 .*@@@@@@@@@@#*=:.                                               .:=*#%@@@@@@%@#:
 *@@@@@@@@@@@@%*#==:..                                        .:=+#*@@@@@@@@@@@@#
@@ -117,40 +121,1084 @@ function initButterfly() {
                            %@@%@*@+#    .   #+@+@@@@@:
                            .:=@#%%=.        .=#@%@#=-
                               ..:.            .---. `
-  ]
+    ]
+  }
 
-  const durations = [300, 150, 120, 200, 120, 150]
-  const sequence = [0, 1, 2, 3, 2, 1]
+  const extraArts = [
+  {
+    name: 'cat',
+    frameMs: 100,
+    frames: [
+`                               ..                       
+                             k1JBBB5JL                  
+                           vBi,BP,,:iqB5                
+                       ;uN8BB0BL   .   B2               
+                    ;MBXJ:.  .i ..,,,. FB               
+                   BBi         ..,,,.  BB               
+                 ,Bj      ..... ..,.  2BBN              
+                .Br  5BB  ......    .BB. BL             
+                BM  :BBB7 .....  iXBBS   jB             
+               ,B:   0BG   ..... 08L   . .Bi            
+               Br    :U,::.......     ..  BF            
+              UB:    .,:::::............  OE            
+              BBB     ::..i:,...........  BL            
+              7BN     ,::i:,............ .B.            
+               BB;,   .................  GB             
+                0G.      . . . . . .    SB              
+                 iM8r                .r8Z               
+                   jBMB0JYrr:rrLLLvFMEBB                
+                   jBBB7J2U2BGUULBB:. :B                
+                  .kLBX    .B     Br  .B.               
+                  BU i5 .. iB     YB   B7               
+                 :qiUM7.., rB  .   Bi  BU               
+                 jO :0,.,, rB      Mq  BU               
+                 5UN7..,,, ,B. ;7LiuM  Bu               
+                 5B  .,,,   BPri. .FB  .B.              
+                  B1     .  ;BqXPGBG: q8L               
+                   MMJ:,  .     .    0B.                
+                    .UBB  ..  NLr2kMB2                  
+                      ;B     SB.BM                      
+                      :B    LB 7O                       
+              .,::ir7r7MBOMBBBME7;L77ii::..             
+           .,ii77YuFk0NEMBBBBBBOOME0F5jY7ri:..          
+                .,::iir;rrrr7r7r7irii::..`,
+`                               ..                       
+                             k1JBBB5JL                  
+                           vBi,BP,,:iqB5                
+                       ;uN8BB0BL   .   B2               
+                    ;MBXJ:.  .i ..,,,. FB               
+                   BBi         ..,,,.  BB               
+                 ,Bj      ..... ..,.  2BBN              
+                .Br  5BB  ......    .BB. BL             
+                BM  :BBB7 .....  iXBBS   jB             
+               ,B:   0BG   ..... 08L   . .Bi            
+               Br    :U,::.......     ..  BF            
+              UB:    .,:::::............  OE            
+              BBB     ::..i:,...........  BL            
+              7BN     ,::i:,............ .B.            
+               BB;,   .................  GB             
+                0G.      . . . . . .    SB              
+                 iM8r                .r8Z               
+                   jBMB0JYrr:rrLLLvFMEBB                
+                   jBBB7J2U2BGUULBB:. :B                
+                  .kLBX    .B     Br  .B.               
+                  BU i5 .. iB     YB   B7               
+                 :qiUM7.., rB  .   Bi  BU               
+                 jO :0,.,, rB      Mq  BU               
+                 5UN7..,,, ,B. ;7LiuM  Bu               
+                 5B  .,,,   BPri. .FB  .B.              
+                  B1     .  ;BqXPGBG: q8L               
+                   MMJ:,  .     .    0B.                
+                    .UBB  ..  NLr2kMB2                  
+                      ;B     SB.BM                      
+                      :B    LB 7O                       
+              .,::ir7r7MBOMBBBME7;L77ii::..             
+           .,ii77YuFk0NEMBBBBBBOOME0F5jY7ri:..          
+                .,::iir;rrrr7r7r7irii::..`,
+`                                                        
+                              r;7PY                     
+                            PO70BBB0MBX                 
+                         .iBBikB.    .EB.               
+                     ,k8BEXUrFB  .,.,  BB               
+                   :BBY,        ,,.,.. NM               
+                  NBi     ... . .,,..  BB               
+                 MB  .jr ....... ... :BFiB.             
+                JB  .BBBi ......  .:MBY  MM             
+                BU  .BBB.  ..... EBB5.   iB             
+               PB    :k: ...... .::   .   BY            
+              :B     :rir7,,.....    ...  OE            
+              MBB     ,, .i:,...........  B2            
+              qBB     :i,:::............  Br            
+              .BN,.   .,:,,............  iB             
+               rBL   . . . ......... .   Bj             
+                :Mq:        . .        :B1              
+                  :BML:.            iUBB                
+                   :BBBBMO8XX088MMBBu,UB                
+                  7BOBG  , L7 ..  :BX  B                
+                 BBi 1k .. :Bi      rGYB,               
+               iBqE5,7j .:. :BY      :BBr               
+              LB.:u rB; ,,,  .BE   .82 ,B.              
+              1B 7FJr;.,,:..   0B: Br  MB               
+               LBB2;, .,:....   ;BMv,U1S1               
+                 PB   .,......    JZPL.:M.              
+                  YB::. ...           B1                
+                   .BB. ....  ...,.:1B7                 
+                    Bv  .  JB0PEBXBBi                   
+                   :B     ;BBN    SX                    
+              .,:::7BEY7YMBUrB1 ,qB7iii::..             
+           .,ii77YJuYEBBBBBBBBBBBBXF11jY7ri:..          
+                .,::::iirr77vr7rr:i:i::..`,
+`                                                        
+                              r;7PY                     
+                            PO70BBB0MBX                 
+                         .iBBikB.    .EB.               
+                     ,k8BEXUrFB  .,.,  BB               
+                   :BBY,        ,,.,.. NM               
+                  NBi     ... . .,,..  BB               
+                 MB  .jr ....... ... :BFiB.             
+                JB  .BBBi ......  .:MBY  MM             
+                BU  .BBB.  ..... EBB5.   iB             
+               PB    :k: ...... .::   .   BY            
+              :B     :rir7,,.....    ...  OE            
+              MBB     ,, .i:,...........  B2            
+              qBB     :i,:::............  Br            
+              .BN,.   .,:,,............  iB             
+               rBL   . . . ......... .   Bj             
+                :Mq:        . .        :B1              
+                  :BML:.            iUBB                
+                   :BBBBMO8XX088MMBBu,UB                
+                  7BOBG  , L7 ..  :BX  B                
+                 BBi 1k .. :Bi      rGYB,               
+               iBqE5,7j .:. :BY      :BBr               
+              LB.:u rB; ,,,  .BE   .82 ,B.              
+              1B 7FJr;.,,:..   0B: Br  MB               
+               LBB2;, .,:....   ;BMv,U1S1               
+                 PB   .,......    JZPL.:M.              
+                  YB::. ...           B1                
+                   .BB. ....  ...,.:1B7                 
+                    Bv  .  JB0PEBXBBi                   
+                   :B     ;BBN    SX                    
+              .,:::7BEY7YMBUrB1 ,qB7iii::..             
+           .,ii77YJuYEBBBBBBBBBBBBXF11jY7ri:..          
+                .,::::iirr77vr7rr:i:i::..`,
+`                                                        
+                                                        
+                                :.,.                    
+                             .P85BBBMj7                 
+                          ..1BP.PEi.:rMBi               
+                      7EMM8EOk1B1      :B7              
+                    0Bq:.        .,.,,. BM              
+                  7Bj      . .   ,,,,,  BU              
+                 2B. iBE. ........,..  5BB              
+                rB. :BBBS ......     :MB NB             
+                B;  .MBB: .....  :50BBj  ,B             
+               B:    ij,........ JMX:     B7            
+              MB     .::7::......     .   BY            
+              BBU    .:: :i:...... . ...  BJ            
+              BB,    .::::i,. .........   B.            
+              :BY7   ..,,,.. ..........  FB             
+               LB:    . . ...........   ,B:             
+                :BMr     . . . ...     :BN              
+                  ,qBUi,.            :0B:               
+                   :BMBBE80ZSSFS1FqBBuFB                
+                 .uBBBM  .,:7;7r7rjOBkOB                
+               iM0Bv 0S ..           .rEBS              
+              BB: O1 iU ,,, .NB,       ii7B2            
+            vBi  Y2 vB;..:,.  jB8i    J5  BP            
+            7B.  jqii7..:,...   YBB1, S  qB             
+             jB7 1UL, .,,.....    :FMBkrBB              
+              ,MBBB  ,,..........     ;0B.              
+                  2XUB.  ...          Mj.               
+                   PB,  .         .,7OBi                
+                   B,     .PXPSPMBGu7 GF                
+              .,:,7B0:  .JBOUuULjZML,uB:...             
+           .,ii77YLYMBBBBBBBBBBBZkSMBM7r7ri:..          
+                ..:,::rr7r77L77r7ii:,....`,
+`                                                        
+                                                        
+                                :.,.                    
+                             .P85BBBMj7                 
+                          ..1BP.PEi.:rMBi               
+                      7EMM8EOk1B1      :B7              
+                    0Bq:.        .,.,,. BM              
+                  7Bj      . .   ,,,,,  BU              
+                 2B. iBE. ........,..  5BB              
+                rB. :BBBS ......     :MB NB             
+                B;  .MBB: .....  :50BBj  ,B             
+               B:    ij,........ JMX:     B7            
+              MB     .::7::......     .   BY            
+              BBU    .:: :i:...... . ...  BJ            
+              BB,    .::::i,. .........   B.            
+              :BY7   ..,,,.. ..........  FB             
+               LB:    . . ...........   ,B:             
+                :BMr     . . . ...     :BN              
+                  ,qBUi,.            :0B:               
+                   :BMBBE80ZSSFS1FqBBuFB                
+                 .uBBBM  .,:7;7r7rjOBkOB                
+               iM0Bv 0S ..           .rEBS              
+              BB: O1 iU ,,, .NB,       ii7B2            
+            vBi  Y2 vB;..:,.  jB8i    J5  BP            
+            7B.  jqii7..:,...   YBB1, S  qB             
+             jB7 1UL, .,,.....    :FMBkrBB              
+              ,MBBB  ,,..........     ;0B.              
+                  2XUB.  ...          Mj.               
+                   PB,  .         .,7OBi                
+                   B,     .PXPSPMBGu7 GF                
+              .,:,7B0:  .JBOUuULjZML,uB:...             
+           .,ii77YLYMBBBBBBBBBBBZkSMBM7r7ri:..          
+                ..:,::rr7r77L77r7ii:,....`,
+`                                                        
+                                                        
+                               jESMN.                   
+                             5M7:BBBBMG:                
+                        ,iLYBBUYBY   .rBZ               
+                     rOBGPJv;:rB:  ...  Bk              
+                   7B0:          .,.,,. ME              
+                  MB.      . . . .,,,,  BU              
+                 BB  MBBr ....... ,..  BBB:             
+                GB  :BBB2  .....    ,2B5 YB             
+               7B    LBu  .....  LBBBk.  .B.            
+              :B     i;,i:...... iv:   .  BY            
+              BBv     .,:::,.....     ..  BJ            
+              BB:    .:i :i:...... .....  Bv            
+              MBr.   .::i::.. .........  ,B             
+               B2:   .................   BE             
+                B5.       ...........   YB              
+                 JB2.        . .       2Bi              
+                   1B0PUr:,.        iUBB                
+                  .BMZB810EMZqZM88BBU,vB                
+                 .BBZM0     :u. . :MM  B                
+                 BB: JF .,.  B;     UBrB:               
+                UBSYrJj ,,,  7B   .  ,BBr               
+                BBL :B:..:..  MB      rB2               
+               UB7j5v,..:,...  BO  :Xj, Bi              
+               .NBP: ..:,. ...  BN:S   UB:              
+                 .B:  ....... .  GB7r2B8M               
+                  :B2:   ...      .i:XBr.               
+                    rBB ... .riir:;7PX.                 
+                     Nk     BBL2LqB:                    
+              .,::iiiBY    uBJ   ZE,::i::..             
+           .,ii77Yu52BB0Y5BBBBBMBBFX11jY7ri:..          
+                .,::::ruXFu777uY7:i:i::..`,
+`                                                        
+                                                        
+                               jESMN.                   
+                             5M7:BBBBMG:                
+                        ,iLYBBUYBY   .rBZ               
+                     rOBGPJv;:rB:  ...  Bk              
+                   7B0:          .,.,,. ME              
+                  MB.      . . . .,,,,  BU              
+                 BB  MBBr ....... ,..  BBB:             
+                GB  :BBB2  .....    ,2B5 YB             
+               7B    LBu  .....  LBBBk.  .B.            
+              :B     i;,i:...... iv:   .  BY            
+              BBv     .,:::,.....     ..  BJ            
+              BB:    .:i :i:...... .....  Bv            
+              MBr.   .::i::.. .........  ,B             
+               B2:   .................   BE             
+                B5.       ...........   YB              
+                 JB2.        . .       2Bi              
+                   1B0PUr:,.        iUBB                
+                  .BMZB810EMZqZM88BBU,vB                
+                 .BBZM0     :u. . :MM  B                
+                 BB: JF .,.  B;     UBrB:               
+                UBSYrJj ,,,  7B   .  ,BBr               
+                BBL :B:..:..  MB      rB2               
+               UB7j5v,..:,...  BO  :Xj, Bi              
+               .NBP: ..:,. ...  BN:S   UB:              
+                 .B:  ....... .  GB7r2B8M               
+                  :B2:   ...      .i:XBr.               
+                    rBB ... .riir:;7PX.                 
+                     Nk     BBL2LqB:                    
+              .,::iiiBY    uBJ   ZE,::i::..             
+           .,ii77Yu52BB0Y5BBBBBMBBFX11jY7ri:..          
+                .,::::ruXFu777uY7:i:i::..`,
+`                                                        
+                                                        
+                              ,u5kBY                    
+                             80iUBBBGBG.                
+                        :iYFBB7EB:   .vBj               
+                     2MB0F7v::EB  .,.. ,B:              
+                   1B1.         .,,.,,  B:              
+                  BM       . . . ,,,.. vB.              
+                 BS  YBBi ........,.  7B0B              
+                BB  .BBBM  .....   .vBB, BB             
+               uB    kBP. .....  1BBB7   rB             
+              rB     77.i:...... ii.   .  Bi            
+              BBU     .,i::,.....     ..  Bi            
+              BBL    .:i..i:............  B:            
+              BB:    .::i::,. .........  iB             
+               BXi   .................   B0             
+                BU    .   ...........   ZB              
+                 UB5.        . .       NB               
+                   FBP27:..       .,7XBB                
+                   rBBBOP01BBB8M8ZNM1:7B                
+                   GBBN   LB1 .. ..   .B.               
+                  PL Y2 .BG.     B7    BB.              
+                  M1rLi,BY  .   MB  .  GBB              
+                 uN :BJBi      1B  ... MrLB             
+                 JXF;;B,:U2i  uB. ...  Bv:B:            
+                 ZO: .BP  .jvFB.   .   kB0              
+                 .B:   jMFi.BB    :    :B               
+                  :B5:   ,vj7  .  BU YBj.               
+                    7GEk7:.r:   . YBGZ.                 
+                       UBv;YB;    FB                    
+              .,::i;7ri7Bv. kBr .XBr::i::..             
+           .,ii77YuFk0EGMBBBBBBBBBq521jY7ri:..          
+                .,::iir;rr7r7r77r:i:i::..`,
+`                                                        
+                                                        
+                              ,j1kBY                    
+                             G0iUBBB8B8,                
+                        :;YFBB7EB,    LBj               
+                     UMBEFvvi:EM  .... ,B:              
+                   1B5.         .,,.,,  B:              
+                  BM       ...   ,,,.. 7B.              
+                 BF  YBBi ........,.  7B0B.             
+                BB  .BBBM  .....   .LBB, BB             
+               jB    kBP. . .....2BBB7   ;B             
+              rB     77.i:...... i:.   .  B:            
+              BBU     .,i::,.....   ...   Bi            
+              BBL    .:i..::............  B:            
+              BB:    .::i::,...........  iB             
+               BPi   .................   B0             
+                BU    . . ...........   ZB              
+                 UBF.        . . .     NB               
+                   FBP17:..        ,7kBB                
+                   rBBBMPN5BBM8M8ENM1:7B                
+                   GBBN   LB1... ..   .B.               
+                  Xv J1 .BG      B7    BB.              
+                  M5rL;:BL  .   MB  .  8BB              
+                 uN :BYBi      1B. ... MrLB             
+                 YPF;;B,:U1:  uB. ...  Bv:B:            
+                 ZO: .BP  .JvFB. .     XB0              
+                 .B:   jMFi.BB    :    :B               
+                  :B1:   ,7J7  .  BU YBj.               
+                    7GEk7:.r:     YBZZ.                 
+                       UBviYBi    SB                    
+             ..,::;i7ri7B7. kBr .XBr::i::..             
+           .,ii77YuFkNEGMBBBBBBBBBN122JY77i:..          
+               ...::iirirr7rvr77rii:i::..`,
+`                                                        
+                                                        
+                                ,.,                     
+                             iZXqBBBqXr                 
+                          ..BBriBU. :rBB.               
+                     ,jMMMEG82BB:  ..  uB.              
+                   ,BBU,         .,.,.  Br              
+                  kBi      . .  .,,,., ,B               
+                 MB  ,GS. ........,..  BBG              
+                uB   BBBM  .....    .UBJ Bk             
+               .B,   BBBi ...... r8BBM,  YB             
+               B,    rL. . ..... UNY.    .B,            
+              BB     :::vi:......     .   Bi            
+              BBM     .:..::............  Bi            
+              BB.    .:::.i:...........  :B             
+              rBj7   ..,::.. ..........  ZB             
+               LB:  . . . . .........   rB:             
+                :BMi     . . . . .     rB:              
+                  :8BL:.            .;BB                
+                   iBMBBEZFJ2F1S15XM82ZB                
+                   EBBM . :BBvrrr::.  ,B                
+                  rY.EF  LBY     2i    BB               
+                  BP i7 8B.     7B, .  BBM              
+                 vS 7B:BX      ,B7 ... OLMq             
+                 YG;:7B1:i:   .BJ  ..  Mr.B:            
+                 0SY.:B: :jq:.BU  ..   BBGr             
+                 rB   iB5.  NB7   ..   .B.              
+                  SB.   iq0qB:   .. :P1Uv               
+                   iG8L:          . .BB                 
+                    ,BijuUFO1SM7     2B                 
+             ..,::i:LBU:iLBBuY0BX,  ,B5.,..             
+           .,ii77Yj1U1MBBBBBBBMBBBO8BNrLrri:..          
+               ...::i:i:;;7rL77rri7r:.,..`,
+`                                                        
+                                                        
+                                ,.,                     
+                             iZXqBBBqXr                 
+                          ..BBriBU. :rBB.               
+                     ,jMMMEG82BB:  ..  uB.              
+                   ,BBU,         .,.,.  Br              
+                  kBi      . .  .,,,., ,B               
+                 MB  ,GS. ........,..  BBG              
+                uB   BBBM  .....    .UBJ Bk             
+               .B,   BBBi ...... r8BBM,  YB             
+               B,    rL. . ..... UNY.    .B,            
+              BB     :::vi:......     .   Bi            
+              BBM     .:..::............  Bi            
+              BB.    .:::.i:...........  :B             
+              rBj7   ..,::.. ..........  ZB             
+               LB:  . . . . .........   rB:             
+                :BMi     . . . . .     rB:              
+                  :8BL:.            .;BB                
+                   iBMBBEZFJ2F1S15XM82ZB                
+                   EBBM . :BBvrrr::.  ,B                
+                  rY.EF  LBY     2i    BB               
+                  BP i7 8B.     7B, .  BBM              
+                 vS 7B:BX      ,B7 ... OLMq             
+                 YG;:7B1:i:   .BJ  ..  Mr.B:            
+                 0SY.:B: :jq:.BU  ..   BBGr             
+                 rB   iB5.  NB7   ..   .B.              
+                  SB.   iq0qB:   .. :P1Uv               
+                   iG8L:          . .BB                 
+                    ,BijuUFO1SM7     2B                 
+             ..,::i:LBU:iLBBuY0BX,  ,B5.,..             
+           .,ii77Yj1U1MBBBBBBBMBBBO8BNrLrri:..          
+               ...::i:i:;;7rL77rri7r:.,..`,
+`                                                        
+                                                        
+                                ,.,                     
+                             iZXqBBBqXr                 
+                          ..BBriBU. :rBB.               
+                     ,jMMMEG82BB:  ..  uB.              
+                   ,BBU,         .,.,.  Br              
+                  kBi      . .  .,,,., ,B               
+                 MB  ,GS. ........,..  BBG              
+                uB   BBBM  .....    .UBJ Bk             
+               .B,   BBBi ...... r8BBM,  YB             
+               B,    rL. . ..... UNY.    .B,            
+              BB     :::vi:......     .   Bi            
+              BBM     .:..::............  Bi            
+              BB.    .:::.i:...........  :B             
+              rBj7   ..,::.. ..........  ZB             
+               LB:  . . . . .........   rB:             
+                :BMi     . . . . .     rB:              
+                  :8BL:.            .;BB                
+                   iBMBBEZFJ2F1S15XM82ZB                
+                   EBBM . :BBvrrr::.  ,B                
+                  rY.EF  LBY     2i    BB               
+                  BP i7 8B.     7B, .  BBM              
+                 vS 7B:BX      ,B7 ... OLMq             
+                 YG;:7B1:i:   .BJ  ..  Mr.B:            
+                 0SY.:B: :jq:.BU  ..   BBGr             
+                 rB   iB5.  NB7   ..   .B.              
+                  SB.   iq0qB:   .. :P1Uv               
+                   iG8L:          . .BB                 
+                    ,BijuUFO1SM7     2B                 
+             ..,::i:LBU:iLBBuY0BX,  ,B5.,..             
+           .,ii77Yj1U1MBBBBBBBMBBBO8BNrLrri:..          
+               ...::i:i:;;7rL77rri7r:.,..`,
+`                                                        
+                                                        
+                                ,.,                     
+                             iZXqBBBqXr                 
+                          ..BBriBU. :rBB.               
+                     ,jMMMEG82BB:  ..  uB.              
+                   ,BBU,         .,.,.  Br              
+                  kBi      . .  .,,,., ,B               
+                 MB  ,GS. ........,..  BBG              
+                uB   BBBM  .....    .UBJ Bk             
+               .B,   BBBi ...... r8BBM,  YB             
+               B,    rL. . ..... UNY.    .B,            
+              BB     :::vi:......     .   Bi            
+              BBM     .:..::............  Bi            
+              BB.    .:::.i:...........  :B             
+              rBj7   ..,::.. ..........  ZB             
+               LB:  . . . . .........   rB:             
+                :BMi     . . . . .     rB:              
+                  :8BL:.            .;BB                
+                   iBMBBEZFJ2F1S15XM82ZB                
+                   EBBM . :BBvrrr::.  ,B                
+                  rY.EF  LBY     2i    BB               
+                  BP i7 8B.     7B, .  BBM              
+                 vS 7B:BX      ,B7 ... OLMq             
+                 YG;:7B1:i:   .BJ  ..  Mr.B:            
+                 0SY.:B: :jq:.BU  ..   BBGr             
+                 rB   iB5.  NB7   ..   .B.              
+                  SB.   iq0qB:   .. :P1Uv               
+                   iG8L:          . .BB                 
+                    ,BijuUFO1SM7     2B                 
+             ..,::i:LBU:iLBBuY0BX,  ,B5.,..             
+           .,ii77Yj1U1MBBBBBBBMBBBO8BNrLrri:..          
+               ...::i:i:;;7rL77rri7r:.,..`,
+`                                                        
+                                                        
+                               :77L,                    
+                             UMUuBBBOGJ                 
+                         .:iBB:7BL  .:ZB:               
+                     iFBM8qN1YBB.  ..  7B.              
+                   iBM7.         ,,.,,  Bi              
+                  OB,      . .   ,,,., :B               
+                 BB  :B8, ........,.. .BBB              
+                SB   BBBM  .....    ,NBr BE             
+               iB.   MBB: . .... 7BBBP.  vB             
+              ,B     77.,:.. ... YU;     .B:            
+              BBi    .::ri:,.....     .   Bi            
+              BBX    .,i. ::............  Bi            
+              BB,     ::i::,...........  :B             
+              ,BFr   ....... .........   MB             
+               :Bi    . . . .........   YB.             
+                 MB7       . . . .     YB,              
+                  .ZBYi,.           :LBB                
+                   iBBBBEZSXG0NZNNNMGL5B                
+                   ZBB8   7BB::::,:   .B                
+                  LL P5  EB:     M7    BB               
+                  Bq,rr B0      FB. .  MBB              
+                 LS rBrBL      rB: ... MrUB             
+                 YEvi7Br:Yv.  iBi ...  B7,B:            
+                 EP7.,Bv  iXirBi   .   BBZ.             
+                 :B.  .G87  MB,   .    .B               
+                  7B;    LFPk.    B7 :BFi               
+                   .XMN7.  :.     5B1B7                 
+                      .EBULNB.    YB:                   
+             ..,::iiri:LB:  FB.  7BY.:i::..             
+           .,ii77YuFkN0GBBBBBBBBBBM22UYY77i:..          
+               ...::ii;irrv7v7LYvii::::..`,
+`                                                        
+                                                        
+                               :77L,                    
+                             UMUuBBBOGJ                 
+                         .:iBB:7BL  .:ZB:               
+                     iFBM8qN1YBB.  ..  7B.              
+                   iBM7.         ,,.,,  Bi              
+                  OB,      . .   ,,,., :B               
+                 BB  :B8, ........,.. .BBB              
+                SB   BBBM  .....    ,NBr BE             
+               iB.   MBB: . .... 7BBBP.  vB             
+              ,B     77.,:.. ... YU;     .B:            
+              BBi    .::ri:,.....     .   Bi            
+              BBX    .,i. ::............  Bi            
+              BB,     ::i::,...........  :B             
+              ,BFr   ....... .........   MB             
+               :Bi    . . . .........   YB.             
+                 MB7       . . . .     YB,              
+                  .ZBYi,.           :LBB                
+                   iBBBBEZSXG0NZNNNMGL5B                
+                   ZBB8   7BB::::,:   .B                
+                  LL P5  EB:     M7    BB               
+                  Bq,rr B0      FB. .  MBB              
+                 LS rBrBL      rB: ... MrUB             
+                 YEvi7Br:Yv.  iBi ...  B7,B:            
+                 EP7.,Bv  iXirBi   .   BBZ.             
+                 :B.  .G87  MB,   .    .B               
+                  7B;    LFPk.    B7 :BFi               
+                   .XMN7.  :.     5B1B7                 
+                      .EBULNB.    YB:                   
+             ..,::iiri:LB:  FB.  7BY.:i::..             
+           .,ii77YuFkN0GBBBBBBBBBBM22UYY77i:..          
+               ...::ii;irrv7v7LYvii::::..`
+    ]
+  },
+  {
+    name: 'dragon',
+    frameMs: 100,
+    frames: [
+`                        ii                                            
+                    .,.riiY..,i;7SU    ::                             
+                   YBNP   ;M,:MBBBBB5;B7:P,                           
+                   :7 r1   2    PB85BU 2r ur                          
+                   Mr  rN. q.    rB  B: U7 E:                         
+                 :ME    .L7qi     78  E. :vOM.                        
+                ,0                 .  ..    .E,                       
+                E.                           :k                       
+               i1                             Z.                      
+               Xi                             N.                      
+               E,          .222YvU5k7      :F;B                       
+               M.           ....            i;N:                      
+               M.                       v7i    Z                      
+               M:                      :BBBB   :S                     
+               Lq                       :BBr    S,                    
+                B                        ::     q.                    
+                vM                       ,     k7                     
+                 1N                          :57                      
+                  rX:                     .ij7                        
+                    rGr:           ..:;7FMUi  .:                      
+                   :J,..       .U7L77:,   .,::.,F                     
+               ..7Yr                    i      v7                     
+          .rririi.                      M,::;r7:                      
+          :P           :                U.                            
+           :Yi:.....:iPJ                ii                            
+             .,:::.   r:                 EBMqXULi:.                   
+                   ,qBB                  :8:vJkEBBBBBMj,              
+                 .BB; r                   7          iBBBS            
+                  ZBL:j.                   i        :LBBBJ            
+                   .5BBBBBBBME0FU1U2U1U2uUPBEMBBBBBBBM7.              
+                  J5  r   ,:;Lj152ZEGEG0Z25Bj7r:,.                    
+                   N  ;:                  ::                          
+                   .j7JP,                2j                           
+                        7U     ..,,:r:   Z.                           
+                         k.  :U::,:.k,  ,7                            
+                        ,L   8      ri  rU,                           
+                        v:   iY.    i;    iY.                         
+                       ,O:....2Y.:,.7qii:,.0:                         
+                        ..:::,,  ..  .,.:,.`,
+`                                                                      
+                         .    .;i,                                    
+               :Suv.:rEBBBBMv:87:r5.                                  
+           .rS57  :B:.;8BBBBBB.,S, LL                                 
+           .BrLr   ir    rBE uB  L7iBu                                
+            r: iX; .k      BU  X.  ,:7X,                              
+            B:   rY7q;      i   .      G,                             
+           M5                          .Z                             
+          Ur                            U.                            
+          q              .:i7jUkPY    .JM7                            
+         .O            YPUuri,.          F                            
+         .8                          BBBF.S.                          
+         .B                          FBBB  0,                         
+          M.                           8i  :1                         
+          51                           ,.  ,5                         
+           B.                              P:                         
+           iB                             jr ,77:                     
+            7M                          .ZU:7; 7Y                     
+         .:. :X:                      ,jB2,.  ,U                      
+         F.:r:i0EL..               :7Uv.     i2                       
+         S      :iiii           .LYr:       LJ                        
+         .Y7.                           k  1;                         
+           ,7Lr.                        :O7                           
+              ,;r7;i:i.                  L,                           
+                   .,,F.                  P2UL7:,                     
+                      :r                  iBBBBBBBBBBMui              
+                      Yr                   r      ,;FMBBBBP:          
+                     8B,                   L             1BBB         
+                     BBU                   7             7BBB         
+                  iiiU0BBBB0Li.            7     .,;JGBBBBBv          
+                  M2 i   :1MBBBBBBBBBBBBBBBBBBBBBBBBBBOY:             
+                  .S.iY         .::;777JL8Z;r7i:..                    
+                    7rFv.                Z                            
+                       .72    ii:iirj.   2                            
+                        .v   Y;     5,  Yr                            
+                        r7  :G      .v  77i:                          
+                        u.    ij    .U     u7                         
+                       :EiiriirP,,,.7EvL77iU:                         
+                          .....   .`,
+`                         :i                                           
+                     i::::Br.,:rr1k.                                  
+                    7Ur   Gi,,5BBBBBOi:rO1                            
+                    L7v  ,L     UBEUBE riX7r                          
+                   Yj Li,k.      YB :B.  7 .X                         
+                  N7   :r.        O  77  U:ik1r                       
+                 E:               .   .   :.  k1                      
+                u7                             M,                     
+                M                              7U                     
+               rU            ....:.            ,j                     
+               uY        :P5FuULJv:        L0UL1r                     
+               1i                            .:27                     
+               Uj                     .iii.     P.                    
+               LX                     0BBBq     ,G                    
+               .B                      kBE       Xi                   
+                Sv                      J        M.                   
+                7B                     ..       5Y                    
+               1 iB.                          .8B                     
+              7i  GSi                       iXG7L                     
+              L.  ,7Y0S:       ...   ..:rjqO5: ,r                     
+              ;v    . .         JOEP0qXjLi.   ,2                      
+               F.                           ,LL                       
+                Jr.                      .E7i                         
+                 :rLi:::                 U:                           
+                      kY                 7                            
+                      Y                  GU:                          
+                   ,YE                   MBBBBO.                      
+              .uMBBBBM                   L   ;ZBN                     
+           :NBBBM7.  i                   i.   iBB                     
+         :BBB7      r:                    UvOBBj                      
+         BBBu      q,i              :iUMBBBBP,                        
+         .FBBBBBMPuBYBLrYUuSq8BBBBBBBBBq;;v                           
+            .iUNBBBBBBBBBBBBBP2Lr,.      J                            
+                       .7     .   .i.   r2                            
+                        v    v, .. 1,   7:                            
+                        7.   F     :r   :Li                           
+                        7.   .vr   ,S     ,2.                         
+                        Nr.....0:,.:1j;i:iiF,                         
+                         .::::::. .  .:,,..`,
+`                         .7                                           
+                     ,i,::NN .:rrYkL                                  
+                     0v   i2:.7BBBBBBL::NNi                           
+                     1Y.  u     ,BBvBB.:ijj7:                         
+                   :0.:j,vY       B: B8  ;. E:                        
+                  vk   .ir        UL  0  ,Y,S1u.                      
+                 7S               .       ::  ,B.                     
+                .M                             7N                     
+                1i                              S                     
+                M                               U                     
+               .8         ;L7i:,.               5                     
+               :O         .iir7YJU1.       :NXFP8                     
+               .M                               rY                    
+                B                                N:                   
+                8r                     .Xk5r     ,Z                   
+                :B                     :BBBB     rS                   
+                 XZii                   iBF     ,M                    
+                .F..P                   ,i     YBr                    
+                X.  G:                      .YB7j.                    
+                M   :GF7.       ..     ,:71Zk7  u                     
+                Z.     .        :0OX0PPUJr,    J:                     
+                :Z                          :L7:                      
+                 :Fr,                     FL:                         
+      UBBBkr.       LX                  .k.                           
+       :UGBBBBBqv.  i.                  k.                            
+            .vNBBBBBBu,                Li                             
+                  iXBBBBBB5i.          U                              
+                   .r  :jBBBBBBq;.     i                              
+                   iU       ,vMBBBBBGr;r                              
+                   rU            .rqBBBBBB5.                          
+                   :2                  :BBB:                          
+                    q.                  :                             
+                    iP.                 L.                            
+                     :5Y    :Ui:,.,,   Lu                             
+                       S7   iE .::MJ   .P                             
+                        q    P,    u    :Yi                           
+                        1:    75.  :5     .U,                         
+                        2X.,.. XP...uSri:::Sr                         
+                         .:ii::;, .  .,,,..`
+    ]
+  },
+  {
+    name: 'phoenix',
+    frameMs: 100,
+    frames: [
+`                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                       .N:                            
+                                      YN2G                            
+                              ...,7P7NB  B                            
+                         ,rPUNFk12UNBM.  Zr                           
+                       .5E2:       1v    ;BU                          
+                     :G7r                 v:X7                        
+                    LBr                     .0u                       
+                   0M                         Br                      
+                  Bi                          :B                      
+                 02.r15Sk5J7.                  8j                     
+                :BrBBB8kOMBBG                  .B                     
+               :Ui         .                    0i                    
+              7Bi         .                     iP                    
+             YB.        :::.                    ,M                    
+            .B         ,i.  :.                  .X LSqv.              
+            :M         :,,.::.                  :BBBMBBBM,            
+            .B          ::::.                  :O0NXqMBMBBu           
+             B                               LMBNNEMBB   ,            
+             NU                   .UNSBii7PMBBBBBBBBB,                
+              B5.                iB:  BGMBOM8BN2U7:.                  
+               vBP:              BY  :0    :qi                        
+                 r2GBr:.        :B   0u ,YGL                          
+                    :7FuNkqLUYL:kL   GBki:                            
+                          ..:B: i.   5Bi                              
+                             B        .B7                             
+                             B,        ,8r                            
+                             U1          EB5F7rij772r                 
+                             .B          rBMJuvYY;: :F,               
+                              uB.  .     B7  .:::iL1L YY              
+                              ZYqLrBM.   :0:        BLrBL             
+                             :B. ,. iB,   .XL        ::,.             
+                              ,J5j:. BBi.   FU                        
+                                 .iru,iBr   5U                        
+                                       0Zrj5B,                        
+                                        ..`,
+`                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                  .J:  Xq                             
+                                 rB;B:ErB                             
+                         :LPj51P5BYLBB. 0i                            
+                       uB8L:.      .k   UBEi                          
+                     YBi.               rE:XPL                        
+                    EM.                     .BU                       
+                  .BY                         B7                      
+                 .B,                          :B                      
+                .Bi                            Mu                     
+                GU7BBBBBBBBF:                  .B                     
+                B  i,....:YB.                   B.                    
+              rB7                               B:                    
+             :Bi       .:.,                     Z7                    
+             B:        i. ..                    8i                    
+            LN        ..,...i                   7.                    
+            2L        ,:,,..:                   5  .7v8BBB            
+            rG         ..:::            .7JUUu2qOO8BBBMMBB            
+             Bi                     522BBBBBBBBBO0GNE08BBi            
+             :B7                  ,B7..BBBBBBBBBBBBBBBOUi             
+              ,GBY.              .Bi  7Y   ;B;7L1PGBGu                
+                .U0Pvi.          BL  .BJiYkJ                          
+                   .iU5BEXFLkYU7BB   jkri,                            
+                         ,:..BY.Br   UN                               
+                             B        qZ.                             
+                             B.        rBY         :,.                
+                             5j          uB2i,,.i7SjLY07              
+                             .B.          B8LUrrvr irvuBU             
+                             .BB       iBBq1NZir522r:,ruu             
+                            M0,N0i77    ,i  :G,                       
+                           .B   .rkBBP:      vM                       
+                          :Mr   ,Bii iUEuYYuXN;                       
+                          FONqBMS.     ..:i..                         
+                             .::`,
+`                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                   j;                                 
+                                 .BrE:,BM                             
+                           :iYJuJBMr:N8;B                             
+                        YXOJYii::.  ZM  0q.                           
+                      v81i         2E   2BZG:                         
+                    .ZM            .    7X :BN                        
+                   LqL                       NZ                       
+                  uB                          08                      
+                 :B                            B7                     
+                .B.                            ,B                     
+                P5 qBBBBBBS.                    B,                    
+               vB ::i,i,i7Br                    17                    
+              SB.                               Y1                    
+             uB         i.,.                    Jk                    
+            .B         ; ..,.                   :i                    
+            i8        :: :. r               iLL7Ji::                  
+            .B        .:,:,.r            rSBBBBBBBBBMB2r:             
+             Bi         ,:.:.        ,:UBBBBZLSOBBBBBBBBBB.           
+             rB.                   ;BMr7B8,   S  :OBBBBBBBBBU         
+              rBu.                :B7  .O   7G;       .YBBB2.         
+               .5GPu.            .B:  :M  vB1.                        
+                  .r5ZE2Yi;,. i..BY   BZLYj.                          
+                      .ir7U2UBqUBO   .B                               
+                             0,       j2.                             
+                             Mi        ;Br          ,77i              
+                             F2          8Z7Y2kSXrvXE:.Bj             
+                             .B.         :BSFXP17:. .,YBG             
+                              LB       qrjZ   .:77SF5jr               
+                               Nq,;    LBG                            
+                               BUJBr    iLB:                          
+                              PS  :B      k2                          
+                             LB    BBuYv,:Bi                          
+                           .8BJr77MU ::7Jui                           
+                               :.,`,
+`                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                   iL                                 
+                                 ,GMB  rS                             
+                          uPX0MqMBBYGBBBZE                            
+                       .1828r,       BY  B7                           
+                     iGNv           Br   FBMN:                        
+                   .MBi             i    ,B :Br                       
+                  rBr                     j   B:                      
+                 :B:                          rB                      
+                 B7                            Br                     
+                iZ                             rZ                     
+                JNirr.,.,                      :M                     
+               :B1BBBBBBBE8:                   .B         ..          
+              .BY      ,YG2                     B.  .kBBBBB1:         
+              Br         i:                     q.:0BBMBj             
+             PG        .,                       vkBM8NBB              
+             B         ;, .:                   .EBZ8MBBG              
+             B         rr.::;                :YBBOBBBBBr              
+             B.        i.i:r         :;LLkXBBBBBBB2: .                
+             i0i                    OSi.NBBBBBSL:                     
+              .NBU.                BU   0: i.                         
+                .7MGXL,           Bq   BBu0Y                          
+                    :LZ1q15qPUrr,0Z   iM7.                            
+                          . .82r;r   .B.                              
+                             8,      GkO:    .i72LjU,,                
+                             Mv        .EY :Xq21JLUrJFFYLi,           
+                             YG          rB5rUu7:irYU7vjUB,           
+                              BL          Bk1i        ...             
+                              .B,Li    .JBY                           
+                               rBF    7BB;                            
+                               r8      iB                             
+                                ZBS;:  :N                             
+                                .BULPGBB                              
+                                  :::i;i`,
+`                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                   uBY                                
+                                 :5: 5                                
+                          :j1jUN2MNrLB  .                             
+                       .SSu7:. .    iYBBB.                            
+                      72:            i5.:BJ:                          
+                    :2v            :2r   BrSB.                        
+                   UM              7     B. vB:                       
+                  SB                     i,  .BY                      
+                 .B                            B:                     
+                 ZY                            uk                     
+                7B                             ,B                     
+               FB. :Ui:.,                       B                     
+              OM   iBBBBBqJ                     8:                    
+             5M       ::vOBB:                   B:                    
+             B            :G                    B:                    
+            :G         ..                       B                     
+             B        ::,..                    uj         .i          
+             Fq       r.: i,                  LBBUJYNr  7XBB:         
+              B:      ::i.:.         qqjLBBBBBBBBBBBBBBBBBBB          
+              ,B0:                  OG   B2GBBBBBBBBBBBBBBB.          
+                rSO8Y:             Bj   2B:,.  ,.,..ir:rii.           
+                   :25PO0U7:i:::i:BX   0B1,                           
+                        .::rYBMrYBB   MN                              
+                             Xi      7BO           .:..               
+                             8:      . .0i      .7UJ22Su7             
+                             M7          BLrrY7UOjv7rYU;rL:           
+                             LO          vBrr77Y1qLr::,7vBB           
+                              B2 :;    : NL7JLr:.        .            
+                               GBB,   rBB.                            
+                               5B     B8Yu.                           
+                               72;.   .B  2E                          
+                                ,U8kLJBr   ;X                         
+                                   ::,;Bv7;jB:                        
+                                       .ir..`,
+`                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                    r                                 
+                                  vZ5E  J;                            
+                           .LjYqUMB5rBkFFB.                           
+                        .YqOS:,.    iMB  5L                           
+                      .2Zu.        :27   LBF.                         
+                    .UEi                 J07PP.                       
+                   iBi                   Ei  :B7                      
+                  LB.                         .B:                     
+                 .B.                           XN                     
+                 M1                            .B                     
+               :ZP  EGEBJ7.                     Ej                    
+              qM,   1qZ2MBBBB7                  Lj                    
+             :B           .UBq                  1u                    
+             B,                                 B,                    
+             B         i.                      ,M                     
+             B.       i....:.                  F7                     
+             8S       i.::.i.                  B                      
+             ,B:       ,:,i         .2k18BM1qrSBL                     
+              .Bu                  :L. LBrqBBBBBBBN0J                 
+                UBNr.             :F   S: , iUBBBBBBBB                
+                  iUMNY:.        :B   7BUSL   .BBBBB8BS .i            
+                     .751NNPq:;rYOu  rB7.       YBBBBBBBBB.           
+                            :Mr:r:   BMr          iEP5MML             
+                             Z:     .L ZL                             
+                             uu         i1       .YjiYrk              
+                             .B          JBYY2rvU7viii:YB,            
+                              Gq         :BL77Y7rrkE7v5k8,            
+                               B8.       ;BPUii:v;,                   
+                              UU      :B87 ,;B                        
+                             jN    ,kMBL     Bi                       
+                             Bi    BJ ;BUjYY1B.                       
+                             vkXkYMU     .. ,                         
+                               .,.`,
+`                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                         M                            
+                                    :   BB                            
+                               :iJSBBXuF,B.                           
+                        .YqU8N1FU:r7FB1  XY                           
+                       YBS.         Xr   :BL                          
+                     7Z7                  BBU                         
+                   .UJ                      YBi                       
+                  r5.                        ,Bu                      
+                 7M                            Bi                     
+                 M.                            :M                     
+                .r,UMBZMS2r7:                   B                     
+               Bq..7k50EMBBB:                   B:                    
+              GB                                G7                    
+             YB                                 O:                    
+             B,        ::                       B:                    
+             B,       i, .:i                    M                     
+             ES       .r:r:i           YPBBBBBXB8:                    
+              B         i .        iYBBBBBBBBMO8BBB7                  
+              1B.                 FB:rBY7:.7OBBMNEGBBBv               
+               YB:               ,B   E    rLLBBBBMEOBX               
+                :qZkJi           Br  B,  YNr  .7B88BGBF               
+                   :7NZZ1vvi. ..OU  1B.iMG.        UBBBB7             
+                       ,:iiuUBYkB   BBB,            rqjU7             
+                             B .M   JBM                               
+                             B        UB                              
+                             B:        iBLLYMJ7NY   .i:               
+                             LZ         .BB2u57::MFJZJBL              
+                              B: .       BU   7Mr  . :B,              
+                              :OiB    i.iB      XEu2j1.               
+                               rB:   iBBBXY                           
+                               8k    B. . B:                          
+                              N5    8NiiirMv                          
+                             .B7 ..JB;::,:.                           
+                              :,iYri`,
+`                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                                                      
+                                       .kB.                           
+                               ...:Y: ;5.B7                           
+                          .YBBBMMuSBBBB  75                           
+                       ;MM1P:       r.   :B                           
+                     .G8r                 BBU                         
+                    :B,                    .FBi                       
+                   YB.                       .::                      
+                  rB.                          B.                     
+                 iB.  ,,:,.                    SF                     
+                 r GBBBBMBBBi                  :B                     
+               YB  :7i::,,UXL                   B                     
+              LB,                               Mr                    
+             :B       ...                       8.                    
+             BJ      .;. ..                     0:                    
+             B       .:r::;               iLEXU1BO8u0Yjr              
+             B        ,:,:.            ,BBBBBBBB8MMBBBBBB.            
+             B7                   .:,7BBBBBBBBBBBBBBBGBBBB1           
+             ,Br                 7MPrBB0X1X52BkNqNBBF    7Z           
+              rBZ               ,B   B      ;Y                        
+                8BN,            8r  5Y    .k:                         
+                 .FNM2j,.      :B   B  :XMN.                          
+                     iv1E55E0SuB7  :BBBrr                             
+                            OJ.B7  7qGP                               
+                            JY        iB:                             
+                            7O         :Bi7uJ1uGJ,                    
+                             B.         :BY.::,:.2B:                  
+                             FB          BM2L7LuGrJ17rUj              
+                              PL M.     UP      .77qMXBB              
+                              SBBB    BBq           :,:,              
+                              OrB,   2BB:                             
+                              LZB7    BB:                             
+                               .:Bi.. SB                              
+                                 ivrL;ii`
+    ]
+  },
+]
+
+  // Each extra art is a plain frame loop: play every frame in order, fixed cadence.
+  const normalizedExtras = extraArts.map(function(art) {
+    return {
+      name: art.name,
+      frames: art.frames,
+      sequence: art.frames.map(function(_, k) { return k }),
+      durations: art.frames.map(function() { return art.frameMs })
+    }
+  })
+
+  const arts = [butterflyArt].concat(normalizedExtras)
+  const art = arts[Math.floor(Math.random() * arts.length)]
+
+  const el = document.getElementById('butterfly')
+  if (!el) return
+
+  el.dataset.art = art.name
+  el.textContent = art.frames[0]
+
   let i = 0
   let animating = false
   let timer = null
-  const el = document.getElementById('butterfly')
 
-  if (el) {
-    el.textContent = frames[0]
-
-    function animate() {
-      if (!animating) return
-      i = (i + 1) % sequence.length
-      el.textContent = frames[sequence[i]]
-      timer = setTimeout(animate, durations[i])
-    }
-
-    el.addEventListener('mouseenter', function() {
-      animating = true
-      animate()
-    })
-
-    el.addEventListener('mouseleave', function() {
-      animating = false
-      clearTimeout(timer)
-      i = 0
-      el.textContent = frames[0]
-    })
+  function animate() {
+    if (!animating) return
+    i = (i + 1) % art.sequence.length
+    el.textContent = art.frames[art.sequence[i]]
+    timer = setTimeout(animate, art.durations[i])
   }
+
+  el.addEventListener('mouseenter', function() {
+    animating = true
+    animate()
+  })
+
+  el.addEventListener('mouseleave', function() {
+    animating = false
+    clearTimeout(timer)
+    i = 0
+    el.textContent = art.frames[0]
+  })
 }
-initButterfly()
-document.addEventListener('astro:page-load', initButterfly)
+initAsciiArt()
+document.addEventListener('astro:page-load', initAsciiArt)
 </script>
 
 <style>
