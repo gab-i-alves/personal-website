@@ -12,7 +12,6 @@ const currentPath = Astro.url.pathname
       <a href="/now" aria-current={currentPath === '/now' ? 'page' : undefined}>now</a>
       <a href="/posts" aria-current={currentPath.startsWith('/posts') ? 'page' : undefined}>posts</a>
       <a href="/curriculum" aria-current={currentPath.startsWith('/curriculum') ? 'page' : undefined}>curriculum</a>
-      <a href="/library" aria-current={currentPath.startsWith('/library') ? 'page' : undefined}>library</a>
       <a href="/tasks" aria-current={currentPath === '/tasks' ? 'page' : undefined}>tasks</a>
 
       <a href="/bookmarks" aria-current={currentPath === '/bookmarks' ? 'page' : undefined}>bookmarks</a>
