@@ -2,7 +2,7 @@
 import '@/styles/global.css'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import BaseHead from '@/components/layout/BaseHead.astro'
-import Ripples from '@/components/effects/Ripples.astro'
+import Stars from '@/components/effects/Stars.astro'
 import Butterfly from '@/components/effects/Butterfly.astro'
 import { themeConfig } from '@/config'
 ---
@@ -11,7 +11,7 @@ import { themeConfig } from '@/config'
   <BaseHead title={themeConfig.site.title} description={themeConfig.site.description} slot="head" />
 
   <div class="landing">
-    <Ripples opacity={0.16} />
+    <Stars count={80} maxOpacity={0.7} />
 
     <div class="landing-group">
       <div class="content">
