@@ -1,0 +1,178 @@
+---
+interface Props {
+  opacity?: number
+  fontSize?: number
+  dropRate?: number // drops spawned per second
+  speed?: number // ring expansion, cells per second
+  maxRipples?: number
+}
+
+// Subtle by default so it reads as background texture, not foreground noise.
+const {
+  opacity = 0.16,
+  fontSize = 12,
+  dropRate = 2,
+  speed = 14,
+  maxRipples = 18,
+} = Astro.props
+---
+
+<pre
+  class="ripples-canvas"
+  id="ripples-canvas"
+  aria-hidden="true"
+  style={`--ripples-opacity: ${opacity}; --ripples-font-size: ${fontSize}px;`}
+></pre>
+
+<script is:inline define:vars={{ dropRate, speed, maxRipples }}>
+function initRipples() {
+  const el = document.getElementById('ripples-canvas')
+  if (!el) return
+
+  // Tear down any loop a prior page-load left running (SPA navigations).
+  if (window.__ripplesRaf) cancelAnimationFrame(window.__ripplesRaf)
+  window.__ripplesRaf = null
+
+  // Dots charset, sparse → dense. A leading space is the empty water surface.
+  const ramp = ' .:oO@'
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  // Cells are taller than wide; scale Y distance so rings read as circles.
+  const ASPECT = 1.15 / 0.6 // line-height / monospace advance
+  // Double-ring look: two concentric rings travelling together.
+  const RING_WIDTH = 1.1
+  const RING_GAP = 2.2
+
+  let cols = 0
+  let rows = 0
+  let maxR = 0
+  let drops = []
+
+  function measure() {
+    const fs = parseFloat(getComputedStyle(el).fontSize) || 12
+    const charW = fs * 0.6
+    const lineH = fs * 1.15
+    cols = Math.ceil(window.innerWidth / charW) + 1
+    rows = Math.ceil(window.innerHeight / lineH) + 1
+    maxR = Math.hypot(cols, rows * ASPECT) * 0.6
+  }
+
+  function spawnDrop(t) {
+    if (drops.length >= maxRipples) return
+    drops.push({
+      cx: Math.random() * cols,
+      cy: Math.random() * rows,
+      born: t,
+    })
+  }
+
+  // Intensity of a double ring at signed distance `delta` from the ring radius.
+  function ringProfile(delta) {
+    const a = Math.exp(-(delta * delta) / (2 * RING_WIDTH * RING_WIDTH))
+    const d2 = delta + RING_GAP
+    const b = Math.exp(-(d2 * d2) / (2 * RING_WIDTH * RING_WIDTH))
+    return a + b
+  }
+
+  function render(t) {
+    const last = ramp.length - 1
+    const band = RING_WIDTH * 3 + RING_GAP
+    const lines = new Array(rows)
+
+    for (let y = 0; y < rows; y++) {
+      let line = ''
+      for (let x = 0; x < cols; x++) {
+        let v = 0
+        for (let k = 0; k < drops.length; k++) {
+          const d = drops[k]
+          const r = ((t - d.born) / 1000) * speed
+          const dx = x - d.cx
+          const dy = (y - d.cy) * ASPECT
+          // Cheap reject before sqrt: skip cells the ring can't reach.
+          if (dx > r + band || dx < -(r + band)) continue
+          if (dy > r + band || dy < -(r + band)) continue
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          const delta = dist - r
+          if (delta > band || delta < -band) continue
+          const amp = 1 - r / maxR // fade as the ring expands outward
+          if (amp <= 0) continue
+          v += amp * ringProfile(delta)
+        }
+        let idx = (v * last) | 0
+        if (idx < 0) idx = 0
+        else if (idx > last) idx = last
+        line += ramp[idx]
+      }
+      lines[y] = line
+    }
+    el.textContent = lines.join('\n')
+  }
+
+  measure()
+
+  if (reduceMotion) {
+    // A few static ripples, no animation loop.
+    drops = [
+      { cx: cols * 0.3, cy: rows * 0.4, born: -700 },
+      { cx: cols * 0.7, cy: rows * 0.6, born: -1200 },
+      { cx: cols * 0.5, cy: rows * 0.3, born: -300 },
+    ]
+    render(0)
+    window.addEventListener('resize', function () {
+      measure()
+      render(0)
+    })
+    return
+  }
+
+  const frameMs = 1000 / 30
+  const spawnEvery = 1000 / dropRate
+  let lastDraw = 0
+  let nextSpawn = 0
+
+  function loop(now) {
+    window.__ripplesRaf = requestAnimationFrame(loop)
+    if (document.hidden) return
+
+    if (now >= nextSpawn) {
+      spawnDrop(now)
+      nextSpawn = now + spawnEvery
+    }
+    // Retire ripples once they have expanded past the screen.
+    drops = drops.filter(function (d) {
+      return ((now - d.born) / 1000) * speed <= maxR
+    })
+
+    if (now - lastDraw < frameMs) return
+    lastDraw = now
+    render(now)
+  }
+
+  window.__ripplesRaf = requestAnimationFrame(loop)
+  window.addEventListener('resize', measure)
+}
+initRipples()
+document.addEventListener('astro:page-load', initRipples)
+</script>
+
+<style is:global>
+  .ripples-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: var(--ripples-font-size, 12px);
+    line-height: 1.15;
+    letter-spacing: 0;
+    white-space: pre;
+    opacity: var(--ripples-opacity, 0.16);
+  }
+</style>
