@@ -14,26 +14,41 @@ function initStars() {
   const canvas = document.getElementById('stars-canvas')
   if (!canvas) return
 
+  // Tear down anything a prior page-load left running (SPA navigations).
   canvas.innerHTML = ''
-  const chars = ['\u00b7', ':', '*', '.', '+', '\u2022', '\u2027']
+  if (window.__starsShootTimer) clearTimeout(window.__starsShootTimer)
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  const nearChars = ['·', ':', '*', '.', '+', '•', '‧']
+  const farChars = ['·', '.', '‧']
   const stars = []
 
   // Center reference
   let cx = window.innerWidth / 2
   let cy = window.innerHeight / 2
 
-  for (let i = 0; i < count; i++) {
+  // One star span. `layer` tunes size, brightness, and how much it parallaxes.
+  function makeStar(layer) {
     const span = document.createElement('span')
     span.className = 'star'
 
     const x = Math.random() * window.innerWidth
     const y = Math.random() * window.innerHeight
-    const size = 7 + Math.random() * 11
     // Depth: 0 = far (barely moves), 1 = close (moves most)
-    const depth = 0.15 + Math.random() * 0.85
-    // Twinkle timing
-    const dur = 3 + Math.random() * 5
+    const depth = layer === 'far'
+      ? 0.04 + Math.random() * 0.16
+      : 0.15 + Math.random() * 0.85
+    const size = layer === 'far'
+      ? 2.5 + Math.random() * 2.5
+      : 7 + Math.random() * 11
+    const chars = layer === 'far' ? farChars : nearChars
+    // Twinkle timing — far layer breathes slower so it reads as distant.
+    const dur = (layer === 'far' ? 5 : 3) + Math.random() * 5
     const delay = Math.random() * 7
+    // Far stars top out dim; near stars scale brightness with depth.
+    const peak = layer === 'far'
+      ? maxOpacity * (0.06 + depth * 0.5)
+      : maxOpacity * (0.4 + depth * 0.6)
 
     span.textContent = chars[Math.floor(Math.random() * chars.length)]
     span.style.left = x + 'px'
@@ -41,14 +56,19 @@ function initStars() {
     span.style.fontSize = size + 'px'
     span.style.setProperty('--dur', dur + 's')
     span.style.setProperty('--delay', delay + 's')
-    span.style.setProperty('--max-opacity', (maxOpacity * (0.4 + depth * 0.6)).toFixed(3))
-    span.style.setProperty('--min-opacity', (maxOpacity * 0.08).toFixed(3))
+    span.style.setProperty('--max-opacity', peak.toFixed(3))
+    span.style.setProperty('--min-opacity', (maxOpacity * 0.06).toFixed(3))
     // Deeper stars transition slower — feels like inertia (Emil: spring-like lag)
     span.style.transition = 'translate ' + (0.6 + (1 - depth) * 1.4).toFixed(2) + 's cubic-bezier(0.23, 1, 0.32, 1)'
 
     canvas.appendChild(span)
     stars.push({ el: span, depth: depth })
   }
+
+  // Far layer first (denser, behind), then the original near layer.
+  const farCount = Math.round(count * 2.4)
+  for (let i = 0; i < farCount; i++) makeStar('far')
+  for (let i = 0; i < count; i++) makeStar('near')
 
   // Mouse parallax
   let targetX = 0
@@ -80,6 +100,47 @@ function initStars() {
     cx = window.innerWidth / 2
     cy = window.innerHeight / 2
   })
+
+  // Occasional shooting star — a faint streak crosses the upper screen every
+  // 15-30s, travels down-right, and fades out.
+  function fireShootingStar() {
+    const streak = document.createElement('div')
+    streak.className = 'shooting-star'
+
+    const startX = Math.random() * window.innerWidth * 0.6
+    const startY = Math.random() * window.innerHeight * 0.4
+    const angle = 18 + Math.random() * 22 // degrees, down-right
+    const rad = (angle * Math.PI) / 180
+    const distance = window.innerWidth * (0.45 + Math.random() * 0.4)
+    const dx = Math.cos(rad) * distance
+    const dy = Math.sin(rad) * distance
+    const duration = 700 + Math.random() * 500
+
+    streak.style.left = startX + 'px'
+    streak.style.top = startY + 'px'
+    canvas.appendChild(streak)
+
+    const anim = streak.animate(
+      [
+        { transform: 'translate(0, 0) rotate(' + angle + 'deg)', opacity: 0 },
+        { opacity: maxOpacity, offset: 0.18 },
+        { opacity: maxOpacity, offset: 0.7 },
+        { transform: 'translate(' + dx.toFixed(0) + 'px, ' + dy.toFixed(0) + 'px) rotate(' + angle + 'deg)', opacity: 0 }
+      ],
+      { duration: duration, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' }
+    )
+    anim.onfinish = function() { streak.remove() }
+  }
+
+  function scheduleShootingStar() {
+    const wait = 15000 + Math.random() * 15000
+    window.__starsShootTimer = setTimeout(function() {
+      if (!document.hidden) fireShootingStar()
+      scheduleShootingStar()
+    }, wait)
+  }
+
+  if (!reduceMotion) scheduleShootingStar()
 }
 initStars()
 document.addEventListener('astro:page-load', initStars)
@@ -110,11 +171,31 @@ document.addEventListener('astro:page-load', initStars)
     50% { opacity: var(--max-opacity); }
   }
 
+  .shooting-star {
+    position: absolute;
+    width: 130px;
+    height: 1.5px;
+    transform-origin: left center;
+    border-radius: 1px;
+    /* tail fades in from the left, bright point at the leading (right) edge */
+    background: linear-gradient(
+      90deg,
+      rgba(252, 214, 230, 0) 0%,
+      rgba(252, 214, 230, 0.35) 70%,
+      rgba(252, 214, 230, 0.95) 100%
+    );
+    box-shadow: 0 0 6px rgba(252, 214, 230, 0.5);
+    will-change: transform, opacity;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .star {
       animation: none;
       opacity: var(--min-opacity);
       transition: none !important;
+    }
+    .shooting-star {
+      display: none;
     }
   }
 </style>
