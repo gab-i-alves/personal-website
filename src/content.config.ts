@@ -52,4 +52,19 @@ const shelf = defineCollection({
     })
 })
 
-export const collections = { posts, about, dailyLogs, shelf }
+const curriculum = defineCollection({
+  loader: glob({ base: './src/content/curriculum', pattern: '**/*.{md,mdx}' }),
+  schema: () =>
+    z.object({
+      title: z.string(),
+      // course code shown as the catalog marker, e.g. "DATA 101"
+      code: z.string(),
+      track: z.enum(['data', 'mind', 'org', 'theory']),
+      summary: z.string(),
+      // sorts courses within a track
+      order: z.number().default(0),
+      status: z.enum(['planned', 'reading', 'active', 'done']).default('planned')
+    })
+})
+
+export const collections = { posts, about, dailyLogs, shelf, curriculum }

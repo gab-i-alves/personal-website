@@ -1,0 +1,164 @@
+---
+import '@/styles/global.css'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import BaseHead from '@/components/layout/BaseHead.astro'
+import Stars from '@/components/effects/Stars.astro'
+import BackLink from '@/components/layout/BackLink.astro'
+import SiteFooter from '@/components/layout/SiteFooter.astro'
+import { getCollection, render } from 'astro:content'
+import { themeConfig } from '@/config'
+
+export async function getStaticPaths() {
+  const entries = await getCollection('curriculum')
+  return entries.map((entry) => ({
+    params: { id: entry.id },
+    props: { entry }
+  }))
+}
+
+const { entry } = Astro.props
+const { Content } = await render(entry)
+const { title, code, track, status, summary } = entry.data
+
+const TRACK_NAME = {
+  data: 'Data-Intensive Systems',
+  mind: 'Mind, Brain & Biology',
+  org: 'People & Organization',
+  theory: 'Systems, Ideas & Theory'
+}
+
+const STATUS_LABEL = {
+  active: 'in progress',
+  reading: 'reading',
+  planned: 'planned',
+  done: 'done'
+}
+---
+
+<BaseLayout title={`${title} · ${themeConfig.site.title}`} description={summary}>
+  <BaseHead title={`${title} · ${themeConfig.site.title}`} description={summary} slot="head" />
+
+  <Stars count={40} maxOpacity={0.3} />
+  <BackLink href="/curriculum" label="curriculum" />
+
+  <article class="course-page">
+    <header class="course-header">
+      <div class="course-marks">
+        <span class="mark-code">{code}</span>
+        <span class="mark-track">{TRACK_NAME[track]}</span>
+        <span class={`mark-status mark-status--${status}`}>{STATUS_LABEL[status]}</span>
+      </div>
+      <h1 class="course-h1">{title}</h1>
+      <p class="course-lede">{summary}</p>
+    </header>
+
+    <div class="course-body">
+      <Content />
+    </div>
+
+    <SiteFooter />
+  </article>
+</BaseLayout>
+
+<style is:global>
+  .course-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .course-header {
+    padding: 3rem 0 2.5rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 2.5rem;
+  }
+
+  .course-marks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .mark-code {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+  }
+
+  .mark-track {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-style: italic;
+    color: var(--text-faint);
+    letter-spacing: 0.02em;
+  }
+
+  .mark-status {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+    padding: 0.18rem 0.5rem;
+    border-radius: 100px;
+    color: var(--text-faint);
+    background: rgba(252, 214, 230, 0.05);
+  }
+
+  .mark-status--active {
+    color: rgba(252, 200, 215, 0.95);
+    background: rgba(252, 180, 200, 0.16);
+  }
+
+  .mark-status--reading {
+    color: rgba(200, 220, 200, 0.9);
+    background: rgba(160, 200, 180, 0.14);
+  }
+
+  .course-h1 {
+    font-family: var(--display);
+    font-size: var(--display-md);
+    font-weight: normal;
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    margin: 0;
+  }
+
+  .course-lede {
+    font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 300;
+    line-height: 1.65;
+    color: var(--text-dim);
+    letter-spacing: 0.01em;
+    margin: 1.25rem 0 0;
+  }
+
+  .course-body {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    line-height: 1.75;
+    color: var(--text-dim);
+  }
+
+  .course-body em {
+    color: var(--text-faint);
+    font-style: italic;
+  }
+
+  @media (max-width: 768px) {
+    .course-page {
+      padding: 0 1.25rem 3rem;
+    }
+    .course-header {
+      padding: 2rem 0 2rem;
+    }
+  }
+</style>
