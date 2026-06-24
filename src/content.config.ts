@@ -63,7 +63,20 @@ const curriculum = defineCollection({
       summary: z.string(),
       // sorts courses within a track
       order: z.number().default(0),
-      status: z.enum(['planned', 'reading', 'active', 'done']).default('planned')
+      status: z.enum(['planned', 'reading', 'active', 'done']).default('planned'),
+      // materials worked through for this course — the rows of the "Progress" table
+      progress: z
+        .array(
+          z.object({
+            name: z.string(),
+            // book / paper / course / video / project …
+            type: z.string(),
+            status: z.enum(['planned', 'reading', 'active', 'done']).default('planned'),
+            // out of 10, only meaningful once something is finished
+            rating: z.number().min(1).max(10).optional()
+          })
+        )
+        .default([])
     })
 })
 
