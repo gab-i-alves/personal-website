@@ -225,6 +225,11 @@ const description = 'a quiet shelf — hover to peek, click to open'
     const hint = document.getElementById('libHint')
     if (!card) return
 
+    // initLibrary fires on both the inline call and astro:page-load — bind once,
+    // or two click handlers would toggle open/closed and cancel each other out.
+    if (card.dataset.bound) return
+    card.dataset.bound = '1'
+
     const bookImg = card.querySelector('.lib-face--book')
 
     // Defer the heavy book SVG until it's actually wanted.
