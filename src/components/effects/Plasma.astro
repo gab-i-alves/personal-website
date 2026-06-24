@@ -1,0 +1,130 @@
+---
+interface Props {
+  opacity?: number
+  fontSize?: number
+  speed?: number
+  scale?: number
+}
+
+// Subtle by default so it reads as background texture, not foreground noise.
+const { opacity = 0.14, fontSize = 12, speed = 1, scale = 1 } = Astro.props
+---
+
+<pre
+  class="plasma-canvas"
+  id="plasma-canvas"
+  aria-hidden="true"
+  style={`--plasma-opacity: ${opacity}; --plasma-font-size: ${fontSize}px;`}
+></pre>
+
+<script is:inline define:vars={{ speed, scale }}>
+function initPlasma() {
+  const el = document.getElementById('plasma-canvas')
+  if (!el) return
+
+  // Tear down any loop a prior page-load left running (SPA navigations).
+  if (window.__plasmaRaf) cancelAnimationFrame(window.__plasmaRaf)
+  window.__plasmaRaf = null
+
+  // Density ramp: sparse → dense. Plasma "brightness" maps to character weight,
+  // keeping the effect monochrome and on-palette instead of a rainbow heat map.
+  const ramp = ' .·:-=+*#%'
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  let cols = 0
+  let rows = 0
+
+  // Measure how many monospace cells fit the viewport at the current font size.
+  function measure() {
+    const fontSize = parseFloat(getComputedStyle(el).fontSize) || 12
+    const charW = fontSize * 0.6 // monospace advance ≈ 0.6em
+    const lineH = fontSize * 1.15 // matches line-height below
+    cols = Math.ceil(window.innerWidth / charW) + 1
+    rows = Math.ceil(window.innerHeight / lineH) + 1
+  }
+
+  // One plasma field sample in 0..1, built from layered sine waves so the
+  // pattern flows and never visibly repeats. `t` is the animation clock.
+  function field(x, y, t) {
+    const s = 0.04 * scale
+    let v = Math.sin(x * s + t)
+    v += Math.sin((y * s + t) * 1.3)
+    v += Math.sin((x + y) * s * 0.7 + t * 0.8)
+    const cx = cols / 2
+    const cy = rows / 2
+    const dist = Math.sqrt((x - cx) * (x - cx) + (y - cy) * (y - cy))
+    v += Math.sin(dist * s * 1.5 - t * 1.2)
+    // v is in [-4, 4]; normalize to [0, 1].
+    return (v + 4) / 8
+  }
+
+  function render(t) {
+    const lines = new Array(rows)
+    const last = ramp.length - 1
+    for (let y = 0; y < rows; y++) {
+      let line = ''
+      for (let x = 0; x < cols; x++) {
+        const v = field(x, y, t)
+        let idx = (v * last) | 0
+        if (idx < 0) idx = 0
+        else if (idx > last) idx = last
+        line += ramp[idx]
+      }
+      lines[y] = line
+    }
+    el.textContent = lines.join('\n')
+  }
+
+  measure()
+
+  if (reduceMotion) {
+    render(0) // single static frame, no animation loop
+    window.addEventListener('resize', function () {
+      measure()
+      render(0)
+    })
+    return
+  }
+
+  // ~30fps is plenty for a soft background and keeps CPU low.
+  const frameMs = 1000 / 30
+  const drift = 0.0012 * speed // clock advance per millisecond
+  let lastDraw = 0
+
+  function loop(now) {
+    window.__plasmaRaf = requestAnimationFrame(loop)
+    if (document.hidden) return
+    if (now - lastDraw < frameMs) return
+    lastDraw = now
+    render(now * drift)
+  }
+
+  window.__plasmaRaf = requestAnimationFrame(loop)
+
+  window.addEventListener('resize', measure)
+}
+initPlasma()
+document.addEventListener('astro:page-load', initPlasma)
+</script>
+
+<style is:global>
+  .plasma-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: var(--plasma-font-size, 12px);
+    line-height: 1.15;
+    letter-spacing: 0;
+    white-space: pre;
+    opacity: var(--plasma-opacity, 0.14);
+  }
+</style>
