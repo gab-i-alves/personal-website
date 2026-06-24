@@ -80,4 +80,13 @@ const curriculum = defineCollection({
     })
 })
 
-export const collections = { posts, about, dailyLogs, shelf, curriculum }
+const program = defineCollection({
+  loader: glob({ base: './src/content/program', pattern: '**/*.{md,mdx}' }),
+  schema: () =>
+    z.object({
+      title: z.string(),
+      description: z.string()
+    })
+})
+
+export const collections = { posts, about, dailyLogs, shelf, curriculum, program }

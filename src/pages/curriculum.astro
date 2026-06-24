@@ -5,123 +5,43 @@ import BaseHead from '@/components/layout/BaseHead.astro'
 import Stars from '@/components/effects/Stars.astro'
 import BackLink from '@/components/layout/BackLink.astro'
 import SiteFooter from '@/components/layout/SiteFooter.astro'
-import { getCollection } from 'astro:content'
+import { getEntry, render } from 'astro:content'
 import { themeConfig } from '@/config'
 
-const courses = await getCollection('curriculum')
+const entry = await getEntry('program', 'curriculo-autodirigido')
+const { Content, headings } = await render(entry!)
 
-// Track order — used only to cluster the rail; the screen is a flat list.
-const TRACK_RANK = { data: 0, mind: 1, org: 2, theory: 3 }
+// Section rail: the numbered sections + appendices are the only depth-2 headings.
+const sections = headings.filter((h) => h.depth === 2)
 
-const TRACK_NAME = {
-  data: 'Data-Intensive Systems',
-  mind: 'Mind, Brain & Biology',
-  org: 'People & Organization',
-  theory: 'Systems, Ideas & Theory'
-}
-
-const STATUS_LABEL = {
-  active: 'in progress',
-  reading: 'reading',
-  planned: 'planned',
-  done: 'done'
-}
-
-// Rail order: by track, then by the in-track order field.
-const subjects = [...courses].sort((a, b) => {
-  const t = TRACK_RANK[a.data.track] - TRACK_RANK[b.data.track]
-  return t !== 0 ? t : a.data.order - b.data.order
-})
-
-const description = 'a self-directed curriculum — the things i am teaching myself, on purpose'
+const description = entry!.data.description
 ---
 
-<BaseLayout title={`Curriculum · ${themeConfig.site.title}`} description={description}>
-  <BaseHead title={`Curriculum · ${themeConfig.site.title}`} description={description} slot="head" />
+<BaseLayout title={`Currículo · ${themeConfig.site.title}`} description={description}>
+  <BaseHead title={`Currículo · ${themeConfig.site.title}`} description={description} slot="head" />
 
   <Stars count={50} maxOpacity={0.4} />
   <BackLink />
 
-  <div class="cur-page">
-    <header class="cur-header">
-      <h1 class="cur-title">personal curriculum</h1>
-      <p class="cur-subtitle">{description}</p>
-    </header>
+  <div class="prog-page">
+    <p class="prog-eyebrow">currículo · programa autodirigido</p>
 
-    <div class="cur-layout">
-      <!-- master · subject rail -->
-      <nav class="rail" aria-label="Subjects">
-        {subjects.map((course, i) => (
-          <button
-            type="button"
-            class="rail-item"
-            data-target={course.id}
-            aria-pressed={i === 0 ? 'true' : 'false'}
-            style={`animation-delay: ${i * 40}ms`}
-          >
-            <span class="rail-name">{course.data.title}</span>
-            <span class="rail-code">{course.data.code}</span>
-          </button>
-        ))}
-      </nav>
+    <div class="prog-shell">
+      <!-- sticky section navigator -->
+      <aside class="prog-nav" aria-label="Seções">
+        <p class="prog-nav-label">índice</p>
+        <ol class="prog-nav-list">
+          {sections.map((s) => (
+            <li>
+              <a href={`#${s.slug}`} data-slug={s.slug}>{s.text}</a>
+            </li>
+          ))}
+        </ol>
+      </aside>
 
-      <!-- detail · one pane per subject, only the active one is shown -->
-      <div class="detail">
-        {subjects.map((course, i) => (
-          <article class="pane" id={`pane-${course.id}`} data-pane={course.id} hidden={i !== 0}>
-            <div class="pane-head">
-              <h2 class="pane-title">
-                <span class="pane-code">{course.data.code}</span>
-                <span class="pane-sep">·</span>
-                <span class="pane-name">{course.data.title}</span>
-              </h2>
-              <a class="pane-open" href={`/curriculum/${course.id}`}>open notebook →</a>
-            </div>
-
-            <p class="pane-meta">
-              <span class="pane-track">{TRACK_NAME[course.data.track]}</span>
-              <span class={`pane-status status--${course.data.status}`}>
-                {STATUS_LABEL[course.data.status]}
-              </span>
-            </p>
-
-            <p class="pane-summary">{course.data.summary}</p>
-
-            <h3 class="prog-heading">Progress</h3>
-
-            {course.data.progress.length > 0 ? (
-              <table class="prog-table">
-                <thead>
-                  <tr>
-                    <th class="col-name">Name</th>
-                    <th class="col-type">Type</th>
-                    <th class="col-status">Status</th>
-                    <th class="col-rating">Rating</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {course.data.progress.map((item) => (
-                    <tr>
-                      <td class="col-name">{item.name}</td>
-                      <td class="col-type">{item.type}</td>
-                      <td class="col-status">
-                        <span class={`prog-pill status--${item.status}`}>
-                          {STATUS_LABEL[item.status]}
-                        </span>
-                      </td>
-                      <td class="col-rating">
-                        {item.rating ? `${item.rating}/10` : <span class="prog-dash">—</span>}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <p class="prog-empty">Nothing logged yet — syllabus still taking shape.</p>
-            )}
-          </article>
-        ))}
-      </div>
+      <article class="prog-prose">
+        <Content />
+      </article>
     </div>
 
     <SiteFooter />
@@ -129,381 +49,372 @@ const description = 'a self-directed curriculum — the things i am teaching mys
 </BaseLayout>
 
 <script>
-  const rail = document.querySelectorAll<HTMLButtonElement>('.rail-item')
-  const panes = document.querySelectorAll<HTMLElement>('.pane')
+  // Highlight the section currently in view inside the rail.
+  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.prog-nav-list a'))
+  const bySlug = new Map(links.map((a) => [a.dataset.slug, a]))
+  const targets = links
+    .map((a) => document.getElementById(a.dataset.slug!))
+    .filter((el): el is HTMLElement => el !== null)
 
-  function select(id: string) {
-    rail.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.target === id)))
-    panes.forEach((p) => {
-      p.hidden = p.dataset.pane !== id
-    })
-    if (history.replaceState) history.replaceState(null, '', `#${id}`)
+  let current: HTMLAnchorElement | null = null
+  function setActive(slug: string | undefined) {
+    const next = slug ? bySlug.get(slug) ?? null : null
+    if (next === current) return
+    current?.removeAttribute('aria-current')
+    next?.setAttribute('aria-current', 'true')
+    current = next
   }
 
-  rail.forEach((btn) => {
-    btn.addEventListener('click', () => select(btn.dataset.target!))
-  })
-
-  // Deep-link: honor #subject-id on load.
-  const fromHash = decodeURIComponent(location.hash.slice(1))
-  if (fromHash && document.querySelector(`[data-pane="${CSS.escape(fromHash)}"]`)) {
-    select(fromHash)
-  }
+  const io = new IntersectionObserver(
+    (entries) => {
+      const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+      if (visible.length) setActive(visible[0].target.id)
+    },
+    { rootMargin: '-10% 0px -75% 0px', threshold: 0 }
+  )
+  targets.forEach((t) => io.observe(t))
 </script>
 
 <style is:global>
-  .cur-page {
-    max-width: 1080px;
+  .prog-page {
+    max-width: 1140px;
     margin: 0 auto;
     padding: 0 2rem 4rem;
     position: relative;
     z-index: 1;
   }
 
-  /* ===== Header ===== */
-  .cur-header {
-    padding: 2.5rem 0 2.5rem;
-  }
-
-  .cur-title {
-    font-family: var(--display);
-    font-size: var(--display-lg);
-    font-weight: normal;
-    line-height: 1;
-    letter-spacing: 0.03em;
-    color: var(--text);
-    opacity: 0.92;
-    margin: 0;
-  }
-
-  .cur-subtitle {
-    font-family: var(--sans);
-    font-size: 0.95rem;
-    font-weight: 300;
-    font-style: italic;
-    color: var(--text-dim);
-    letter-spacing: 0.04em;
-    margin: 1rem 0 0;
-    max-width: 60ch;
-  }
-
-  /* ===== Master / detail layout ===== */
-  .cur-layout {
-    display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 1.75rem;
-    align-items: start;
-  }
-
-  /* ===== Rail ===== */
-  .rail {
-    display: flex;
-    flex-direction: column;
-    gap: 0.7rem;
-  }
-
-  .rail-item {
-    display: flex;
-    flex-direction: column;
-    gap: 0.3rem;
-    text-align: left;
-    width: 100%;
-    box-sizing: border-box;
-    padding: 0.95rem 1.1rem;
-    cursor: pointer;
-    color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    background: rgba(215, 208, 223, 0.015);
-    animation: cardIn 350ms var(--ease-out) both;
-    transition:
-      background var(--dur-normal) var(--ease-out),
-      border-color var(--dur-normal) var(--ease-out),
-      transform var(--dur-fast) var(--ease-out);
-  }
-
-  @keyframes cardIn {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .rail-item:hover {
-      background: rgba(215, 208, 223, 0.05);
-      border-color: rgba(215, 208, 223, 0.18);
-      transform: translateX(2px);
-    }
-  }
-
-  .rail-item:active {
-    transform: scale(0.99);
-  }
-
-  .rail-item[aria-pressed='true'] {
-    border-color: rgba(215, 208, 223, 0.28);
-    background: rgba(215, 208, 223, 0.06);
-  }
-
-  .rail-name {
-    font-family: var(--sans);
-    font-size: 0.92rem;
-    font-weight: 500;
-    line-height: 1.25;
-    letter-spacing: -0.005em;
-    color: var(--text);
-  }
-
-  .rail-code {
+  .prog-eyebrow {
     font-family: var(--mono);
     font-feature-settings: var(--mono-feat);
     font-size: 0.66rem;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.18em;
+    text-transform: lowercase;
     color: var(--text-faint);
+    margin: 2.5rem 0 0;
   }
 
-  /* ===== Detail pane ===== */
-  .detail {
-    min-width: 0;
+  /* ===== Two-column shell: sticky rail + reading column ===== */
+  .prog-shell {
+    display: grid;
+    grid-template-columns: 220px minmax(0, 1fr);
+    gap: 2.5rem;
+    align-items: start;
+    margin-top: 1.25rem;
   }
 
-  .pane {
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 2rem 2.1rem 2.4rem;
-    background: rgba(215, 208, 223, 0.012);
-    min-height: 420px;
-    animation: paneIn 300ms var(--ease-out) both;
+  .prog-nav {
+    position: sticky;
+    top: 2rem;
+    align-self: start;
+    max-height: calc(100vh - 4rem);
+    overflow-y: auto;
   }
 
-  @keyframes paneIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  .pane-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .pane-title {
-    display: flex;
-    align-items: baseline;
-    gap: 0.55rem;
-    flex-wrap: wrap;
-    margin: 0;
-    font-weight: normal;
-  }
-
-  .pane-code {
+  .prog-nav-label {
     font-family: var(--mono);
     font-feature-settings: var(--mono-feat);
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    color: var(--text-dim);
-  }
-
-  .pane-sep {
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
     color: var(--text-faint);
+    margin: 0 0 0.9rem;
   }
 
-  .pane-name {
-    font-family: var(--display);
-    font-size: var(--display-md);
-    line-height: 1.1;
-    letter-spacing: 0.02em;
-    color: var(--text);
+  .prog-nav-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    counter-reset: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
   }
 
-  .pane-open {
+  .prog-nav-list li {
+    margin: 0;
+    padding: 0;
+  }
+
+  .prog-nav-list a {
+    display: block;
     font-family: var(--sans);
-    font-size: 0.78rem;
+    font-size: 0.8rem;
+    line-height: 1.35;
     color: var(--text-faint);
     text-decoration: none;
-    letter-spacing: 0.02em;
-    white-space: nowrap;
-    transition: color var(--dur-normal) var(--ease-out);
+    padding-left: 0.7rem;
+    border-left: 1px solid var(--border);
+    transition:
+      color var(--dur-normal) var(--ease-out),
+      border-color var(--dur-normal) var(--ease-out);
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .pane-open:hover {
+    .prog-nav-list a:hover {
       color: var(--text);
     }
   }
 
-  .pane-meta {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    margin: 1rem 0 0;
+  .prog-nav-list a[aria-current='true'] {
+    color: var(--text);
+    border-left-color: rgba(252, 200, 215, 0.7);
   }
 
-  .pane-track {
+  /* ===== Reading column (dark-theme prose) ===== */
+  .prog-prose {
+    min-width: 0;
     font-family: var(--sans);
-    font-size: 0.74rem;
-    font-style: italic;
-    color: var(--text-faint);
-    letter-spacing: 0.02em;
-  }
-
-  .pane-status,
-  .prog-pill {
-    font-family: var(--mono);
-    font-feature-settings: var(--mono-feat);
-    font-size: 0.6rem;
-    letter-spacing: 0.08em;
-    text-transform: lowercase;
-    padding: 0.18rem 0.5rem;
-    border-radius: 100px;
-    white-space: nowrap;
-    color: var(--text-faint);
-    background: rgba(215, 208, 223, 0.05);
-  }
-
-  .status--active {
-    color: rgba(252, 200, 215, 0.95);
-    background: rgba(252, 180, 200, 0.16);
-  }
-
-  .status--reading {
-    color: rgba(200, 220, 200, 0.9);
-    background: rgba(160, 200, 180, 0.14);
-  }
-
-  .status--done {
-    color: rgba(190, 205, 235, 0.95);
-    background: rgba(160, 185, 235, 0.14);
-  }
-
-  .pane-summary {
-    font-family: var(--sans);
-    font-size: 0.98rem;
+    font-size: 0.97rem;
     font-weight: 300;
-    line-height: 1.65;
+    line-height: 1.75;
     color: var(--text-dim);
     letter-spacing: 0.01em;
-    margin: 1.4rem 0 0;
-    max-width: 64ch;
   }
 
-  /* ===== Progress table ===== */
-  .prog-heading {
+  .prog-prose > :first-child {
+    margin-top: 0;
+  }
+
+  /* document title (the single h1) */
+  .prog-prose h1 {
     font-family: var(--display);
-    font-size: 1.3rem;
+    font-size: var(--display-md);
     font-weight: normal;
+    line-height: 1.12;
     letter-spacing: 0.02em;
     color: var(--text);
-    margin: 2.2rem 0 1.1rem;
-    padding-bottom: 0.9rem;
-    border-bottom: 1px solid var(--border);
+    margin: 0.4rem 0 0;
   }
 
-  .prog-table {
-    width: 100%;
-    border-collapse: collapse;
+  /* the standalone h3 directly under the title acts as a subtitle */
+  .prog-prose h1 + h3 {
     font-family: var(--sans);
+    font-size: 1rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--text-faint);
+    letter-spacing: 0.03em;
+    margin: 0.9rem 0 0;
+    padding: 0;
+    border: none;
   }
 
-  .prog-table th {
+  .prog-prose h2 {
+    font-family: var(--display);
+    font-size: 1.65rem;
+    font-weight: normal;
+    line-height: 1.2;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    margin: 3.5rem 0 1.4rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: 1.5rem;
+  }
+
+  .prog-prose h3 {
+    font-family: var(--display);
+    font-size: 1.22rem;
+    font-weight: normal;
+    letter-spacing: 0.01em;
+    color: var(--text);
+    margin: 2.4rem 0 1rem;
+    scroll-margin-top: 1.5rem;
+  }
+
+  .prog-prose h4 {
+    font-family: var(--sans);
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--text);
+    margin: 1.8rem 0 0.8rem;
+  }
+
+  .prog-prose p {
+    margin: 1.1rem 0;
+    max-width: 70ch;
+  }
+
+  .prog-prose strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .prog-prose em {
+    font-style: italic;
+    color: var(--text);
+    opacity: 0.92;
+  }
+
+  .prog-prose a {
+    color: var(--text);
+    text-decoration: underline;
+    text-decoration-color: var(--text-faint);
+    text-underline-offset: 2px;
+    transition: text-decoration-color var(--dur-normal) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .prog-prose a:hover {
+      text-decoration-color: var(--text);
+    }
+  }
+
+  /* lists */
+  .prog-prose ul,
+  .prog-prose ol {
+    margin: 1.1rem 0;
+    padding-left: 1.4rem;
+    max-width: 70ch;
+  }
+
+  .prog-prose li {
+    margin: 0.45rem 0;
+    line-height: 1.7;
+  }
+
+  .prog-prose li::marker {
+    color: var(--text-faint);
+  }
+
+  .prog-prose ul ul,
+  .prog-prose ol ol,
+  .prog-prose ul ol,
+  .prog-prose ol ul {
+    margin: 0.45rem 0;
+  }
+
+  /* inline code */
+  .prog-prose code {
     font-family: var(--mono);
     font-feature-settings: var(--mono-feat);
-    font-size: 0.68rem;
+    font-size: 0.84em;
+    padding: 0.1em 0.4em;
+    border-radius: 5px;
+    background: rgba(215, 208, 223, 0.07);
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  /* code blocks (Appendix A prereq map) */
+  .prog-prose pre {
+    background: rgba(215, 208, 223, 0.04);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.4rem;
+    margin: 1.6rem 0;
+    overflow-x: auto;
+  }
+
+  .prog-prose pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: 0.82rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+  }
+
+  /* blockquotes -> callout cards */
+  .prog-prose blockquote {
+    margin: 1.8rem 0;
+    padding: 1.1rem 1.4rem;
+    border: 1px solid var(--border);
+    border-left: 2px solid rgba(252, 200, 215, 0.55);
+    border-radius: 12px;
+    background: rgba(215, 208, 223, 0.025);
+    color: var(--text-dim);
+  }
+
+  .prog-prose blockquote p {
+    margin: 0.5rem 0;
+    max-width: none;
+  }
+
+  .prog-prose blockquote p:first-child {
+    margin-top: 0;
+  }
+
+  .prog-prose blockquote p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* tables */
+  .prog-prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.6rem 0;
+    font-size: 0.86rem;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .prog-prose thead th {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.66rem;
     font-weight: 500;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--text-faint);
     text-align: left;
-    padding: 0 0.75rem 0.85rem;
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
   }
 
-  .prog-table td {
-    font-size: 0.88rem;
+  .prog-prose tbody td {
+    padding: 0.7rem 0.9rem;
+    border-bottom: 1px solid var(--border);
     color: var(--text-dim);
-    padding: 0.85rem 0.75rem;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .prog-prose tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .prog-prose hr {
+    border: none;
     border-top: 1px solid var(--border);
-    vertical-align: middle;
-  }
-
-  .prog-table .col-name {
-    color: var(--text);
-    width: 48%;
-  }
-
-  .col-type {
-    text-transform: lowercase;
-  }
-
-  .col-rating {
-    font-family: var(--mono);
-    font-feature-settings: var(--mono-feat);
-    color: var(--text);
-  }
-
-  .prog-dash {
-    color: var(--text-faint);
-  }
-
-  .prog-empty {
-    font-family: var(--sans);
-    font-size: 0.88rem;
-    font-style: italic;
-    color: var(--text-faint);
-    margin: 0.5rem 0 0;
+    margin: 3rem 0;
   }
 
   /* ===== Responsive ===== */
-  @media (max-width: 860px) {
-    .cur-layout {
+  @media (max-width: 900px) {
+    .prog-shell {
       grid-template-columns: 1fr;
-      gap: 1.25rem;
+      gap: 1.5rem;
     }
-    .rail {
+    .prog-nav {
+      position: static;
+      max-height: none;
+      overflow: visible;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .prog-nav-list {
       flex-direction: row;
       flex-wrap: wrap;
+      gap: 0.5rem 0.9rem;
     }
-    .rail-item {
-      flex: 1 1 calc(50% - 0.35rem);
-      min-width: 140px;
+    .prog-nav-list a {
+      border-left: none;
+      padding-left: 0;
+    }
+    .prog-nav-list a[aria-current='true'] {
+      border-left: none;
     }
   }
 
   @media (max-width: 768px) {
-    .cur-page {
+    .prog-page {
       padding: 0 1.25rem 3rem;
     }
-    .cur-header {
-      padding: 1.75rem 0 2rem;
-    }
-    .pane {
-      padding: 1.5rem 1.4rem 1.8rem;
-    }
-    .pane-head {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-  }
-
-  @media (max-width: 520px) {
-    .rail-item {
-      flex: 1 1 100%;
-    }
-    .col-type {
-      display: none;
-    }
-    .prog-table th.col-type {
-      display: none;
+    .prog-prose h2 {
+      font-size: 1.4rem;
     }
   }
 </style>
