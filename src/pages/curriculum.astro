@@ -5,16 +5,52 @@ import BaseHead from '@/components/layout/BaseHead.astro'
 import Stars from '@/components/effects/Stars.astro'
 import BackLink from '@/components/layout/BackLink.astro'
 import SiteFooter from '@/components/layout/SiteFooter.astro'
-import { getEntry, render } from 'astro:content'
+import { getCollection, getEntry, render } from 'astro:content'
 import { themeConfig } from '@/config'
 
-const entry = await getEntry('program', 'curriculo-autodirigido')
-const { Content, headings } = await render(entry!)
+// Framework prose: top intro + footer references.
+const overviewEntry = await getEntry('program', 'overview')
+const appendicesEntry = await getEntry('program', 'appendices')
+const { Content: Overview } = await render(overviewEntry!)
+const { Content: Appendices } = await render(appendicesEntry!)
 
-// Section rail: the numbered sections + appendices are the only depth-2 headings.
-const sections = headings.filter((h) => h.depth === 2)
+const PHASE_RANK = { prop: 0, i: 1, ii: 2, iii: 3 }
 
-const description = entry!.data.description
+const PHASE_NAME = {
+  prop: 'Propedêutica',
+  i: 'Fase I — Fundamentos',
+  ii: 'Fase II — Aprofundamento',
+  iii: 'Fase III — Pesquisa'
+}
+
+const TRACK_NAME = {
+  A: 'Sistemas de Dados & Engenharia',
+  B: 'Neurociência Computacional',
+  C: 'Bioinformática',
+  D: 'Liderança & Sociotécnica',
+  E: 'Sistemas, Cognição & Meta'
+}
+
+const courses = await getCollection('curriculum')
+const subjects = [...courses].sort((a, b) => {
+  const p = PHASE_RANK[a.data.phase] - PHASE_RANK[b.data.phase]
+  return p !== 0 ? p : a.data.order - b.data.order
+})
+
+// Render every subject body once so each pane can show its full description.
+const rendered = await Promise.all(subjects.map((s) => render(s)))
+
+// Group the rail by phase, preserving the sorted order.
+const phaseOrder = ['prop', 'i', 'ii', 'iii'] as const
+const groups = phaseOrder
+  .map((phase) => ({
+    phase,
+    name: PHASE_NAME[phase],
+    items: subjects.filter((s) => s.data.phase === phase)
+  }))
+  .filter((g) => g.items.length > 0)
+
+const description = overviewEntry!.data.description
 ---
 
 <BaseLayout title={`Currículo · ${themeConfig.site.title}`} description={description}>
@@ -23,68 +59,111 @@ const description = entry!.data.description
   <Stars count={50} maxOpacity={0.4} />
   <BackLink />
 
-  <div class="prog-page">
-    <p class="prog-eyebrow">currículo · programa autodirigido</p>
+  <div class="cur-page">
+    <p class="cur-eyebrow">currículo · programa autodirigido</p>
 
-    <div class="prog-shell">
-      <!-- sticky section navigator -->
-      <aside class="prog-nav" aria-label="Seções">
-        <p class="prog-nav-label">índice</p>
-        <ol class="prog-nav-list">
-          {sections.map((s) => (
-            <li>
-              <a href={`#${s.slug}`} data-slug={s.slug}>{s.text}</a>
-            </li>
-          ))}
-        </ol>
-      </aside>
+    <!-- intro · the framework prose lives between the title and the listing -->
+    <section class="cur-prose cur-overview">
+      <Overview />
+    </section>
 
-      <article class="prog-prose">
-        <Content />
-      </article>
+    <h2 class="cur-section-title">As matérias</h2>
+    <p class="cur-section-hint">Selecione uma disciplina à esquerda para ver a ementa completa, os conteúdos, materiais, ferramentas e o checkpoint de avaliação.</p>
+
+    <div class="cur-layout">
+      <!-- master · subject rail, grouped by phase -->
+      <nav class="rail" aria-label="Matérias">
+        {groups.map((group) => (
+          <div class="rail-group">
+            <p class="rail-group-label">{group.name}</p>
+            {group.items.map((course, gi) => (
+              <button
+                type="button"
+                class="rail-item"
+                data-target={course.id}
+                aria-pressed={course.id === subjects[0].id ? 'true' : 'false'}
+                style={`animation-delay: ${gi * 35}ms`}
+              >
+                <span class="rail-name">{course.data.title}</span>
+                <span class="rail-code">{course.data.code}</span>
+              </button>
+            ))}
+          </div>
+        ))}
+      </nav>
+
+      <!-- detail · one pane per subject; only the active one is shown -->
+      <div class="detail">
+        {subjects.map((course, i) => {
+          const Body = rendered[i].Content
+          return (
+            <article class="pane" data-pane={course.id} hidden={i !== 0}>
+              <div class="pane-head">
+                <h3 class="pane-title">
+                  <span class="pane-code">{course.data.code}</span>
+                  <span class="pane-sep">·</span>
+                  <span class="pane-name">{course.data.heading}</span>
+                </h3>
+              </div>
+
+              <p class="pane-meta">
+                <span class="pane-phase">{PHASE_NAME[course.data.phase]}</span>
+                {course.data.track && (
+                  <span class="pane-track">Trilha {course.data.track} · {TRACK_NAME[course.data.track]}</span>
+                )}
+              </p>
+
+              <div class="cur-prose pane-body">
+                <Body />
+              </div>
+            </article>
+          )
+        })}
+      </div>
     </div>
+
+    <!-- footer · references and appendices -->
+    <section class="cur-prose cur-appendices">
+      <Appendices />
+    </section>
 
     <SiteFooter />
   </div>
 </BaseLayout>
 
 <script>
-  // Highlight the section currently in view inside the rail.
-  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.prog-nav-list a'))
-  const bySlug = new Map(links.map((a) => [a.dataset.slug, a]))
-  const targets = links
-    .map((a) => document.getElementById(a.dataset.slug!))
-    .filter((el): el is HTMLElement => el !== null)
+  const rail = document.querySelectorAll<HTMLButtonElement>('.rail-item')
+  const panes = document.querySelectorAll<HTMLElement>('.pane')
 
-  let current: HTMLAnchorElement | null = null
-  function setActive(slug: string | undefined) {
-    const next = slug ? bySlug.get(slug) ?? null : null
-    if (next === current) return
-    current?.removeAttribute('aria-current')
-    next?.setAttribute('aria-current', 'true')
-    current = next
+  function select(id: string) {
+    rail.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.target === id)))
+    panes.forEach((p) => {
+      p.hidden = p.dataset.pane !== id
+    })
+    if (history.replaceState) history.replaceState(null, '', `#${id}`)
   }
 
-  const io = new IntersectionObserver(
-    (entries) => {
-      const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-      if (visible.length) setActive(visible[0].target.id)
-    },
-    { rootMargin: '-10% 0px -75% 0px', threshold: 0 }
-  )
-  targets.forEach((t) => io.observe(t))
+  rail.forEach((btn) => {
+    btn.addEventListener('click', () => select(btn.dataset.target!))
+  })
+
+  // Deep-link: honor #subject-id on load.
+  const fromHash = decodeURIComponent(location.hash.slice(1))
+  if (fromHash && document.querySelector(`[data-pane="${CSS.escape(fromHash)}"]`)) {
+    select(fromHash)
+  }
 </script>
 
 <style is:global>
-  .prog-page {
-    max-width: 1140px;
+  .cur-page {
+    max-width: 1080px;
     margin: 0 auto;
     padding: 0 2rem 4rem;
     position: relative;
     z-index: 1;
   }
 
-  .prog-eyebrow {
+  .cur-eyebrow {
     font-family: var(--mono);
     font-feature-settings: var(--mono-feat);
     font-size: 0.66rem;
@@ -94,160 +173,310 @@ const description = entry!.data.description
     margin: 2.5rem 0 0;
   }
 
-  /* ===== Two-column shell: sticky rail + reading column ===== */
-  .prog-shell {
-    display: grid;
-    grid-template-columns: 220px minmax(0, 1fr);
-    gap: 2.5rem;
-    align-items: start;
-    margin-top: 1.25rem;
+  /* ===== Section heading between intro and listing ===== */
+  .cur-section-title {
+    font-family: var(--display);
+    font-size: var(--display-md);
+    font-weight: normal;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    margin: 3.5rem 0 0.6rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
   }
 
-  .prog-nav {
-    position: sticky;
-    top: 2rem;
-    align-self: start;
-    max-height: calc(100vh - 4rem);
-    overflow-y: auto;
-  }
-
-  .prog-nav-label {
-    font-family: var(--mono);
-    font-feature-settings: var(--mono-feat);
-    font-size: 0.62rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+  .cur-section-hint {
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 300;
+    font-style: italic;
     color: var(--text-faint);
-    margin: 0 0 0.9rem;
+    letter-spacing: 0.02em;
+    margin: 0 0 2rem;
+    max-width: 64ch;
   }
 
-  .prog-nav-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    counter-reset: none;
+  /* ===== Master / detail layout ===== */
+  .cur-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 1.75rem;
+    align-items: start;
+  }
+
+  /* ===== Rail ===== */
+  .rail {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+  }
+
+  .rail-group {
     display: flex;
     flex-direction: column;
     gap: 0.55rem;
   }
 
-  .prog-nav-list li {
-    margin: 0;
-    padding: 0;
-  }
-
-  .prog-nav-list a {
-    display: block;
-    font-family: var(--sans);
-    font-size: 0.8rem;
-    line-height: 1.35;
+  .rail-group-label {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--text-faint);
-    text-decoration: none;
-    padding-left: 0.7rem;
-    border-left: 1px solid var(--border);
-    transition:
-      color var(--dur-normal) var(--ease-out),
-      border-color var(--dur-normal) var(--ease-out);
+    margin: 0 0 0.15rem;
   }
 
-  @media (hover: hover) and (pointer: fine) {
-    .prog-nav-list a:hover {
-      color: var(--text);
+  .rail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    text-align: left;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(215, 208, 223, 0.015);
+    animation: cardIn 350ms var(--ease-out) both;
+    transition:
+      background var(--dur-normal) var(--ease-out),
+      border-color var(--dur-normal) var(--ease-out),
+      transform var(--dur-fast) var(--ease-out);
+  }
+
+  @keyframes cardIn {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 
-  .prog-nav-list a[aria-current='true'] {
-    color: var(--text);
-    border-left-color: rgba(252, 200, 215, 0.7);
+  @media (hover: hover) and (pointer: fine) {
+    .rail-item:hover {
+      background: rgba(215, 208, 223, 0.05);
+      border-color: rgba(215, 208, 223, 0.18);
+      transform: translateX(2px);
+    }
   }
 
-  /* ===== Reading column (dark-theme prose) ===== */
-  .prog-prose {
-    min-width: 0;
+  .rail-item:active {
+    transform: scale(0.99);
+  }
+
+  .rail-item[aria-pressed='true'] {
+    border-color: rgba(252, 200, 215, 0.4);
+    background: rgba(215, 208, 223, 0.06);
+  }
+
+  .rail-name {
     font-family: var(--sans);
-    font-size: 0.97rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.25;
+    letter-spacing: -0.005em;
+    color: var(--text);
+  }
+
+  .rail-code {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.64rem;
+    letter-spacing: 0.12em;
+    color: var(--text-faint);
+  }
+
+  /* ===== Detail pane ===== */
+  .detail {
+    min-width: 0;
+  }
+
+  .pane {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem 2.1rem 2.4rem;
+    background: rgba(215, 208, 223, 0.012);
+    min-height: 420px;
+    animation: paneIn 300ms var(--ease-out) both;
+  }
+
+  @keyframes paneIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .pane-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .pane-title {
+    display: flex;
+    align-items: baseline;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+    margin: 0;
+    font-weight: normal;
+  }
+
+  .pane-code {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+
+  .pane-sep {
+    color: var(--text-faint);
+  }
+
+  .pane-name {
+    font-family: var(--display);
+    font-size: var(--display-md);
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    color: var(--text);
+  }
+
+  .pane-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+    margin: 1rem 0 0;
+  }
+
+  .pane-phase,
+  .pane-track {
+    font-family: var(--sans);
+    font-size: 0.74rem;
+    font-style: italic;
+    color: var(--text-faint);
+    letter-spacing: 0.02em;
+  }
+
+  .pane-phase {
+    font-family: var(--mono);
+    font-feature-settings: var(--mono-feat);
+    font-style: normal;
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+    padding: 0.18rem 0.5rem;
+    border-radius: 100px;
+    color: rgba(252, 200, 215, 0.95);
+    background: rgba(252, 180, 200, 0.16);
+  }
+
+  /* ===== Shared dark-theme prose (overview, panes, appendices) ===== */
+  .cur-prose {
+    font-family: var(--sans);
+    font-size: 0.95rem;
     font-weight: 300;
-    line-height: 1.75;
+    line-height: 1.7;
     color: var(--text-dim);
     letter-spacing: 0.01em;
   }
 
-  .prog-prose > :first-child {
+  .cur-overview {
+    margin-top: 1.75rem;
+  }
+
+  .cur-appendices {
+    margin-top: 3.5rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .pane-body {
+    margin-top: 1.6rem;
+  }
+
+  .cur-prose > :first-child {
     margin-top: 0;
   }
 
-  /* document title (the single h1) */
-  .prog-prose h1 {
+  .cur-prose h1 {
     font-family: var(--display);
-    font-size: var(--display-md);
+    font-size: var(--display-lg);
     font-weight: normal;
-    line-height: 1.12;
+    line-height: 1.08;
     letter-spacing: 0.02em;
     color: var(--text);
-    margin: 0.4rem 0 0;
+    margin: 0;
   }
 
-  /* the standalone h3 directly under the title acts as a subtitle */
-  .prog-prose h1 + h3 {
+  /* the standalone h3 right under the h1 is the document subtitle */
+  .cur-overview h1 + h3 {
     font-family: var(--sans);
-    font-size: 1rem;
+    font-size: 1.02rem;
     font-weight: 300;
     font-style: italic;
     color: var(--text-faint);
     letter-spacing: 0.03em;
     margin: 0.9rem 0 0;
-    padding: 0;
-    border: none;
   }
 
-  .prog-prose h2 {
+  .cur-prose h2 {
     font-family: var(--display);
-    font-size: 1.65rem;
+    font-size: 1.55rem;
     font-weight: normal;
     line-height: 1.2;
     letter-spacing: 0.02em;
     color: var(--text);
-    margin: 3.5rem 0 1.4rem;
-    padding-bottom: 0.85rem;
+    margin: 3rem 0 1.3rem;
+    padding-bottom: 0.8rem;
     border-bottom: 1px solid var(--border);
-    scroll-margin-top: 1.5rem;
   }
 
-  .prog-prose h3 {
+  .cur-prose h3 {
     font-family: var(--display);
-    font-size: 1.22rem;
+    font-size: 1.18rem;
     font-weight: normal;
     letter-spacing: 0.01em;
     color: var(--text);
-    margin: 2.4rem 0 1rem;
-    scroll-margin-top: 1.5rem;
+    margin: 2rem 0 0.9rem;
   }
 
-  .prog-prose h4 {
+  .cur-prose h4 {
     font-family: var(--sans);
-    font-size: 0.92rem;
+    font-size: 0.9rem;
     font-weight: 500;
     color: var(--text);
-    margin: 1.8rem 0 0.8rem;
+    margin: 1.6rem 0 0.7rem;
   }
 
-  .prog-prose p {
-    margin: 1.1rem 0;
-    max-width: 70ch;
+  .cur-prose p {
+    margin: 1rem 0;
+    max-width: 72ch;
   }
 
-  .prog-prose strong {
+  .cur-prose strong {
     color: var(--text);
     font-weight: 500;
   }
 
-  .prog-prose em {
+  .cur-prose em {
     font-style: italic;
     color: var(--text);
     opacity: 0.92;
   }
 
-  .prog-prose a {
+  .cur-prose a {
     color: var(--text);
     text-decoration: underline;
     text-decoration-color: var(--text-faint);
@@ -256,37 +485,35 @@ const description = entry!.data.description
   }
 
   @media (hover: hover) and (pointer: fine) {
-    .prog-prose a:hover {
+    .cur-prose a:hover {
       text-decoration-color: var(--text);
     }
   }
 
-  /* lists */
-  .prog-prose ul,
-  .prog-prose ol {
-    margin: 1.1rem 0;
+  .cur-prose ul,
+  .cur-prose ol {
+    margin: 1rem 0;
     padding-left: 1.4rem;
-    max-width: 70ch;
+    max-width: 72ch;
   }
 
-  .prog-prose li {
-    margin: 0.45rem 0;
-    line-height: 1.7;
+  .cur-prose li {
+    margin: 0.4rem 0;
+    line-height: 1.65;
   }
 
-  .prog-prose li::marker {
+  .cur-prose li::marker {
     color: var(--text-faint);
   }
 
-  .prog-prose ul ul,
-  .prog-prose ol ol,
-  .prog-prose ul ol,
-  .prog-prose ol ul {
-    margin: 0.45rem 0;
+  .cur-prose ul ul,
+  .cur-prose ol ol,
+  .cur-prose ul ol,
+  .cur-prose ol ul {
+    margin: 0.4rem 0;
   }
 
-  /* inline code */
-  .prog-prose code {
+  .cur-prose code {
     font-family: var(--mono);
     font-feature-settings: var(--mono-feat);
     font-size: 0.84em;
@@ -297,17 +524,16 @@ const description = entry!.data.description
     color: var(--text);
   }
 
-  /* code blocks (Appendix A prereq map) */
-  .prog-prose pre {
+  .cur-prose pre {
     background: rgba(215, 208, 223, 0.04);
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 1.25rem 1.4rem;
-    margin: 1.6rem 0;
+    margin: 1.5rem 0;
     overflow-x: auto;
   }
 
-  .prog-prose pre code {
+  .cur-prose pre code {
     background: none;
     border: none;
     padding: 0;
@@ -316,9 +542,8 @@ const description = entry!.data.description
     color: var(--text-dim);
   }
 
-  /* blockquotes -> callout cards */
-  .prog-prose blockquote {
-    margin: 1.8rem 0;
+  .cur-prose blockquote {
+    margin: 1.6rem 0;
     padding: 1.1rem 1.4rem;
     border: 1px solid var(--border);
     border-left: 2px solid rgba(252, 200, 215, 0.55);
@@ -327,33 +552,32 @@ const description = entry!.data.description
     color: var(--text-dim);
   }
 
-  .prog-prose blockquote p {
+  .cur-prose blockquote p {
     margin: 0.5rem 0;
     max-width: none;
   }
 
-  .prog-prose blockquote p:first-child {
+  .cur-prose blockquote p:first-child {
     margin-top: 0;
   }
 
-  .prog-prose blockquote p:last-child {
+  .cur-prose blockquote p:last-child {
     margin-bottom: 0;
   }
 
-  /* tables */
-  .prog-prose table {
+  .cur-prose table {
     width: 100%;
     border-collapse: collapse;
-    margin: 1.6rem 0;
-    font-size: 0.86rem;
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
     display: block;
     overflow-x: auto;
   }
 
-  .prog-prose thead th {
+  .cur-prose thead th {
     font-family: var(--mono);
     font-feature-settings: var(--mono-feat);
-    font-size: 0.66rem;
+    font-size: 0.64rem;
     font-weight: 500;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -364,7 +588,7 @@ const description = entry!.data.description
     white-space: nowrap;
   }
 
-  .prog-prose tbody td {
+  .cur-prose tbody td {
     padding: 0.7rem 0.9rem;
     border-bottom: 1px solid var(--border);
     color: var(--text-dim);
@@ -372,49 +596,41 @@ const description = entry!.data.description
     line-height: 1.5;
   }
 
-  .prog-prose tbody tr:last-child td {
+  .cur-prose tbody tr:last-child td {
     border-bottom: none;
   }
 
-  .prog-prose hr {
+  .cur-prose hr {
     border: none;
     border-top: 1px solid var(--border);
-    margin: 3rem 0;
+    margin: 2.5rem 0;
   }
 
   /* ===== Responsive ===== */
-  @media (max-width: 900px) {
-    .prog-shell {
+  @media (max-width: 860px) {
+    .cur-layout {
       grid-template-columns: 1fr;
-      gap: 1.5rem;
+      gap: 1.25rem;
     }
-    .prog-nav {
-      position: static;
-      max-height: none;
-      overflow: visible;
-      padding-bottom: 1.25rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .prog-nav-list {
+    .rail {
       flex-direction: row;
       flex-wrap: wrap;
-      gap: 0.5rem 0.9rem;
+      gap: 1rem;
     }
-    .prog-nav-list a {
-      border-left: none;
-      padding-left: 0;
-    }
-    .prog-nav-list a[aria-current='true'] {
-      border-left: none;
+    .rail-group {
+      flex: 1 1 100%;
     }
   }
 
   @media (max-width: 768px) {
-    .prog-page {
+    .cur-page {
       padding: 0 1.25rem 3rem;
     }
-    .prog-prose h2 {
-      font-size: 1.4rem;
+    .pane {
+      padding: 1.5rem 1.4rem 1.8rem;
+    }
+    .cur-prose h2 {
+      font-size: 1.35rem;
     }
   }
 </style>

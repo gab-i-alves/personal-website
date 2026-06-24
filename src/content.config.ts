@@ -56,27 +56,18 @@ const curriculum = defineCollection({
   loader: glob({ base: './src/content/curriculum', pattern: '**/*.{md,mdx}' }),
   schema: () =>
     z.object({
+      // short title for the rail (the part after the em dash in the source heading)
       title: z.string(),
-      // course code shown as the catalog marker, e.g. "DATA 101"
+      // full original heading, e.g. "Disciplina D1 — Teoria da Informação"
+      heading: z.string(),
+      // catalog marker: P1, P2, D1…D12, S1, S2, Capstone
       code: z.string(),
-      track: z.enum(['data', 'mind', 'org', 'theory']),
-      summary: z.string(),
-      // sorts courses within a track
-      order: z.number().default(0),
-      status: z.enum(['planned', 'reading', 'active', 'done']).default('planned'),
-      // materials worked through for this course — the rows of the "Progress" table
-      progress: z
-        .array(
-          z.object({
-            name: z.string(),
-            // book / paper / course / video / project …
-            type: z.string(),
-            status: z.enum(['planned', 'reading', 'active', 'done']).default('planned'),
-            // out of 10, only meaningful once something is finished
-            rating: z.number().min(1).max(10).optional()
-          })
-        )
-        .default([])
+      // which phase the subject belongs to
+      phase: z.enum(['prop', 'i', 'ii', 'iii']),
+      // thematic track A–E (disciplines only; P/S subjects omit it)
+      track: z.enum(['A', 'B', 'C', 'D', 'E']).optional(),
+      // sorts subjects within a phase
+      order: z.number().default(0)
     })
 })
 
