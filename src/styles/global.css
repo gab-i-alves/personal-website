@@ -1,24 +1,44 @@
 @import './fonts.css';
 @import './post.css';
+@import './frame.css';
 
 :root {
-  /* Color Palette — dark-only */
-  --bg: #373044;
-  --text: #D7D0DF;
-  --text-dim: rgba(215, 208, 223, 0.55);
-  --text-faint: rgba(215, 208, 223, 0.3);
-  --border: rgba(215, 208, 223, 0.08);
-  --selection: rgba(215, 208, 223, 0.12);
-  --code-bg: rgba(215, 208, 223, 0.06);
-  --mark: rgba(215, 208, 223, 0.15);
+  /* Color Palette — paper. The frame is printed ink on stock: one ink colour
+     (#2A2420) on one paper colour (#FBF7EF), and the violet only ever appears
+     as a solid fill — inverted bars, and the drape in the banner.
+       #2A2420  ink            → text, inverted bars
+       #FBF7EF  paper          → panel, article stock
+       #F3EDE2  toned stock    → rails
+       #EFE7DA  backdrop       → behind the frame */
+  --bg: #EFE7DA;
+  --text: #2A2420;
+  --text-dim: rgba(42, 36, 32, 0.62);
+  --text-faint: rgba(42, 36, 32, 0.32);
+  --border: rgba(42, 36, 32, 0.2);
+  --selection: rgba(55, 48, 68, 0.2);
+  --code-bg: rgba(42, 36, 32, 0.06);
+  --mark: rgba(55, 48, 68, 0.13);
+
+  /* Frame chrome */
+  --panel: #FBF7EF;
+  --rail: #F3EDE2;
+  --ink-invert: #373044;
+  --ink-invert-text: #F5F0E8;
+  --rule: rgba(42, 36, 32, 0.34);
+
+  /* Banner drape — the violet photograph, and the light text that sits on it */
+  --drape-dark: #4A3E63;
+  --drape-deep: #2B2140;
+  --on-drape: #F3EFE7;
+  --on-drape-dim: rgba(243, 239, 231, 0.78);
 
   /* Paper (articles, notebook) */
-  --paper: #F5F0E8;
+  --paper: #FBF7EF;
   --paper-text: #2A2420;
-  --paper-dim: rgba(42, 36, 32, 0.5);
-  --paper-faint: rgba(42, 36, 32, 0.25);
-  --paper-border: rgba(42, 36, 32, 0.1);
-  --paper-code-bg: rgba(42, 36, 32, 0.06);
+  --paper-dim: rgba(42, 36, 32, 0.56);
+  --paper-faint: rgba(42, 36, 32, 0.3);
+  --paper-border: rgba(42, 36, 32, 0.14);
+  --paper-code-bg: rgba(42, 36, 32, 0.07);
 
   /* Backward-compat aliases (used by inherited components) */
   --text-primary: var(--text);
@@ -31,11 +51,11 @@
   --display: 'Dreamer', Georgia, serif;
   --sans: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell,
     Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  /* --mono is Inter too — for metadata/dates/versions where we want a thin,
-     numeric look. Tabular nums (`tnum`) align numbers like a real monospace.
-     ASCII-art that truly needs equal-width characters (Butterfly) keeps a
-     hard-coded monospace fallback. */
-  --mono: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, sans-serif;
+  /* --mono is a real monospace now: the frame chrome (tabs, widget titles,
+     dates, changelog) is meant to read like a terminal-era UI font. Long
+     prose still uses --sans. */
+  --mono: ui-monospace, 'Cascadia Mono', 'Segoe UI Mono', 'DejaVu Sans Mono', 'Liberation Mono',
+    Menlo, Consolas, monospace;
   --mono-feat: 'tnum' 1, 'zero' 1, 'cv01' 1;
 
   --font-size-s: 0.85rem;
@@ -73,18 +93,18 @@
   --display-lg: clamp(2.5rem, 5vw, 4.5rem);
   --display-md: clamp(1.8rem, 3.5vw, 3rem);
 
-  /* Syntax Theme (dark) */
-  --astro-code-foreground: rgba(215, 208, 223, 0.9);
-  --astro-code-background: rgba(215, 208, 223, 0.04);
-  --astro-code-token-constant: rgba(215, 208, 223, 0.9);
-  --astro-code-token-string: rgba(215, 208, 223, 0.9);
-  --astro-code-token-comment: rgba(215, 208, 223, 0.35);
-  --astro-code-token-keyword: rgba(215, 208, 223, 0.55);
-  --astro-code-token-parameter: rgba(215, 208, 223, 0.9);
-  --astro-code-token-function: rgba(215, 208, 223, 0.9);
-  --astro-code-token-string-expression: rgba(215, 208, 223, 0.55);
-  --astro-code-token-punctuation: rgba(215, 208, 223, 0.55);
-  --astro-code-token-link: rgba(215, 208, 223, 0.55);
+  /* Syntax Theme — ink on the paper stock, violet for keywords. */
+  --astro-code-foreground: rgba(42, 36, 32, 0.94);
+  --astro-code-background: rgba(42, 36, 32, 0.055);
+  --astro-code-token-constant: rgba(42, 36, 32, 0.94);
+  --astro-code-token-string: rgba(42, 36, 32, 0.94);
+  --astro-code-token-comment: rgba(42, 36, 32, 0.45);
+  --astro-code-token-keyword: rgba(55, 48, 68, 0.95);
+  --astro-code-token-parameter: rgba(42, 36, 32, 0.94);
+  --astro-code-token-function: rgba(42, 36, 32, 0.94);
+  --astro-code-token-string-expression: rgba(55, 48, 68, 0.9);
+  --astro-code-token-punctuation: rgba(42, 36, 32, 0.58);
+  --astro-code-token-link: rgba(55, 48, 68, 0.9);
 }
 
 html {
@@ -123,22 +143,10 @@ body {
 }
 
 ::selection {
-  background-color: rgba(215, 208, 223, 0.2);
+  background-color: var(--selection);
 }
 
-/* View Transitions — fade between pages */
-::view-transition-old(root) {
-  animation: fadeOut 150ms var(--ease-out);
-}
-::view-transition-new(root) {
-  animation: fadeIn 200ms var(--ease-out);
-}
-@keyframes fadeOut {
-  to { opacity: 0; }
-}
-@keyframes fadeIn {
-  from { opacity: 0; }
-}
+/* No cross-page view transition: pages swap instantly. */
 
 :focus {
   outline: 2px solid var(--text-faint);

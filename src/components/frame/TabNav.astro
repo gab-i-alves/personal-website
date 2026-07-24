@@ -1,0 +1,37 @@
+---
+// The masthead tab strip. `current` is matched against each tab's href so the
+// active tab renders inverted.
+interface Props {
+  current?: string
+}
+
+const { current = '' } = Astro.props
+
+// No bookmarks tab: the bookmarks now live in the "find me" rail, which is on
+// every page, so a tab for them would just be a second door to the same room.
+// The full grid is still at /bookmarks, linked from the bottom of that widget.
+const tabs = [
+  { label: 'articles', href: '/posts' },
+  { label: 'logs', href: '/daily-logs' },
+  { label: 'shelf', href: '/shelf' }
+]
+---
+
+<nav class="frame-tabs" aria-label="sections">
+  <a class="frame-brand" href="/">
+    hot topics
+    <span class="rule-out"></span>
+    <span aria-hidden="true">&rarr;</span>
+  </a>
+  <ul class="frame-tab-list">
+    {
+      tabs.map((tab) => (
+        <li>
+          <a href={tab.href} aria-current={current === tab.href ? 'page' : undefined}>
+            {tab.label}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>

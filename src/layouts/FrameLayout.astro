@@ -1,0 +1,140 @@
+---
+import '@/styles/global.css'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import BaseHead from '@/components/layout/BaseHead.astro'
+import TabNav from '@/components/frame/TabNav.astro'
+import LeftRail from '@/components/frame/LeftRail.astro'
+import RightRail from '@/components/frame/RightRail.astro'
+import { themeConfig } from '@/config'
+
+// Two pieces of chrome, following the reference site: the home page gets the
+// tall banner and the tab strip, every inner page gets a short strip of the
+// same drape plus a breadcrumb — you already know where you are by then.
+//   chrome  portal | section
+// And the column shape:
+//   portal  190px | 1fr | 190px   widget rail + content + profile rail (home)
+//   page    190px | 1fr           widget rail + content (lists)
+//   index   170px | 1fr           index rail + content (detail pages)
+//   wide    1fr                   no rails, for layouts that need the room
+interface Props {
+  title: string
+  description: string
+  ogImage?: string
+  chrome?: 'portal' | 'section'
+  variant?: 'portal' | 'page' | 'index' | 'wide'
+  current?: string
+  section?: { label: string; href: string }
+  epigraph?: string
+  /** Shown in the section banner. Defaults to the title minus the site name. */
+  heading?: string
+  /** Optional line under the banner heading. */
+  subtitle?: string
+  type?: 'page' | 'post'
+}
+
+const {
+  title,
+  description,
+  ogImage,
+  chrome = 'section',
+  variant = 'page',
+  current = '',
+  section,
+  epigraph,
+  heading,
+  subtitle,
+  type = 'page'
+} = Astro.props
+
+const pageHeading = heading ?? title.split(' · ')[0]
+
+const showWidgetRail = variant === 'page' || variant === 'portal'
+const showIndexRail = variant === 'index'
+const showRight = variant === 'page' || variant === 'portal'
+const year = new Date().getFullYear()
+const brand = themeConfig.site.author.toLowerCase()
+---
+
+<BaseLayout title={title} description={description} type={type}>
+  <BaseHead title={title} description={description} ogImage={ogImage} slot="head" />
+
+  <div class="frame" data-variant={variant}>
+    {
+      chrome === 'portal' ? (
+        <header class="frame-banner">
+          <div>
+            <p class="frame-wordmark">
+              <a href="/">{brand}</a>
+            </p>
+          </div>
+        </header>
+      ) : (
+        <header class="frame-strip-banner">
+          <h1 class="frame-page-title">{pageHeading}</h1>
+          {subtitle && <p class="frame-page-sub">{subtitle}</p>}
+        </header>
+      )
+    }
+
+    {/* The tab strip stays on every page. The reference drops it on inner pages,
+        but then the only way from one section to another is back through the
+        front door — worth the one extra row to avoid that dead end. */}
+    <TabNav current={current} />
+
+    {
+      chrome === 'section' && (
+        <div class="frame-crumbs">
+          <nav aria-label="breadcrumb">
+            <a href="/">{brand}</a>
+            <span class="sep" aria-hidden="true">/</span>
+            {section && section.href !== Astro.url.pathname ? (
+              <>
+                <a href={section.href}>{section.label}</a>
+                <span class="sep" aria-hidden="true">/</span>
+                <span class="here">{title.split(' · ')[0]}</span>
+              </>
+            ) : (
+              <span class="here">{section?.label ?? title.split(' · ')[0]}</span>
+            )}
+          </nav>
+          {epigraph && <p class="frame-epigraph">{epigraph}</p>}
+        </div>
+      )
+    }
+
+    <div class="frame-body">
+      {/* Profile rail on the left, made-things and read-things on the right. */}
+      {
+        showWidgetRail && (
+          <aside class="frame-rail">
+            <RightRail />
+          </aside>
+        )
+      }
+      {
+        showIndexRail && (
+          <aside class="frame-rail">
+            <slot name="index" />
+          </aside>
+        )
+      }
+
+      <main class="frame-main">
+        <slot />
+      </main>
+
+      {
+        showRight && (
+          <aside class="frame-rail frame-rail--right">
+            <LeftRail />
+          </aside>
+        )
+      }
+    </div>
+
+    <footer class="frame-footer">
+      <span>c. {brand} {year}</span>
+      <span>built with <a href="https://astro.build">astro</a></span>
+    </footer>
+  </div>
+</BaseLayout>

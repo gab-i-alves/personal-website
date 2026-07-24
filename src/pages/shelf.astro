@@ -1,10 +1,6 @@
 ---
-import '@/styles/global.css'
-import BaseLayout from '@/layouts/BaseLayout.astro'
-import BaseHead from '@/components/layout/BaseHead.astro'
-import Stars from '@/components/effects/Stars.astro'
-import BackLink from '@/components/layout/BackLink.astro'
-import SiteFooter from '@/components/layout/SiteFooter.astro'
+import FrameLayout from '@/layouts/FrameLayout.astro'
+import Bookshelf from '@/components/shelf/Bookshelf.astro'
 import { getCollection } from 'astro:content'
 import { themeConfig } from '@/config'
 
@@ -24,17 +20,34 @@ function formatMedium(m: string) {
 }
 ---
 
-<BaseLayout title={`Shelf · ${themeConfig.site.title}`} description="my notes on things i've read, watched, and listened to">
-  <BaseHead title={`Shelf · ${themeConfig.site.title}`} description="my notes on things i've read, watched, and listened to" slot="head" />
-
-  <Stars count={40} maxOpacity={0.3} />
-  <BackLink />
-
+<FrameLayout
+  title={`Shelf · ${themeConfig.site.title}`}
+  description="my notes on things i've read, watched, and listened to"
+  variant="page"
+  current="/shelf"
+  section={{ label: 'shelf', href: '/shelf' }}
+  epigraph="bookshelf adapted from petargyurov/virtual-bookshelf"
+  heading="shelf"
+>
   <div class="shelf-page">
-    <header class="shelf-header">
-      <h1 class="shelf-title">shelf</h1>
-      <p class="shelf-subtitle">notes on things i've read, watched, and listened to</p>
-    </header>
+
+    <Bookshelf
+      books={sorted.map((e) => ({
+        id: e.id,
+        title: e.data.title,
+        author: e.data.author,
+        favorite: e.data.favorite,
+        cover: e.data.cover
+      }))}
+    />
+
+    <p class="shelf-credit">
+      the shelf above is adapted from
+      <a href="https://github.com/petargyurov/virtual-bookshelf" rel="noopener">
+        petargyurov/virtual-bookshelf
+      </a>
+      (public domain) — reworked for this palette. hover a spine to pull it out.
+    </p>
 
     <!-- Filters -->
     <div class="shelf-controls">
@@ -107,45 +120,27 @@ function formatMedium(m: string) {
         </tbody>
       </table>
     </div>
-
-    <SiteFooter />
   </div>
-</BaseLayout>
+</FrameLayout>
 
 <style is:global>
   /* ===== Page ===== */
-  .shelf-page {
-    max-width: 920px;
-    margin: 0 auto;
-    padding: 0 2rem 4rem;
-    position: relative;
-    z-index: 1;
-  }
-
   .shelf-header {
-    padding: 3rem 0 2.5rem;
+    padding: 0 0 1.5rem;
     text-align: center;
   }
 
-  .shelf-title {
-    font-family: var(--display);
-    font-size: var(--display-xl);
-    font-weight: normal;
-    line-height: 1;
-    color: var(--text);
-    opacity: 0.92;
-    margin: 0;
+  .shelf-credit {
+    font-family: var(--mono);
+    font-size: 0.66rem;
+    line-height: 1.6;
+    color: var(--text-dim);
+    text-align: center;
+    margin: 0 0 1.75rem;
   }
 
-  .shelf-subtitle {
-    font-family: var(--sans);
-    font-size: 0.95rem;
-    font-weight: 300;
-    color: var(--text-dim);
-    opacity: 0.85;
-    margin-top: 1.25rem;
-    letter-spacing: 0.04em;
-    font-style: italic;
+  .shelf-credit a {
+    color: var(--text);
   }
 
   /* ===== Controls ===== */
@@ -179,14 +174,14 @@ function formatMedium(m: string) {
   }
 
   .filter-btn.active {
-    background: rgba(215, 208, 223, 0.1);
+    background: rgba(42, 36, 32, 0.1);
     color: var(--text);
-    border-color: rgba(215, 208, 223, 0.2);
+    border-color: rgba(42, 36, 32, 0.2);
   }
 
   @media (hover: hover) and (pointer: fine) {
     .filter-btn:hover {
-      border-color: rgba(215, 208, 223, 0.15);
+      border-color: rgba(42, 36, 32, 0.15);
       color: var(--text);
     }
   }
@@ -231,7 +226,7 @@ function formatMedium(m: string) {
     white-space: nowrap;
     position: sticky;
     top: 0;
-    background: var(--bg);
+    background: var(--panel);
     z-index: 2;
   }
 
@@ -257,13 +252,13 @@ function formatMedium(m: string) {
 
   @media (hover: hover) and (pointer: fine) {
     .shelf-row:hover {
-      background: rgba(215, 208, 223, 0.04);
+      background: rgba(42, 36, 32, 0.04);
     }
   }
 
   .shelf-row td {
     padding: 0.65rem 0.75rem;
-    border-bottom: 1px solid rgba(215, 208, 223, 0.04);
+    border-bottom: 1px solid rgba(42, 36, 32, 0.04);
     vertical-align: middle;
   }
 
@@ -305,12 +300,13 @@ function formatMedium(m: string) {
     white-space: nowrap;
   }
 
-  .pill-fiction { background: rgba(180, 160, 220, 0.15); color: rgba(200, 180, 240, 0.85); }
-  .pill-nonfiction { background: rgba(160, 200, 180, 0.15); color: rgba(180, 220, 200, 0.85); }
-  .pill-advice { background: rgba(220, 190, 150, 0.15); color: rgba(240, 210, 170, 0.85); }
-  .pill-science { background: rgba(150, 190, 220, 0.15); color: rgba(170, 210, 240, 0.85); }
-  .pill-history { background: rgba(200, 170, 160, 0.15); color: rgba(220, 190, 180, 0.85); }
-  .pill-medium { background: rgba(215, 208, 223, 0.06); color: var(--text-dim); }
+  /* Tinted fill, dark ink — the pills have to read on the paper stock. */
+  .pill-fiction { background: rgba(120, 90, 180, 0.18); color: rgba(52, 32, 92, 0.95); }
+  .pill-nonfiction { background: rgba(70, 140, 110, 0.18); color: rgba(20, 66, 48, 0.95); }
+  .pill-advice { background: rgba(180, 130, 60, 0.18); color: rgba(84, 54, 12, 0.95); }
+  .pill-science { background: rgba(70, 130, 180, 0.18); color: rgba(20, 56, 92, 0.95); }
+  .pill-history { background: rgba(170, 110, 95, 0.18); color: rgba(86, 42, 32, 0.95); }
+  .pill-medium { background: rgba(42, 36, 32, 0.06); color: var(--text-dim); }
 
   /* Rating */
   .rating-value {
@@ -339,7 +335,7 @@ function formatMedium(m: string) {
     letter-spacing: 0.03em;
     padding: 0.15rem 0.4rem;
     border-radius: 3px;
-    background: rgba(215, 208, 223, 0.06);
+    background: rgba(42, 36, 32, 0.06);
     color: var(--text-dim);
     white-space: nowrap;
   }
@@ -357,14 +353,6 @@ function formatMedium(m: string) {
 
   /* ===== Responsive ===== */
   @media (max-width: 768px) {
-    .shelf-page {
-      padding: 0 1.25rem 3rem;
-    }
-
-    .shelf-header {
-      padding: 2rem 0 1.5rem;
-    }
-
     .col-category, .col-medium {
       display: none;
     }

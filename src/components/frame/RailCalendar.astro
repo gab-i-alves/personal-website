@@ -1,0 +1,157 @@
+---
+import { getCollection } from 'astro:content'
+import { themeConfig } from '@/config'
+
+// Compact month grid for the left rail. Days that have a daily log link to it;
+// the current day is inverted. Rendered at build time, like the rest of the site.
+const logs = await getCollection('dailyLogs')
+const logByDay = new Map<string, string>()
+for (const log of logs) {
+  if (log.id.startsWith('_')) continue
+  const d = log.data.date
+  logByDay.set(`${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`, log.id)
+}
+
+const today = new Date()
+const year = today.getFullYear()
+const month = today.getMonth()
+
+const firstWeekday = new Date(year, month, 1).getDay()
+const daysInMonth = new Date(year, month + 1, 0).getDate()
+const daysInPrevMonth = new Date(year, month, 0).getDate()
+
+type Cell = { day: number; outside: boolean; slug?: string; isToday: boolean }
+
+const cells: Cell[] = []
+
+// Leading days from the previous month, so the grid is always rectangular.
+for (let i = firstWeekday - 1; i >= 0; i--) {
+  cells.push({ day: daysInPrevMonth - i, outside: true, isToday: false })
+}
+
+for (let day = 1; day <= daysInMonth; day++) {
+  cells.push({
+    day,
+    outside: false,
+    slug: logByDay.get(`${year}-${month}-${day}`),
+    isToday: day === today.getDate()
+  })
+}
+
+// Trailing days to fill the last week.
+let trailing = 1
+while (cells.length % 7 !== 0) {
+  cells.push({ day: trailing++, outside: true, isToday: false })
+}
+
+const monthLabel = `${today.toLocaleString(themeConfig.site.language, { month: 'long' })} ${year}`
+const weekdays = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+---
+
+<div class="railcal">
+  <div class="railcal-month">{monthLabel}</div>
+  <table class="railcal-grid">
+    <thead>
+      <tr>
+        {weekdays.map((d) => <th scope="col">{d}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        Array.from({ length: cells.length / 7 }, (_, week) => (
+          <tr>
+            {cells.slice(week * 7, week * 7 + 7).map((cell) => (
+              <td
+                class:list={[
+                  'railcal-day',
+                  { outside: cell.outside, today: cell.isToday, marked: !!cell.slug }
+                ]}
+              >
+                {cell.slug ? <a href={`/daily-logs/${cell.slug}`}>{cell.day}</a> : cell.day}
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+  <div class="railcal-foot">
+    <a href="/daily-logs">all logs &rarr;</a>
+  </div>
+</div>
+
+<style>
+  .railcal {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    padding: 0.4rem 0.45rem 0.5rem;
+  }
+
+  .railcal-month {
+    text-align: center;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding-bottom: 0.35rem;
+  }
+
+  .railcal-grid {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .railcal-grid th {
+    font-weight: 400;
+    color: var(--text-dim);
+    padding: 0.1rem 0;
+    border: 1px solid var(--border);
+    font-size: 0.66rem;
+  }
+
+  .railcal-day {
+    text-align: center;
+    padding: 0.14rem 0;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .railcal-day.outside {
+    color: var(--text-faint);
+  }
+
+  .railcal-day.today {
+    background: var(--ink-invert);
+    color: var(--ink-invert-text);
+    font-weight: 700;
+  }
+
+  /* A logged day is underlined, the way an old site would mark a live link. */
+  .railcal-day.marked a {
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 0.14em;
+  }
+
+  .railcal-day.today a {
+    color: var(--ink-invert-text);
+  }
+
+  .railcal-foot {
+    text-align: center;
+    padding-top: 0.4rem;
+    font-size: 0.66rem;
+  }
+
+  .railcal-foot a {
+    color: var(--text-dim);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+  }
+
+  .railcal-foot a:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+</style>

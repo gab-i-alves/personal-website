@@ -1,17 +1,14 @@
 ---
-import '@/styles/global.css'
 import type { PostLayoutProps } from '@/types'
 import { getCollection } from 'astro:content'
 import FormattedDate from '@/components/widgets/FormattedDate.astro'
 import FootnoteScroll from '@/components/widgets/FootnoteScroll.astro'
-import BaseHead from '@/components/layout/BaseHead.astro'
 import ImageViewer from '@/components/ui/ImageViewer.astro'
 import CopyCode from '@/components/ui/CopyCode.astro'
-import Stars from '@/components/effects/Stars.astro'
-import BackLink from '@/components/layout/BackLink.astro'
-import BaseLayout from '@/layouts/BaseLayout.astro'
+import FrameLayout from '@/layouts/FrameLayout.astro'
 
 import { themeConfig } from '@/config'
+import { formatDate } from '@/utils/date'
 
 const { title, pubDate, readingTime } = Astro.props as PostLayoutProps
 
@@ -29,22 +26,57 @@ const total = sortedPosts.length
 const prevPost = currentIdx > 0 ? sortedPosts[currentIdx - 1] : null
 const nextPost = currentIdx >= 0 && currentIdx < total - 1 ? sortedPosts[currentIdx + 1] : null
 const pageNumber = currentIdx >= 0 ? currentIdx + 1 : 1
+
+// This layout serves both articles and daily logs, so the index rail lists
+// whichever collection the current page belongs to — dated, newest first, with
+// the entry you are reading inverted.
+const isLog = Astro.url.pathname.startsWith('/daily-logs/')
+
+const logs = (await getCollection('dailyLogs'))
+  .filter((l) => !l.id.startsWith('_'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+
+const shortDate = (d: Date) => formatDate(d)
+
+const indexItems = isLog
+  ? logs.map((l) => ({ href: `/daily-logs/${l.id}`, date: shortDate(l.data.date), label: '', id: l.id }))
+  : sortedPosts.map((p) => ({
+      href: `/${p.id}`,
+      date: shortDate(p.data.pubDate),
+      label: p.data.title,
+      id: p.id
+    }))
+
+const section = isLog
+  ? { label: 'logs', href: '/daily-logs' }
+  : { label: 'articles', href: '/posts' }
+const indexTitle = isLog ? 'all logs' : 'all articles'
 ---
 
-<BaseLayout
+<FrameLayout
   title={`${title} · ${themeConfig.site.title}`}
   description={themeConfig.site.description}
+  ogImage={ogImage}
+  variant="index"
+  current={section.href}
+  section={section}
   type="post"
 >
-  <BaseHead
-    title={`${title} · ${themeConfig.site.title}`}
-    description={themeConfig.site.description}
-    ogImage={ogImage}
-    slot="head"
-  />
-
-  <Stars count={40} maxOpacity={0.25} />
-  <BackLink href="/posts" label="back to articles" />
+  <nav class="index-rail" slot="index" aria-label={indexTitle}>
+    <p class="index-rail-title">{indexTitle}</p>
+    <ol>
+      {
+        indexItems.map((item) => (
+          <li>
+            <a href={item.href} aria-current={item.id === postSlug ? 'page' : undefined}>
+              {item.date}
+              {item.label && <span class="index-label">{item.label}</span>}
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+  </nav>
 
   <div class="magazine-wrapper">
     <article class="magazine-page prose">
@@ -90,27 +122,27 @@ const pageNumber = currentIdx >= 0 ? currentIdx + 1 : 1
   <FootnoteScroll />
   <CopyCode />
   {themeConfig.post.imageViewer && <ImageViewer />}
-</BaseLayout>
+</FrameLayout>
 
 <style is:global>
   .magazine-wrapper {
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 5rem 2rem 3rem;
     position: relative;
-    z-index: 1;
   }
 
+  /* Inside the frame the article is a sheet of the lightest palette tone laid
+     on the violet panel — squared off, with a hard 1px rule instead of a
+     shadow, so it matches the rest of the chrome. */
   .magazine-page {
     background: var(--paper);
     color: var(--paper-text);
     width: 100%;
-    max-width: 1100px;
-    border-radius: 3px;
-    padding: 4.5rem 4.5rem 3rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25), 0 2px 6px rgba(0, 0, 0, 0.15);
+    /* border-box, or width:100% plus the padding below overflows the frame */
+    box-sizing: border-box;
+    border: 1px solid var(--rule);
+    padding: 2.75rem 3.25rem 2.25rem;
     position: relative;
   }
 
@@ -338,8 +370,7 @@ const pageNumber = currentIdx >= 0 ? currentIdx + 1 : 1
   }
 
   @media (max-width: 768px) {
-    .magazine-wrapper { padding: 4rem 1rem 2rem; }
-    .magazine-page { padding: 2.5rem 1.75rem 2rem; }
+    .magazine-page { padding: 1.75rem 1.35rem 1.5rem; }
 
     /* Single column on mobile — magazine becomes a single newspaper column */
     .article-body { column-count: 1; }

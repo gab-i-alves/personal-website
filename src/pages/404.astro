@@ -1,57 +1,58 @@
 ---
-import IndexLayout from '@/layouts/IndexLayout.astro'
-import Stars from '@/components/effects/Stars.astro'
+import '@/styles/global.css'
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import BaseHead from '@/components/layout/BaseHead.astro'
 import { themeConfig } from '@/config'
 ---
 
-<IndexLayout title={`404 · ${themeConfig.site.title}`} description="Not Found">
-  <Stars count={40} maxOpacity={0.4} />
+{/* No frame here, on purpose: the reference strips its 404 down to one image
+    and one link, and a dead end is a good place to drop the furniture. */}
+<BaseLayout title={`404 · ${themeConfig.site.title}`} description="Not Found">
+  <BaseHead title={`404 · ${themeConfig.site.title}`} description="Not Found" slot="head" />
 
-  <div class="error">
-    <h1>404</h1>
-    <p class="hint">page not found</p>
-    <nav>
-      <a href="/">home</a>
-      <a href="/posts">posts</a>
-    </nav>
+  <div class="lost">
+    <p class="lost-note">404 page not found</p>
+    <div class="lost-plate" role="presentation"></div>
+    <p class="lost-back"><a href="/">back to the front page?</a></p>
   </div>
-</IndexLayout>
+</BaseLayout>
 
 <style>
-  .error {
-    margin-top: 4rem;
-  }
-
-  .error h1 {
-    font-family: var(--display);
-    font-size: clamp(4rem, 15vw, 8rem);
-    font-weight: normal;
-    color: var(--text);
-    opacity: 0.3;
-    line-height: 1;
-    margin-bottom: 1rem;
-  }
-
-  .hint {
-    color: var(--text-dim);
-    margin-bottom: 2rem;
-  }
-
-  .error nav {
+  .lost {
+    min-height: 100vh;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     gap: 1.5rem;
+    padding: 2rem;
   }
 
-  .error nav a {
+  .lost-note,
+  .lost-back {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
     color: var(--text);
-    opacity: 0.6;
-    text-decoration: underline;
-    text-underline-offset: 0.2rem;
-    text-decoration-thickness: 1px;
-    transition: opacity 0.2s;
+    margin: 0;
   }
 
-  .error nav a:hover {
-    opacity: 1;
+  /* The drape, masked to an oval and dithered — the reference does the same
+     with a halftoned landscape. */
+  .lost-plate {
+    width: min(560px, 80vw);
+    aspect-ratio: 8 / 5;
+    background-image:
+      radial-gradient(circle at center, var(--drape-deep) 0.8px, transparent 1px),
+      url('/images/banner-drape.webp');
+    background-size: 4px 4px, cover;
+    background-position: 0 0, center;
+    mask-image: radial-gradient(ellipse at center, #000 40%, transparent 72%);
+  }
+
+  .lost-back a {
+    color: var(--text);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
   }
 </style>

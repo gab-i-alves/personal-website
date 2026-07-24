@@ -1,61 +1,26 @@
 ---
-import '@/styles/global.css'
-import BaseLayout from '@/layouts/BaseLayout.astro'
-import BaseHead from '@/components/layout/BaseHead.astro'
-import Stars from '@/components/effects/Stars.astro'
+import FrameLayout from '@/layouts/FrameLayout.astro'
 import ScrapbookGrid from '@/components/bookmarks/ScrapbookGrid.astro'
-import BackLink from '@/components/layout/BackLink.astro'
-import SiteFooter from '@/components/layout/SiteFooter.astro'
 import { categories } from '@/data/bookmarks'
 import { themeConfig } from '@/config'
 ---
 
-<BaseLayout title={`Bookmarks · ${themeConfig.site.title}`} description={themeConfig.site.description}>
-  <BaseHead title={`Bookmarks · ${themeConfig.site.title}`} description={themeConfig.site.description} slot="head" />
-
-  <Stars count={60} maxOpacity={0.5} />
-  <BackLink />
-
-  <div class="page-header">
-    <div class="page-title">bookmarks</div>
-    <div class="page-subtitle">curated list with things I find interesting</div>
-  </div>
+<FrameLayout
+  title={`Bookmarks · ${themeConfig.site.title}`}
+  description={themeConfig.site.description}
+  variant="page"
+  current="/bookmarks"
+  section={{ label: 'bookmarks', href: '/bookmarks' }}
+  epigraph="other people's good pages"
+  heading="bookmarks"
+>
 
   <ScrapbookGrid categories={categories} />
-  <SiteFooter />
-</BaseLayout>
+</FrameLayout>
 
 <style is:global>
   .page-header {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 5rem 2rem 3rem;
     text-align: center;
-    position: relative;
-    z-index: 1;
-  }
-
-  .page-title {
-    font-family: var(--display);
-    font-size: var(--display-xl);
-    font-weight: normal;
-    line-height: 1;
-    color: var(--text);
-    opacity: 0.92;
-  }
-
-  .page-subtitle {
-    font-family: var(--sans);
-    font-size: 0.95rem;
-    font-weight: 300;
-    color: var(--text-dim);
-    opacity: 0.85;
-    margin-top: 1.25rem;
-    letter-spacing: 0.04em;
-    font-style: italic;
-  }
-
-  @media (max-width: 600px) {
-    .page-header { padding: 3rem 1.25rem 2rem; }
+    padding: 0 0 1.5rem;
   }
 </style>

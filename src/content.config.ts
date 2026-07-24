@@ -48,6 +48,8 @@ const shelf = defineCollection({
       tags: z.array(z.string()).default([]),
       favorite: z.boolean().default(false),
       url: z.string().optional(),
+      /** Cover art, served from /public. Used by the bookshelf and the entry page. */
+      cover: z.string().optional(),
       dateRead: z.coerce.date().optional()
     })
 })

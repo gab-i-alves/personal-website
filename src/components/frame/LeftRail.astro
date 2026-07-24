@@ -1,0 +1,112 @@
+---
+import Widget from '@/components/frame/Widget.astro'
+import RailCalendar from '@/components/frame/RailCalendar.astro'
+import LinkGroups from '@/components/frame/LinkGroups.astro'
+import { projects } from '@/data/projects'
+import { categories } from '@/data/bookmarks'
+
+// Left rail carries the made-things and the read-things; the right rail carries
+// who-I-am and where-to-find-me. Split that way the two columns come out at
+// roughly the same height.
+//
+// Bookmarks used to be a page of their own. They fold in here, still sourced
+// from src/data/bookmarks.ts, so there is one list to maintain.
+const bookmarkGroups = categories.map((category) => ({
+  label: category.name,
+  items: category.links.map((link) => ({ label: link.title, href: link.url }))
+}))
+---
+
+<Widget title="calendar" bare>
+  <RailCalendar />
+</Widget>
+
+<Widget title="projects">
+  <ul class="proj-list">
+    {
+      projects.map((project) => (
+        <li>
+          <a class="proj-name" href={project.href}>
+            {project.name}
+          </a>
+          <span class="proj-lang">{project.lang}</span>
+          <span class="proj-blurb">{project.blurb}</span>
+          {project.live && (
+            <a class="proj-live" href={project.live}>
+              live &rarr;
+            </a>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+</Widget>
+
+<Widget title="bookmarks">
+  <LinkGroups groups={bookmarkGroups}>
+    <p class="rail-more"><a href="/bookmarks">all of them, laid out &rarr;</a></p>
+  </LinkGroups>
+</Widget>
+
+<style>
+  .proj-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .proj-list li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 0 0.35rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 0.45rem;
+  }
+
+  .proj-list li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .proj-name {
+    color: var(--text);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .proj-lang {
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    align-self: center;
+    white-space: nowrap;
+  }
+
+  .proj-blurb {
+    grid-column: 1 / -1;
+    font-size: 0.64rem;
+    line-height: 1.45;
+    color: var(--text-dim);
+  }
+
+  .proj-live {
+    grid-column: 1 / -1;
+    font-size: 0.58rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+  }
+
+  .proj-live:hover {
+    color: var(--text);
+    text-decoration: underline;
+  }
+</style>

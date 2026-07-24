@@ -10,11 +10,12 @@ export const themeConfig: ThemeConfig = {
   },
 
   general: {
-    fadeAnimation: true
+    // No cross-page transition: navigation is instant, like an old static site.
+    fadeAnimation: false
   },
 
   date: {
-    dateFormat: 'DD-MM-YYYY',
+    dateFormat: 'MM-DD-YYYY',
     dateSeparator: '.',
     dateOnRight: true
   },

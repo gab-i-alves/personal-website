@@ -1,0 +1,15 @@
+---
+// A rail widget: centred title bar over a bordered body. Pass `bare` when the
+// content brings its own padding (the calendar does).
+interface Props {
+  title: string
+  bare?: boolean
+}
+
+const { title, bare = false } = Astro.props
+---
+
+<section class="widget">
+  <h2 class="widget-title">{title}</h2>
+  {bare ? <slot /> : <div class="widget-body"><slot /></div>}
+</section>
