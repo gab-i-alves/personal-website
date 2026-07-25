@@ -59,6 +59,17 @@ const brand = themeConfig.site.author.toLowerCase()
   <BaseHead title={title} description={description} ogImage={ogImage} slot="head" />
 
   <div class="frame" data-variant={variant}>
+    {/* A charm hung off the top-right corner. The art already draws its own
+        chain and ring, so it hangs from the very top edge and pivots there. */}
+    <img
+      class="frame-charm"
+      src="/images/charm.gif"
+      alt=""
+      role="presentation"
+      width="90"
+      height="200"
+    />
+
     {
       chrome === 'portal' ? (
         <header class="frame-banner">
@@ -138,3 +149,56 @@ const brand = themeConfig.site.author.toLowerCase()
     </footer>
   </div>
 </BaseLayout>
+
+<style is:global>
+  /* Hung from the frame's top edge. The ring is drawn at the very top of the
+     art, so the image starts flush with the border and pivots from that point
+     — anything lower and the chain bends where a chain can't. */
+  .frame-charm {
+    position: absolute;
+    top: -0.3rem;
+    right: 2.2rem;
+    z-index: 5;
+    width: 2.35rem;
+    height: auto;
+    aspect-ratio: 90 / 200;
+    image-rendering: pixelated;
+    pointer-events: none;
+    transform-origin: 50% 0;
+    animation: charm-swing 6s var(--ease-in-out) infinite;
+    filter: drop-shadow(1px 2px 2px rgba(20, 14, 32, 0.3));
+  }
+
+  /* Small angles: the charm is long, so the heart at the bottom travels far
+     even at three degrees. Uneven steps so it reads as a dangle losing
+     momentum rather than a metronome. */
+  @keyframes charm-swing {
+    0%,
+    100% {
+      transform: rotate(-3.2deg);
+    }
+    28% {
+      transform: rotate(2.8deg);
+    }
+    52% {
+      transform: rotate(-1.6deg);
+    }
+    76% {
+      transform: rotate(0.9deg);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .frame-charm {
+      animation: none;
+      transform: rotate(-2deg);
+    }
+  }
+
+  @media (max-width: 620px) {
+    .frame-charm {
+      width: 1.85rem;
+      right: 1rem;
+    }
+  }
+</style>

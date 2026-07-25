@@ -6,7 +6,11 @@ import { getCollection } from 'astro:content'
 import { getSortedFilteredPosts } from '@/utils/draft'
 
 // The changelog in the centre column is derived from real content dates, so it
-// can never drift out of sync with what is actually published.
+// can never drift out of sync with what is actually published. It also folds in
+// the site changelog: shipping a page is as much an update as posting one, and
+// keeping them in separate lists let the two disagree about what "latest" meant.
+import { changelog } from '@/data/changelog'
+
 const posts = await getSortedFilteredPosts()
 const logs = (await getCollection('dailyLogs'))
   .filter((log) => !log.id.startsWith('_'))
@@ -26,10 +30,23 @@ const entries: Entry[] = [
     kind: 'daily log',
     label: log.id,
     href: `/daily-logs/${log.id}`
-  }))
+  })),
+  // Capped: a single busy day of site work produces a dozen entries, and
+  // without a cap it would push every article and log off the front page.
+  // The rest are one click away at /changelog.
+  ...changelog
+    .flatMap((entry) =>
+      entry.items.map((item) => ({
+        date: new Date(`${entry.date}T12:00:00Z`),
+        kind: 'site',
+        label: item.text,
+        href: '/changelog'
+      }))
+    )
+    .slice(0, 4)
 ]
   .sort((a, b) => b.date.valueOf() - a.date.valueOf())
-  .slice(0, 8)
+  .slice(0, 10)
 
 const fmt = (d: Date) => formatDate(d)
 ---
@@ -60,7 +77,6 @@ const fmt = (d: Date) => formatDate(d)
     </p>
   </div>
 
-  {/* The sparkles are white, so they only read over the dark drape band. */}
   <div class="frame-strip strip-sparkle" aria-hidden="true"></div>
 
   <h2 class="frame-h1">changelog</h2>

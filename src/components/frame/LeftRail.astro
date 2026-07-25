@@ -1,6 +1,7 @@
 ---
 import Widget from '@/components/frame/Widget.astro'
 import RailCalendar from '@/components/frame/RailCalendar.astro'
+import DDay from '@/components/frame/DDay.astro'
 import LinkGroups from '@/components/frame/LinkGroups.astro'
 import { projects } from '@/data/projects'
 import { categories } from '@/data/bookmarks'
@@ -19,6 +20,10 @@ const bookmarkGroups = categories.map((category) => ({
 
 <Widget title="calendar" bare>
   <RailCalendar />
+</Widget>
+
+<Widget title="d-day" bare>
+  <DDay />
 </Widget>
 
 <Widget title="projects">
@@ -43,9 +48,7 @@ const bookmarkGroups = categories.map((category) => ({
 </Widget>
 
 <Widget title="bookmarks">
-  <LinkGroups groups={bookmarkGroups}>
-    <p class="rail-more"><a href="/bookmarks">all of them, laid out &rarr;</a></p>
-  </LinkGroups>
+  <LinkGroups groups={bookmarkGroups} />
 </Widget>
 
 <style>

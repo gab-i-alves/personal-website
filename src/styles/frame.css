@@ -53,13 +53,20 @@
   opacity: 0.35;
 }
 
+/* Sparkles ride on the ::after rather than the element background, so they sit
+   above the darkening scrim instead of being dimmed by it. */
 .frame-banner::after {
-  background: linear-gradient(
-    180deg,
-    rgba(43, 33, 64, 0.15) 0%,
-    rgba(43, 33, 64, 0.45) 55%,
-    rgba(43, 33, 64, 0.2) 100%
-  );
+  background-image:
+    url('/images/divider-sparkle.gif'),
+    linear-gradient(
+      180deg,
+      rgba(43, 33, 64, 0.15) 0%,
+      rgba(43, 33, 64, 0.45) 55%,
+      rgba(43, 33, 64, 0.2) 100%
+    );
+  background-size: auto 53px, cover;
+  background-position: center, center;
+  background-repeat: repeat, no-repeat;
 }
 
 /* Banner text sits on the drape, so it is light regardless of the page theme. */
@@ -105,6 +112,7 @@
   /* Same scrim as the tall banner, so the title keeps its contrast wherever the
      drape happens to be light. */
   background-image:
+    url('/images/divider-sparkle.gif'),
     linear-gradient(
       180deg,
       rgba(43, 33, 64, 0.2) 0%,
@@ -113,8 +121,9 @@
     ),
     radial-gradient(circle at center, var(--drape-deep) 0.8px, transparent 1px),
     url('/images/banner-drape.webp');
-  background-size: cover, 4px 4px, cover;
-  background-position: center, 0 0, center 45%;
+  background-size: auto 53px, cover, 4px 4px, cover;
+  background-position: center, center, 0 0, center 45%;
+  background-repeat: repeat, no-repeat, repeat, no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -675,14 +684,20 @@
   margin: 0;
   padding: 0;
   font-family: var(--mono);
-  font-size: 0.74rem;
-  line-height: 1.7;
+  font-size: 0.66rem;
+  line-height: 1.5;
 }
 
+/* One entry, one line. Site changelog labels are full sentences and would wrap
+   to two or three lines otherwise, which turns a scannable log into a wall.
+   Truncating with an ellipsis keeps the column of dates readable down the left
+   edge; the full text is at /changelog. */
 .frame-log li {
   border-top: 1px solid var(--border);
-  padding: 0.5rem 0;
-  text-align: justify;
+  padding: 0.28rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .frame-log li:first-child {
@@ -713,16 +728,17 @@
   background-position: 0 0, center 30%;
 }
 
-/* Animated sparkles layered over the drape band. White on transparent, so the
-   dark band is the only place they show up. */
+/* The divider is now the sparkle strip itself: no drape band behind it, no
+   rule around it. The art is transparent and tinted, so it reads on the paper
+   without needing a dark band to sit on. */
 .frame-strip.strip-sparkle {
-  background-image:
-    url('/images/divider-sparkle.gif'),
-    radial-gradient(circle at center, var(--drape-deep) 0.8px, transparent 1px),
-    url('/images/banner-drape.webp');
-  background-size: auto 100%, 4px 4px, cover;
-  background-position: center, 0 0, center 30%;
-  background-repeat: repeat-x, repeat, no-repeat;
+  height: 53px;
+  border: none;
+  background-color: transparent;
+  background-image: url('/images/divider-sparkle.gif');
+  background-size: auto 100%;
+  background-position: center;
+  background-repeat: repeat-x;
 }
 
 /* --- normalisation inside the frame --------------------------------------

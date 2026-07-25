@@ -1,0 +1,48 @@
+---
+// Three states, three weights of ink. Used by both tracks — the formal course
+// and the self-directed programme — so the same word means the same thing
+// wherever it shows up.
+interface Props {
+  status: 'planned' | 'active' | 'done'
+}
+
+const { status } = Astro.props
+
+const LABEL = {
+  planned: 'planejada',
+  active: 'em curso',
+  done: 'concluída'
+} as const
+---
+
+<span class:list={['spill', `spill--${status}`]}>{LABEL[status]}</span>
+
+<style>
+  .spill {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.08em;
+    padding: 0.15rem 0.45rem;
+    border: 1px solid var(--rule);
+    white-space: nowrap;
+  }
+
+  /* Planned is the quietest: outlined, dim, nothing to celebrate yet. */
+  .spill--planned {
+    color: var(--text-faint);
+    border-style: dotted;
+  }
+
+  /* Active is the one that should catch the eye when you land on the page. */
+  .spill--active {
+    background: var(--ink-invert);
+    border-color: var(--ink-invert);
+    color: var(--ink-invert-text);
+  }
+
+  .spill--done {
+    color: var(--text-dim);
+    background: rgba(42, 36, 32, 0.07);
+  }
+</style>

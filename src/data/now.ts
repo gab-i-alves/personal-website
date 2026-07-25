@@ -65,7 +65,7 @@ export const findMe: FindGroup[] = [
     label: 'this site',
     items: [
       { label: 'sitemap', href: '/sitemap-index.xml', note: 'every page' },
-      { label: 'changelog', href: '/', note: 'front page' }
+      { label: 'changelog', href: '/changelog', note: 'what shipped' }
     ]
   }
 ]

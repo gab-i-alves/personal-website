@@ -2,7 +2,7 @@
 ---
 
 <div class="cursor-wrap" id="cursor-wrap">
-  <div class="cursor-star" id="cursor-star">✦</div>
+  <img class="cursor-star" id="cursor-star" src="/images/cursor.webp" alt="" role="presentation" />
   <div class="cursor-ring" id="cursor-ring"></div>
 </div>
 <canvas class="cursor-trail" id="cursor-trail"></canvas>
@@ -81,8 +81,8 @@ function initCursor() {
       ring.style.scale = '1'
     }
 
-    // Rotate star slowly
-    star.style.rotate = (frameCount * 0.8) + 'deg'
+    // The star used to spin; the sprite that replaced it has an up, so it
+    // stays upright and lets its own animation do the moving.
 
     // Spawn trail particles every 3 frames while moving
     const speed = Math.sqrt((mx - sx) * (mx - sx) + (my - sy) * (my - sy))
@@ -144,14 +144,16 @@ document.addEventListener('astro:page-load', initCursor)
     position: fixed;
     top: 0;
     left: 0;
-    color: var(--text);
-    font-size: 16px;
-    line-height: 1;
+    width: 34px;
+    height: 34px;
     translate: 0 0;
-    margin-left: -8px;
-    margin-top: -8px;
+    /* The sprite is a pointer, so its tip is the hotspot: anchor near the
+       top-left rather than centring it on the mouse position. */
+    margin-left: -6px;
+    margin-top: -4px;
+    image-rendering: pixelated;
     transition: scale 160ms cubic-bezier(0.23, 1, 0.32, 1), opacity 200ms ease;
-    filter: drop-shadow(0 0 4px rgba(42, 36, 32, 0.4));
+    filter: drop-shadow(0 1px 2px rgba(42, 36, 32, 0.45));
     pointer-events: none;
     z-index: 10001;
   }
