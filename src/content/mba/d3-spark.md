@@ -10,9 +10,10 @@ stack: ["Apache Spark", "Spark SQL", "Structured Streaming", "Databricks", "Unit
 lessons:
   - n: 1
     title: "Introdução ao Apache Spark"
+    date: 2026-07-29
     pre: true
     deep: true
-    live: false
+    live: true
     artifact: false
   - n: 2
     title: "Transformação e persistência SQL"
