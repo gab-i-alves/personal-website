@@ -15,20 +15,21 @@
   --text-dim: rgba(42, 36, 32, 0.62);
   --text-faint: rgba(42, 36, 32, 0.32);
   --border: rgba(42, 36, 32, 0.2);
-  --selection: rgba(55, 48, 68, 0.2);
+  --selection: rgba(91, 70, 101, 0.22);
   --code-bg: rgba(42, 36, 32, 0.06);
-  --mark: rgba(55, 48, 68, 0.13);
+  --mark: rgba(91, 70, 101, 0.15);
 
   /* Frame chrome */
   --panel: #FBF7EF;
   --rail: #F3EDE2;
-  --ink-invert: #373044;
+  --ink-invert: #4B3754;
   --ink-invert-text: #F5F0E8;
   --rule: rgba(42, 36, 32, 0.34);
 
-  /* Banner drape — the violet photograph, and the light text that sits on it */
-  --drape-dark: #4A3E63;
-  --drape-deep: #2B2140;
+  /* Violet ink, sampled from the tartan behind the frame: the wordmark uses
+     --drape-dark, and --drape-deep is the darkest thread in the weave. */
+  --drape-dark: #5B4665;
+  --drape-deep: #2B1B2E;
   --on-drape: #F3EFE7;
   --on-drape-dim: rgba(243, 239, 231, 0.78);
 
@@ -99,17 +100,23 @@
   --astro-code-token-constant: rgba(42, 36, 32, 0.94);
   --astro-code-token-string: rgba(42, 36, 32, 0.94);
   --astro-code-token-comment: rgba(42, 36, 32, 0.45);
-  --astro-code-token-keyword: rgba(55, 48, 68, 0.95);
+  --astro-code-token-keyword: rgba(91, 70, 101, 0.95);
   --astro-code-token-parameter: rgba(42, 36, 32, 0.94);
   --astro-code-token-function: rgba(42, 36, 32, 0.94);
-  --astro-code-token-string-expression: rgba(55, 48, 68, 0.9);
+  --astro-code-token-string-expression: rgba(91, 70, 101, 0.9);
   --astro-code-token-punctuation: rgba(42, 36, 32, 0.58);
-  --astro-code-token-link: rgba(55, 48, 68, 0.9);
+  --astro-code-token-link: rgba(91, 70, 101, 0.9);
 }
 
 html {
   cursor: none;
+  /* Tartan stock behind the frame. The file is the 564x423 swatch mirrored into
+     a 2x2 block, so the tile edges match and the repeat leaves no seam. Laid at
+     its own size, never stretched: the weave keeps the scale of the photo. */
   background-color: var(--bg);
+  background-image: url('/images/tartan-tile.webp');
+  background-repeat: repeat;
+  background-size: auto;
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
   overscroll-behavior-y: contain;

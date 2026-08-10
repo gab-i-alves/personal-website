@@ -11,7 +11,7 @@
 .frame {
   --frame-max: 1160px;
   /* Both banners use one size, so the title does not jump between pages. */
-  --banner-title: clamp(2.2rem, 4.6vw, 3.4rem);
+  --banner-title: clamp(3rem, 6.4vw, 5rem);
   max-width: var(--frame-max);
   margin: 1.5rem auto 2.5rem;
   background: var(--panel);
@@ -21,10 +21,8 @@
 }
 
 /* --- banner ---------------------------------------------------------------
-   A photographic violet drape, cropped by `cover`. The dither grid on ::before
-   keeps it in the same visual family as the other halftoned blocks, and the
-   ::after scrim guarantees contrast for the wordmark wherever the drape
-   happens to be light. */
+   The same paper stock as the rest of the frame, with the wordmark printed on
+   it in violet ink. No drape, no scrim, no art. */
 .frame-banner {
   height: 190px;
   border-bottom: 1px solid var(--rule);
@@ -33,55 +31,21 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  background-color: var(--drape-dark);
-  background-image: url('/images/banner-drape.webp');
-  background-size: cover;
-  background-position: center 62%;
+  background: var(--panel);
 }
 
-.frame-banner::before,
-.frame-banner::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.frame-banner::before {
-  background-image: radial-gradient(circle at center, var(--drape-deep) 0.8px, transparent 1px);
-  background-size: 4px 4px;
-  opacity: 0.35;
-}
-
-/* Sparkles ride on the ::after rather than the element background, so they sit
-   above the darkening scrim instead of being dimmed by it. */
-.frame-banner::after {
-  background-image:
-    url('/images/divider-sparkle.gif'),
-    linear-gradient(
-      180deg,
-      rgba(43, 33, 64, 0.15) 0%,
-      rgba(43, 33, 64, 0.45) 55%,
-      rgba(43, 33, 64, 0.2) 100%
-    );
-  background-size: auto 53px, cover;
-  background-position: center, center;
-  background-repeat: repeat, no-repeat;
-}
-
-/* Banner text sits on the drape, so it is light regardless of the page theme. */
+/* Banner text is violet ink on the paper stock. */
 .frame-wordmark {
   font-family: var(--display);
   font-size: var(--banner-title);
   font-weight: normal;
   letter-spacing: 0.04em;
   line-height: 1;
-  color: var(--on-drape);
+  color: var(--drape-dark);
   margin: 0;
   position: relative;
   z-index: 1;
   text-align: center;
-  text-shadow: 0 1px 12px rgba(30, 22, 48, 0.55);
 }
 
 .frame-wordmark a {
@@ -94,7 +58,7 @@
   font-size: 0.62rem;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color: var(--on-drape-dim);
+  color: var(--text-dim);
   margin: 0.5rem 0 0;
   position: relative;
   z-index: 1;
@@ -108,22 +72,8 @@
 .frame-strip-banner {
   height: 190px;
   border-bottom: 1px solid var(--rule);
-  background-color: var(--drape-dark);
-  /* Same scrim as the tall banner, so the title keeps its contrast wherever the
-     drape happens to be light. */
-  background-image:
-    url('/images/divider-sparkle.gif'),
-    linear-gradient(
-      180deg,
-      rgba(43, 33, 64, 0.2) 0%,
-      rgba(43, 33, 64, 0.5) 55%,
-      rgba(43, 33, 64, 0.25) 100%
-    ),
-    radial-gradient(circle at center, var(--drape-deep) 0.8px, transparent 1px),
-    url('/images/banner-drape.webp');
-  background-size: auto 53px, cover, 4px 4px, cover;
-  background-position: center, center, 0 0, center 45%;
-  background-repeat: repeat, no-repeat, repeat, no-repeat;
+  /* Same stock as the tall banner. */
+  background: var(--panel);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -141,16 +91,15 @@
   font-weight: normal;
   line-height: 1.05;
   letter-spacing: 0.03em;
-  color: var(--on-drape);
+  color: var(--drape-dark);
   margin: 0;
-  text-shadow: 0 1px 10px rgba(30, 22, 48, 0.55);
 }
 
 .frame-page-sub {
   font-family: var(--mono);
   font-size: 0.66rem;
   letter-spacing: 0.06em;
-  color: var(--on-drape-dim);
+  color: var(--text-dim);
   margin: 0;
 }
 
@@ -728,17 +677,14 @@
   background-position: 0 0, center 30%;
 }
 
-/* The divider is now the sparkle strip itself: no drape band behind it, no
-   rule around it. The art is transparent and tinted, so it reads on the paper
-   without needing a dark band to sit on. */
+/* The section break is a single printed rule: no art, no band, just the same
+   1px weight the rest of the frame is drawn with. */
 .frame-strip.strip-sparkle {
-  height: 53px;
+  height: 0;
   border: none;
-  background-color: transparent;
-  background-image: url('/images/divider-sparkle.gif');
-  background-size: auto 100%;
-  background-position: center;
-  background-repeat: repeat-x;
+  border-top: 1px solid var(--rule);
+  margin: 1.6rem 0;
+  background: none;
 }
 
 /* --- normalisation inside the frame --------------------------------------
