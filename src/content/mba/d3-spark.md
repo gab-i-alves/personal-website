@@ -17,10 +17,25 @@ lessons:
     artifact: false
   - n: 2
     title: "Transformação e persistência SQL"
+    date: 2026-08-03
+    pre: true
+    deep: true
+    live: true
+    artifact: false
   - n: 3
     title: "Transformação e análise avançada"
+    date: 2026-08-05
+    pre: true
+    deep: true
+    live: true
+    artifact: false
   - n: 4
     title: "Otimização de desempenho no Spark"
+    date: 2026-08-10
+    pre: true
+    deep: true
+    live: true
+    artifact: false
   - n: 5
     title: "Processamento em tempo real"
   - n: 6
