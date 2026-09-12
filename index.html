@@ -1,138 +1,428 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Gabi Alves — data engineer, writer, and perpetual student." />
-    <meta name="theme-color" content="#211c29" />
-    <title>Gabi Alves — Data Engineer</title>
-    <link rel="preconnect" href="https://api.fontshare.com" />
-    <link href="https://api.fontshare.com/v2/css?f[]=gambetta@400,500,600,700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <div class="page-shell">
-      <main>
-        <div class="first-column">
-          <section class="hero" aria-labelledby="hero-title">
-            <h1 id="hero-title">Gabi Alves</h1>
-            <p class="hero-role">Tech Lead and data engineer in Curitiba, working at the intersection of data acquisition, software architecture, and technical leadership.</p>
-          </section>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="color-scheme" content="light">
+<title>Gabi Alves</title>
+<style>
+  html {
+    color-scheme: light;
+  }
 
-          <section class="section intro reveal" aria-labelledby="about-title">
-            <div class="intro-copy">
-              <p class="lead" id="about-title">
-                I design systems that turn official publications and complex documents into reliable, traceable data.
-              </p>
-              <div class="bio-copy">
-                <p>At Legalbot, I lead Data Engineering across architecture, code standards, reviews, mentoring, and the modernization of legacy capture pipelines.</p>
-                <p>I started closer to the code, specializing in crawlers, spiders, and complex PDF parsers for regulatory collection. Before that, I built judicial-data robots, internal documentation, and observability.</p>
-                <p>I care about systems that last: data quality, useful documentation, maintainable legacy code, and processes that help teams reason together. I’m finishing a specialization in Agile Software Development while studying Big Data and AI.</p>
-                <p>My interests move between systems thinking, software architecture, engineering management, neuroscience, and the books that change how I understand all of them. This site is where those threads meet.</p>
-              </div>
-            </div>
-          </section>
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+  }
 
-          <section class="section reveal" aria-labelledby="work-title">
-            <div class="section-content">
-              <div class="title-row">
-                <h2 id="work-title">Things I’ve built</h2>
-              </div>
-              <div class="project-list">
-                <a href="https://github.com/gab-i-alves/parkinson-check" target="_blank" rel="noreferrer" class="project">
-                  <span class="project-n">01</span><span><strong>Parkinson Check</strong><small>Computer vision · Undergrad thesis</small></span><span class="tech">HTML / CV / ML</span>
-                </a>
-                <a href="https://github.com/gab-i-alves/bantads" target="_blank" rel="noreferrer" class="project">
-                  <span class="project-n">02</span><span><strong>Bantads</strong><small>Internet banking on microservices</small></span><span class="tech">Java / Saga / CQRS</span>
-                </a>
-                <a href="https://github.com/gab-i-alves/reverie" target="_blank" rel="noreferrer" class="project">
-                  <span class="project-n">03</span><span><strong>Reverie</strong><small>Letters to your future self</small></span><span class="tech">Astro</span>
-                </a>
-                <a href="https://github.com/gab-i-alves/spectra-notes" target="_blank" rel="noreferrer" class="project">
-                  <span class="project-n">04</span><span><strong>Spectra Notes</strong><small>Textbook-style notes template</small></span><span class="tech">LuaLaTeX</span>
-                </a>
-              </div>
-            </div>
-          </section>
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image: url("img/sky.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+  }
 
-        </div>
+  .columns {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 4%;
+    margin: 20vh 0 20vh 8%;
+  }
 
-        <div class="study-column">
-          <section class="section reveal" aria-labelledby="study-title">
-            <div class="section-content">
-              <div class="title-row study-heading">
-                <div><h2 id="study-title">MBA in Data Engineering</h2></div>
-              </div>
-              <ol class="study-list">
-                <li><span>01</span><strong>Advanced SQL</strong><small>Window functions · CTEs · Query planning</small><b>Planned</b></li>
-                <li><span>02</span><strong>Transformation &amp; Quality with dbt</strong><small>Testing · Lineage · Data quality</small><b>Planned</b></li>
-                <li class="active"><span>03</span><strong>Apache Spark &amp; Spark SQL</strong><small>Structured Streaming · Databricks · Unity Catalog</small><b>In progress</b></li>
-                <li><span>04</span><strong>Data Lakehouse</strong><small>Delta Lake · Medallion · Databricks</small><b>Planned</b></li>
-                <li><span>05</span><strong>ELT with AWS Glue</strong><small>Glue Catalog · Athena · S3</small><b>Planned</b></li>
-                <li><span>06</span><strong>Pipeline Orchestration</strong><small>Step Functions · Lambda · EventBridge</small><b>Planned</b></li>
-                <li><span>07</span><strong>Data Streaming</strong><small>Kafka · Connect · Streams · ksqlDB</small><b>Planned</b></li>
-                <li><span>08</span><strong>Data Engineering for MLOps</strong><small>Feature stores · MLflow · Pipelines</small><b>Planned</b></li>
-              </ol>
-            </div>
-          </section>
+  .intro-text {
+    width: 32%;
+    max-width: 32%;
+    flex: 0 0 32%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #ffffff;
+    text-align: left;
+  }
 
-          <section class="section reveal" aria-labelledby="shelf-title">
-            <div class="section-content">
-              <div class="title-row"><h2 id="shelf-title">Books &amp; papers</h2></div>
-              <div class="shelf">
-                <div class="book favorite"><span>01</span><strong>Memes and the Exploitation of Imagination</strong><small>Daniel C. Dennett · Paper · 9/10</small></div>
-                <div class="book favorite"><span>02</span><strong>Out of the Tar Pit</strong><small>Ben Moseley &amp; Peter Marks · Paper</small></div>
-                <div class="book"><span>03</span><strong>Piranesi</strong><small>Susanna Clarke · Fiction</small></div>
-                <div class="book"><span>04</span><strong>Fluent Python, 2nd ed.</strong><small>Luciano Ramalho · Nonfiction</small></div>
-                <div class="book"><span>05</span><strong>Eu Que Nunca Conheci os Homens</strong><small>Jacqueline Harpman · Fiction</small></div>
-                <div class="book"><span>06</span><strong>O Homem e seus Símbolos</strong><small>C. G. Jung et al. · Nonfiction</small></div>
-                <div class="book"><span>07</span><strong>Livro do Desassossego</strong><small>Fernando Pessoa · Fiction</small></div>
-                <div class="book"><span>08</span><strong>A Dança da Morte</strong><small>Stephen King · Fiction</small></div>
-                <div class="book"><span>09</span><strong>Doze Anos de Escravidão</strong><small>Solomon Northup · History</small></div>
-                <div class="book"><span>10</span><strong>Mundos de uma Noite Só</strong><small>Renata Belmonte · Fiction</small></div>
-              </div>
-            </div>
-          </section>
-        </div>
+  .intro-text p {
+    margin: 0 0 1em 0;
+  }
 
-        <div class="notes-column">
-          <section class="section reveal">
-            <div class="section-content">
-              <div class="title-row"><h2>Bookmarks</h2></div>
-              <div class="bookmark-grid">
-                <div><h3>Design</h3><p>kurnowhere fonts</p><p>gorillasun</p><p>graffioh</p></div>
-                <div><h3>Learning</h3><p>rabbit hole learning</p><p>reading research papers</p><p>attention is all you need</p></div>
-                <div><h3>Tools</h3><p>awesome OSS</p><p>lelouch.dev</p></div>
-                <div><h3>Want to read</h3><p>Maintenance</p><p>996 is not your competition</p></div>
-                <div><h3>Bioinformatics</h3><p>Rosalind</p><p>Bioinformatics Algorithms</p></div>
-                <div><h3>Engineering</h3><p>Irrational Exuberance</p><p>The Pragmatic Engineer</p></div>
-              </div>
-            </div>
-          </section>
+  .intro-text p:last-child {
+    margin-bottom: 0;
+  }
 
-          <section class="section reveal" aria-labelledby="logs-title">
-            <div class="section-content">
-              <div class="title-row"><h2 id="logs-title">Daily log</h2></div>
-              <div class="log-list">
-                <article><time>19.08.26</time><p>Untangled a CI problem by separating tooling failures from old test debt and cache behavior.</p><span>infra</span></article>
-                <article><time>18.08.26</time><p>Spent time making repository defaults safer and the development path more predictable.</p><span>platform</span></article>
-                <article><time>14.08.26</time><p>Reviewed a batch of changes carefully, reproducing behavior locally before approving anything.</p><span>review</span></article>
-                <article><time>13.08.26</time><p>Worked on a difficult PDF parser and expanded the validation set around unusual documents.</p><span>data</span></article>
-                <article><time>02.08.26</time><p>Finished a set of Spark reading guides and checked the older material against current documentation.</p><span>study</span></article>
-                <article><time>25.07.26</time><p>Revised my UFPR project memorial after feedback and brought the separate pieces into one argument.</p><span>writing</span></article>
-                <article><time>20.04.26</time><p>Mapped how accidental complexity grows through feedback loops and turns into technical debt.</p><span>systems</span></article>
-                <article><time>19.04.26</time><p>Turned a paper about software complexity into a practical way to inspect real code.</p><span>software</span></article>
-                <article><time>02.01.26</time><p>Finished the first neuroscience lesson with notes on membrane potential and the GHK equation.</p><span>science</span></article>
-                <article><time>28.12.25</time><p>Looked back through the year’s notes and kept the ideas that still felt useful.</p><span>notes</span></article>
-                <article><time>15.11.25</time><p>Read about how good abstractions hide detail without hiding the decisions that matter.</p><span>design</span></article>
-                <article><time>03.10.25</time><p>Reorganized my reading list around questions instead of subjects or formats.</p><span>reading</span></article>
-                <article><time>21.08.25</time><p>Wrote down a few principles for making complex systems easier to explain and maintain.</p><span>systems</span></article>
-              </div>
-            </div>
-          </section>
-        </div>
-      </main>
+  .intro-text a {
+    color: inherit;
+  }
 
+  .photo-credit {
+    position: fixed;
+    right: 12px;
+    bottom: 8px;
+    z-index: 5;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .photo-credit a {
+    color: inherit;
+  }
+
+  .posts-toggle {
+    position: fixed;
+    top: 50%;
+    right: 16px;
+    transform: translateY(-50%);
+    z-index: 4;
+    background: none;
+    border: none;
+    padding: 8px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 22px;
+    color: #ffffff;
+    cursor: pointer;
+    animation: arrow-blink 1.6s ease-in-out infinite;
+    transition: transform 0.4s ease;
+  }
+
+  .posts-toggle.open {
+    animation: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .posts-back {
+    position: fixed;
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    z-index: 4;
+    background: none;
+    border: none;
+    padding: 8px;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 22px;
+    color: #ffffff;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .posts-back.visible {
+    opacity: 0.7;
+    pointer-events: auto;
+  }
+
+  .posts-back.visible:hover {
+    opacity: 1;
+  }
+
+  @keyframes arrow-blink {
+    0%, 100% { opacity: 0.35; transform: translateY(-50%) translateX(0); }
+    50% { opacity: 1; transform: translateY(-50%) translateX(-6px); }
+  }
+
+  .posts-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.5s ease;
+  }
+
+  .posts-inner {
+    margin: 20vh 0 20vh 8%;
+    width: 32%;
+    max-width: 32%;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #ffffff;
+  }
+
+  .posts-panel h2 {
+    font-size: 14px;
+    font-weight: normal;
+    text-transform: lowercase;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 0.5em;
+    margin: 0 0 1em 0;
+  }
+
+  .post-item {
+    margin: 0 0 1.5em 0;
+  }
+
+  .post-item .post-title {
+    display: block;
+    color: inherit;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .post-item .post-title:hover {
+    text-decoration: underline;
+  }
+
+  .post-item .post-excerpt {
+    margin: 0.3em 0 0 0;
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .main-content {
+    transition: transform 0.5s ease;
+  }
+
+  .board-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    transform: translateX(100%);
+    transition: transform 0.5s ease;
+  }
+
+  .board-frame {
+    position: relative;
+    display: inline-block;
+  }
+
+  .board-frame img {
+    display: block;
+    max-width: 98vw;
+    max-height: 94vh;
+    width: auto;
+    height: auto;
+  }
+
+  .board-note {
+    position: absolute;
+    left: 5.589%;
+    top: 12.81%;
+    width: 34.115%;
+    height: 77.5%;
+    transform: rotate(-1.746deg);
+    transform-origin: top left;
+    overflow: hidden;
+  }
+
+  .board-note-scroll {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    box-sizing: border-box;
+    padding: 15% 10% 6%;
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.9vw;
+    line-height: 1.5;
+    color: #2b2b2b;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .board-note-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .board-note-scroll p {
+    margin: 0 0 1em 0;
+  }
+
+  .board-note-scroll p:last-child {
+    margin-bottom: 0;
+  }
+
+  .board-frame img.board-tape {
+    position: absolute;
+    left: 16.508%;
+    top: 10.612%;
+    width: 9.01%;
+    height: 5.926%;
+    max-width: none;
+    max-height: none;
+    transform: rotate(-10.84deg);
+    transform-origin: top left;
+    display: block;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="main-content" id="mainContent">
+
+<div class="columns">
+  <div class="intro-text">
+    <p>seja bem-vindo(a) ao meu website. me chamo gabi, trabalho com tecnologia há alguns anos e moro em curitiba (pr). antes de explorar, por favor leia este texto com carinho :)</p>
+
+    <p>como tudo que a gente coloca na internet, este site também fica aberto às opiniões, interpretações e julgamentos de quem passa por aqui, sejam eles bons ou ruins. isso faz parte. mas, por ser um espaço pessoal e uma forma de expressão minha, não quero que ele vire lugar para ofensas, ataques ou comentários feitos apenas com a intenção de prejudicar alguém. se você não concorda com algo, simplesmente feche esta aba e não interaja mais.</p>
+
+    <p>este é o meu espaço, onde compartilho ideias, projetos e qualquer outra coisa que eu tenha vontade de colocar por aqui. faço isso principalmente como um hobby pessoal, porque acho muito divertido ter um cantinho da internet que seja meu. nada do que eu escrever aqui deve ser tratado como verdade absoluta: são minhas opiniões, interpretações e interesses, que naturalmente podem mudar com o tempo.</p>
+
+    <p>também peço que não copie ou plagie o que eu escrevo. obviamente eu não tenho controle sobre o que cada pessoa faz depois de entrar aqui e provavelmente não vou descobrir se alguém resolver copiar alguma coisa. ainda assim, acho meio triste abrir mão da própria criatividade para reproduzir a de outra pessoa. se isso não te incomoda, bom... vá em frente.</p>
+  </div>
+
+  <div class="intro-text">
+    <p>com isso esclarecido, acho de bom tom explicar o que você pode encontrar neste site.</p>
+
+    <p>a ideia é "juntar" por aqui tudo que me agrada ou desperta algum interesse: imagens, livros, artigos, trechos, frases, projetos, anotações e provavelmente algumas coisas difíceis de encaixar em qualquer categoria.</p>
+
+    <p>eu também gosto bastante de fazer planos, o que não significa necessariamente que eu vá executá-los. podem ser planos de leitura, explorações de novos assuntos ou o que às vezes chamam de <em>personal curriculum</em>: basicamente, criar a sua própria "grade de ensino" para aprender alguma coisa por conta própria.</p>
+
+    <p>pode ser filosofia, cozinha, história, construção de aviões ou qualquer outro assunto que pareça interessante. a ideia é organizar um caminho para não ficar completamente perdida entre tudo que existe para aprender e ir adquirindo conhecimento aos poucos, sem necessariamente transformar isso em uma obrigação.</p>
+
+    <p>uma frase de que gosto bastante e que, de certa forma, resume este site é: "<a href="https://www.personalcanon.com/p/research-as-leisure-activity?subscribe_prompt=free&sort=community" target="_blank" rel="noopener">research as leisure activity</a>".</p>
+
+    <p>acho que é isso. espero que você encontre alguma coisa interessante por aqui :)</p>
+  </div>
+</div>
+
+</div>
+
+<p class="photo-credit">
+  foto de <a href="https://www.pexels.com/pt-br/foto/mar-barco-bote-montanha-12104899/" target="_blank" rel="noopener" title="mabru rodrigues, vista artística de nuvens sobre o rio de janeiro">mabru rodrigues</a> no pexels
+</p>
+
+<button class="posts-toggle" id="postsToggle" aria-label="abrir posts" aria-expanded="false">&gt;</button>
+<button class="posts-back" id="postsBack" aria-label="voltar para a home">&lt;</button>
+
+<div class="posts-panel" id="postsPanel">
+  <div class="posts-inner">
+    <h2>posts (placeholder)</h2>
+
+    <div class="post-item">
+      <a class="post-title" href="#">post de exemplo 01</a>
+      <p class="post-excerpt">texto placeholder pra testar como fica o layout da coluna de posts.</p>
     </div>
-  </body>
+
+    <div class="post-item">
+      <a class="post-title" href="#">post de exemplo 02</a>
+      <p class="post-excerpt">outro trecho qualquer só pra ocupar espaço e ver o scroll funcionando.</p>
+    </div>
+
+    <div class="post-item">
+      <a class="post-title" href="#">post de exemplo 03</a>
+      <p class="post-excerpt">mais um placeholder, depois entra conteúdo de verdade aqui.</p>
+    </div>
+  </div>
+</div>
+
+<div class="board-panel" id="boardPanel">
+  <div class="board-frame">
+    <img src="img/board1.svg" alt="">
+
+    <div class="board-note">
+      <div class="board-note-scroll">
+        <p><strong>resenha da minha última leitura "o morro dos ventos uivantes"</strong></p>
+
+        <p>foi minha primeira leitura das irmãs brontë e também meu primeiro contato, até onde me lembro, com um romance vitoriano. <em>o morro dos ventos uivantes</em> foi publicado em 1847 e fica ainda mais interessante quando você descobre que esse foi o único romance de emily brontë. depois de terminar, fiquei principalmente com pena de nunca poder ler um segundo livro dela.</p>
+
+        <p>também me surpreendeu o quanto a leitura é acessível. eu esperava encontrar alguma dificuldade por ser um livro do século xix, mas achei muito fácil de acompanhar e extremamente gostoso de ler. existe um emaranhado tão grande de relações, ressentimentos e consequências que passei boa parte do livro tentando montar mentalmente quem causou o quê e como aquilo acabaria voltando para outra pessoa algumas páginas depois.</p>
+
+        <p>uma palavra que me veio várias vezes durante a leitura foi "sujo". não no sentido de vulgar ou mal escrito. sujo porque emily não parece interessada em limpar seus personagens para que eles se tornem agradáveis ao leitor. quase todos são cruéis, egoístas, orgulhosos, obsessivos ou ressentidos em algum nível, e ninguém aparece para funcionar como um grande centro moral da história.</p>
+
+        <p>no começo, tive bastante pena de heathcliff. ele é uma criança deslocada, humilhada e maltratada, e eu esperava que em algum momento surgisse uma oportunidade de redenção. parecia possível que ele crescesse, escapasse daquela violência e virasse uma pessoa melhor.</p>
+
+        <p>a conversa em que catherine fala sobre edgar muda essa expectativa. quando heathcliff percebe que talvez nunca tenha cathy, e ouve isso vindo dela própria, tudo aquilo que ele já carregava parece ganhar uma nova direção. quando volta, o ressentimento deixa de atingir somente quem o maltratou. ele passa a usar a mesma crueldade contra praticamente todos, inclusive contra catherine.</p>
+
+        <p>por isso tenho dificuldade em enxergar o livro como uma grande história de amor.</p>
+
+        <p>existe amor entre os dois, mas existe também identidade, posse, orgulho, ressentimento e uma incapacidade enorme de imaginar a própria existência separada da outra pessoa. quase nada entre heathcliff e catherine transmite paz. tudo é intenso, turbulento e destrutivo.</p>
+
+        <p>catherine também não me parece tão diferente dele. talvez sejam duas versões de uma mesma coisa, formadas em condições diferentes. a frase "eu sou heathcliff" resume muito disso.</p>
+
+        <p>ela quer edgar e tudo que vem junto com ele: segurança, refinamento, posição social, conforto. existe nela uma vontade do chique, daquilo que não teve na infância. escolher edgar parece, para ela, a decisão correta. heathcliff continua ocupando um lugar que essa escolha social não consegue substituir.</p>
+
+        <p>aqui dá pra relacionar com jung: a relação entre os dois lembra aquela dificuldade de conciliar partes da própria personalidade que parecem incompatíveis. catherine constrói uma vida socialmente aceitável com edgar, enquanto heathcliff continua ligado a algo mais bruto nela, quase impossível de domesticar. nesse sentido, "eu sou heathcliff" deixa de soar apenas romântico e começa a ficar meio assustador.</p>
+
+        <p>heathcliff se torna ainda mais cruel quando sua vingança alcança os filhos.</p>
+
+        <p>hareton talvez seja o melhor exemplo. heathcliff sofreu com hindley e depois transforma o filho dele numa espécie de objeto de vingança. quer que hareton cresça humilhado, ignorante e dependente, quase como uma reprodução deliberada daquilo que fizeram com ele.</p>
+
+        <p>é aí que o livro começa a parecer uma longa cadeia de causa e efeito.</p>
+
+        <p>alguém é humilhado e passa a humilhar. alguém é rejeitado e transforma essa rejeição em ressentimento. crianças crescem dentro de conflitos que começaram antes de nascerem e recebem como herança as consequências das escolhas dos adultos.</p>
+
+        <p>emily não parece muito preocupada em julgar ninguém por nós. ela deixa as consequências aparecerem.</p>
+
+        <p>até a própria casa parece participar disso, como se tivesse sido construída com todos os ressentimentos da família e passasse os anos alimentando cada um deles.</p>
+
+        <p>o morro dos ventos uivantes não ficou para mim apenas como cenário. em vários momentos, a mansão parece uma entidade que absorveu a malícia das pessoas que passaram por ali. a casa e a família acabam refletindo uma à outra: fechadas, violentas, deterioradas e presas a acontecimentos antigos.</p>
+
+        <p>a maneira como conhecemos toda essa história também ajuda. quase tudo chega através da nelly, e não consigo tratá-la como uma narradora totalmente confiável. ela esteve envolvida na vida de praticamente todos, gosta de algumas pessoas, julga outras e interfere em diversos acontecimentos. tudo que sabemos já passou antes pela memória e pela interpretação dela. certamente existe coisa que ela pode ter entendido errado, exagerado ou preferido omitir.</p>
+
+        <p>linton foi um personagem que me surpreendeu bastante. ele é irritante, egoísta, frágil e covarde, mas também me fez pensar em quanto da personalidade dele já chega contaminada pela história dos pais. cresceu com isabella depois de tudo que ela viveu com heathcliff e, mais tarde, acaba sendo jogado diretamente nas mãos do próprio pai. outra criança entrando num conflito que já existia muito antes dela.</p>
+
+        <p>a partir daí, a história volta a se concentrar em cathy e hareton. acho que por isso gostei tanto do final com os dois.</p>
+
+        <p>eles não parecem ter qualquer projeto consciente de "quebrar o ciclo". simplesmente chegam a um ponto em que conseguem abrir mão de parte do próprio orgulho. cathy para de olhar hareton apenas como alguém inferior. hareton deixa de responder a ela somente com ressentimento.</p>
+
+        <p>com heathcliff e os demais elementos daquela história finalmente saindo de cena, os dois ganham espaço para pensar por conta própria.</p>
+
+        <p>isso me parece muito mais interessante do que uma grande redenção familiar. eles não consertam o passado. só deixam de obedecer completamente a ele.</p>
+
+        <p>foi um dos primeiros momentos do livro em que senti algum alívio.</p>
+
+        <p>essa atmosfera toda também me lembrou <em>noite na taverna</em>. a comparação surgiu principalmente por causa da sensação de acompanhar pessoas moralmente degradadas, paixões destrutivas e situações caminhando constantemente para o excesso. em <em>o morro dos ventos uivantes</em>, esse excesso aparece menos como uma sequência de acontecimentos grotescos e mais como uma força que se acumula dentro das relações, atravessando gerações e mantendo todos presos ao passado. em <em>noite na taverna</em>, ele é mais explícito e imediato; emily brontë parece mais interessada em mostrar como as pessoas conseguem arrastar umas às outras durante anos.</p>
+
+        <p>talvez tenha sido isso que mais gostei em <em>o morro dos ventos uivantes</em>: ninguém ali parece existir para ser admirado.</p>
+
+        <p>emily cria personagens difíceis, coloca todos dentro daquela casa horrorosa e deixa orgulho, obsessão, ressentimento, inveja e crueldade circularem entre eles durante duas gerações. o resultado é uma história muito mais estranha do que eu esperava encontrar em um livro de 1847.</p>
+
+        <p>terminei querendo continuar pensando nela, o que pra mim costuma ser um ótimo sinal.</p>
+
+        <p>e também terminei lamentando que tenha sido o único romance de emily brontë. agora fiquei bastante curiosa para descobrir o que charlotte e anne fizeram com os próprios mundos.</p>
+      </div>
+    </div>
+
+    <img class="board-tape" src="img/tape.png" alt="">
+  </div>
+</div>
+
+<script>
+  const postsToggle = document.getElementById('postsToggle');
+  const postsBack = document.getElementById('postsBack');
+  const postsPanel = document.getElementById('postsPanel');
+  const boardPanel = document.getElementById('boardPanel');
+  const mainContent = document.getElementById('mainContent');
+
+  const screens = [mainContent, boardPanel, postsPanel];
+  let currentScreen = 0;
+
+  function updateScreens() {
+    screens.forEach((el, index) => {
+      el.style.transform = `translateX(${(index - currentScreen) * 100}%)`;
+    });
+    postsToggle.classList.toggle('open', currentScreen >= screens.length - 1);
+    postsBack.classList.toggle('visible', currentScreen > 0);
+    postsToggle.setAttribute('aria-expanded', currentScreen > 0);
+    postsToggle.setAttribute('aria-label', currentScreen >= screens.length - 1 ? 'fechar' : 'avançar');
+  }
+
+  postsToggle.addEventListener('click', () => {
+    if (currentScreen < screens.length - 1) {
+      currentScreen++;
+      updateScreens();
+    }
+  });
+
+  postsBack.addEventListener('click', () => {
+    if (currentScreen > 0) {
+      currentScreen--;
+      updateScreens();
+    }
+  });
+
+  updateScreens();
+</script>
+
+</body>
 </html>
