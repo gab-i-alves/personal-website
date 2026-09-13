@@ -165,8 +165,8 @@
 
   .posts-inner {
     margin: 20vh 0 20vh 8%;
-    width: 32%;
-    max-width: 32%;
+    width: 40%;
+    max-width: 40%;
     font-family: "TeX Gyre Heros", Helvetica, Arial, sans-serif;
     font-size: 14px;
     line-height: 1.6;
@@ -200,6 +200,24 @@
   .post-item .post-excerpt {
     margin: 0.3em 0 0 0;
     color: rgba(255, 255, 255, 0.8);
+  }
+
+  .post-item-featured {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .post-thumb {
+    width: 110px;
+    height: auto;
+    flex: 0 0 110px;
+    display: block;
+  }
+
+  .post-body {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .main-content {
@@ -324,21 +342,14 @@
 
 <div class="posts-panel" id="postsPanel">
   <div class="posts-inner">
-    <h2>posts (placeholder)</h2>
+    <h2>posts</h2>
 
-    <div class="post-item">
-      <a class="post-title" href="#">post de exemplo 01</a>
-      <p class="post-excerpt">texto placeholder pra testar como fica o layout da coluna de posts.</p>
-    </div>
-
-    <div class="post-item">
-      <a class="post-title" href="#">post de exemplo 02</a>
-      <p class="post-excerpt">outro trecho qualquer só pra ocupar espaço e ver o scroll funcionando.</p>
-    </div>
-
-    <div class="post-item">
-      <a class="post-title" href="#">post de exemplo 03</a>
-      <p class="post-excerpt">mais um placeholder, depois entra conteúdo de verdade aqui.</p>
+    <div class="post-item post-item-featured">
+      <img class="post-thumb" src="img/the-swan.jpg" alt="the swan, de hilma af klint">
+      <div class="post-body">
+        <a class="post-title" href="#"> anotações de leitura de "o homem e seus símbolos" de carl jung, capítulo 1 escrito pelo próprio jung: chegando ao inconsciente</a>
+        <p class="post-excerpt">a psique é maior que a consciência, sonhos e símbolos expressam conteúdos inconscientes, compensam unilateralidades do ego e podem revelar padrões pessoais e arquetípicos, o capítulo introduz sombra, Self e individuação.</p>
+      </div>
     </div>
   </div>
 </div>
