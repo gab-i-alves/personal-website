@@ -299,6 +299,63 @@
     display: block;
     pointer-events: none;
   }
+
+  .cards-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 6;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.65);
+    padding: 6vh 0;
+    transform: translateY(100%);
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+  }
+
+  .cards-panel.open {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .cards-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    padding: 0 16px;
+  }
+
+  .cards-stack img {
+    display: block;
+    max-width: 90vw;
+    max-height: 82vh;
+    width: auto;
+    height: auto;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  .cards-close {
+    position: fixed;
+    top: 16px;
+    right: 24px;
+    z-index: 7;
+    background: none;
+    border: none;
+    padding: 8px;
+    font-family: "TeX Gyre Heros", Helvetica, Arial, sans-serif;
+    font-size: 26px;
+    line-height: 1;
+    color: #ffffff;
+    cursor: pointer;
+    opacity: 0.75;
+  }
+
+  .cards-close:hover {
+    opacity: 1;
+  }
 </style>
 </head>
 <body>
@@ -347,7 +404,7 @@
     <div class="post-item post-item-featured">
       <img class="post-thumb" src="img/the-swan.jpg" alt="the swan, de hilma af klint">
       <div class="post-body">
-        <a class="post-title" href="#"> anotações de leitura de "o homem e seus símbolos" de carl jung, capítulo 1 escrito pelo próprio jung: chegando ao inconsciente</a>
+        <a class="post-title" href="#" id="postJungCards"> anotações de leitura de "o homem e seus símbolos" de carl jung, capítulo 1 escrito pelo próprio jung: chegando ao inconsciente</a>
         <p class="post-excerpt">a psique é maior que a consciência, sonhos e símbolos expressam conteúdos inconscientes, compensam unilateralidades do ego e podem revelar padrões pessoais e arquetípicos, o capítulo introduz sombra, Self e individuação.</p>
       </div>
     </div>
@@ -426,6 +483,13 @@
   </div>
 </div>
 
+<div class="cards-panel" id="cardsPanel">
+  <button class="cards-close" id="cardsClose" aria-label="fechar">&times;</button>
+  <div class="cards-stack">
+    <img src="img/card1.png" alt="página 1 das anotações de leitura de o homem e seus símbolos, capítulo 1">
+  </div>
+</div>
+
 <script>
   const postsToggle = document.getElementById('postsToggle');
   const postsBack = document.getElementById('postsBack');
@@ -461,6 +525,25 @@
   });
 
   updateScreens();
+
+  const postJungCards = document.getElementById('postJungCards');
+  const cardsPanel = document.getElementById('cardsPanel');
+  const cardsClose = document.getElementById('cardsClose');
+
+  postJungCards.addEventListener('click', (event) => {
+    event.preventDefault();
+    cardsPanel.classList.add('open');
+  });
+
+  cardsClose.addEventListener('click', () => {
+    cardsPanel.classList.remove('open');
+  });
+
+  cardsPanel.addEventListener('click', (event) => {
+    if (event.target === cardsPanel) {
+      cardsPanel.classList.remove('open');
+    }
+  });
 </script>
 
 </body>
