@@ -321,20 +321,60 @@
   }
 
   .cards-stack {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 32px;
-    padding: 0 16px;
+    position: relative;
+    width: 90vw;
+    max-width: 640px;
+    height: 82vh;
   }
 
   .cards-stack img {
+    position: absolute;
+    top: 0;
+    left: 50%;
     display: block;
-    max-width: 90vw;
-    max-height: 82vh;
+    max-width: 100%;
+    max-height: 100%;
     width: auto;
     height: auto;
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    transition: transform 0.4s ease, opacity 0.4s ease;
+  }
+
+  .cards-stack img.card-current {
+    transform: translateX(-50%) rotate(0deg);
+    z-index: 3;
+    opacity: 1;
+  }
+
+  .cards-stack img.card-next {
+    transform: translateX(-50%) translateY(18px) rotate(-4deg);
+    z-index: 2;
+    opacity: 1;
+  }
+
+  .cards-stack img.card-next2 {
+    transform: translateX(-50%) translateY(32px) rotate(5deg);
+    z-index: 1;
+    opacity: 1;
+  }
+
+  .cards-stack img.card-hidden {
+    transform: translateX(-50%) translateY(32px) rotate(0deg);
+    z-index: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cards-counter {
+    position: absolute;
+    bottom: -32px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #ffffff;
+    opacity: 0.75;
+    font-family: "TeX Gyre Heros", Helvetica, Arial, sans-serif;
+    font-size: 14px;
   }
 
   .cards-close {
@@ -485,10 +525,11 @@
 
 <div class="cards-panel" id="cardsPanel">
   <button class="cards-close" id="cardsClose" aria-label="fechar">&times;</button>
-  <div class="cards-stack">
+  <div class="cards-stack" id="cardsStack">
     <img src="img/card1.png" alt="página 1 das anotações de leitura de o homem e seus símbolos, capítulo 1">
     <img src="img/card2.png" alt="página 2 das anotações de leitura de o homem e seus símbolos, capítulo 1">
     <img src="img/card3.png" alt="página 3 das anotações de leitura de o homem e seus símbolos, capítulo 1">
+    <div class="cards-counter" id="cardsCounter"></div>
   </div>
 </div>
 
@@ -531,9 +572,41 @@
   const postJungCards = document.getElementById('postJungCards');
   const cardsPanel = document.getElementById('cardsPanel');
   const cardsClose = document.getElementById('cardsClose');
+  const cardsStack = document.getElementById('cardsStack');
+  const cardsCounter = document.getElementById('cardsCounter');
+  const cardImgs = Array.from(cardsStack.querySelectorAll('img'));
+  let currentCard = 0;
+
+  function renderCards() {
+    cardImgs.forEach((img, index) => {
+      const offset = (index - currentCard + cardImgs.length) % cardImgs.length;
+      img.classList.remove('card-current', 'card-next', 'card-next2', 'card-hidden');
+      if (offset === 0) {
+        img.classList.add('card-current');
+      } else if (offset === 1) {
+        img.classList.add('card-next');
+      } else if (offset === 2) {
+        img.classList.add('card-next2');
+      } else {
+        img.classList.add('card-hidden');
+      }
+    });
+    cardsCounter.textContent = `${currentCard + 1} / ${cardImgs.length}`;
+  }
+
+  renderCards();
+
+  cardImgs.forEach((img) => {
+    img.addEventListener('click', () => {
+      currentCard = (currentCard + 1) % cardImgs.length;
+      renderCards();
+    });
+  });
 
   postJungCards.addEventListener('click', (event) => {
     event.preventDefault();
+    currentCard = 0;
+    renderCards();
     cardsPanel.classList.add('open');
   });
 
