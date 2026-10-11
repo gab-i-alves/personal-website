@@ -395,6 +395,74 @@
   .cards-close:hover {
     opacity: 1;
   }
+
+  .reading-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 6;
+    padding: 6vh 20px;
+    box-sizing: border-box;
+    background: rgba(0, 0, 0, 0.65);
+    overflow: auto;
+  }
+
+  .reading-panel[hidden] { display: none; }
+
+  .reading-note {
+    position: relative;
+    width: min(900px, 100%);
+    margin: 0 auto;
+    box-sizing: border-box;
+    container-type: inline-size;
+    background: #f5f0e5;
+    color: #65432d;
+    font-family: "TeX Gyre Heros", Helvetica, Arial, sans-serif;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  }
+
+  .paper-top {
+    aspect-ratio: 1190.25 / 47.5;
+  }
+
+  .reading-paper-background {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url('img/model-thinker-paper-top.svg'), url('img/model-thinker-paper-grid.svg'), url('img/model-thinker-paper-middle.svg');
+    background-size: 100% auto;
+    background-position: top center, center 15.12287335cqw, center 15.12287335cqw;
+    background-repeat: no-repeat, repeat-y, repeat-y;
+  }
+
+  .reading-content {
+    position: relative;
+    --paper-line: 3.15059861cqw;
+    padding: 0 5% var(--paper-line) 17%;
+    font-size: 1.85cqw;
+    line-height: var(--paper-line);
+    overflow-wrap: break-word;
+    display: flow-root;
+  }
+
+  .reading-content :is(h1, h2, h3, p, ul, table) {
+    position: relative;
+    top: 0;
+    font-size: inherit;
+    line-height: inherit;
+    margin: 0 0 var(--paper-line);
+  }
+
+  .reading-content :is(h1, h2, h3) { font-weight: bold; }
+  .reading-content > p {
+    text-align: justify;
+    hyphens: auto;
+  }
+  .reading-content > h1,
+  .reading-content > h1 + p { text-align: center; }
+  .reading-content ul { padding-left: 1.5em; }
+  .reading-content table { width: 100%; border-collapse: collapse; }
+  .reading-content :is(th, td) { text-align: left; vertical-align: top; padding: 0; }
+  .reading-content th:first-child, .reading-content td:first-child { width: 72%; }
 </style>
 </head>
 <body>
@@ -439,6 +507,14 @@
 <div class="posts-panel" id="postsPanel">
   <div class="posts-inner">
     <h2>posts</h2>
+
+    <div class="post-item post-item-featured">
+      <img class="post-thumb" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRR8V02umANTO8p2Hb-Tl2fewDVIbGDiOXLTvfeW66B7lcTHj47cY8XSFw&amp;s=10" alt="imagem do post sobre the model thinker" loading="lazy">
+      <div class="post-body">
+        <a class="post-title" href="#model-thinker" id="postModelThinker">anotações de leitura do livro "the model thinker" de scott e. page, capítulo 1: the many-model thinker</a>
+        <p class="post-excerpt">modelos ajudam a organizar informações, questionar intuições e entender sistemas complexos, mas toda representação tem limites. quanto mais perspectivas conseguimos combinar, melhores são nossas explicações e decisões.</p>
+      </div>
+    </div>
 
     <div class="post-item post-item-featured">
       <img class="post-thumb" src="img/the-swan.jpg" alt="the swan, de hilma af klint">
@@ -532,7 +608,166 @@
   </div>
 </div>
 
+<div class="reading-panel" id="model-thinker" role="dialog" aria-modal="true" aria-labelledby="modelThinkerTitle" hidden>
+  <button class="cards-close" id="readingClose" aria-label="fechar anotações">&times;</button>
+  <article class="reading-note" tabindex="0">
+    <div class="reading-paper-background" aria-hidden="true"></div>
+    <div class="paper-top" aria-hidden="true"></div>
+    <div class="reading-content">
+<h1 id="modelThinkerTitle">pensar com muitos modelos</h1>
+<p><em>anotações de leitura — the model thinker, scott e. page</em></p>
+<h2>1. um mundo com muitos dados e poucas certezas</h2>
+<p>durante muito tempo, o problema era conseguir acesso à informação. o conhecimento estava concentrado em bibliotecas, universidades e grandes acervos físicos. um exemplo são as antigas salas de fichários da universidade de michigan, onde encontrar uma informação exigia percorrer um sistema inteiro de registros.</p>
+<p>hoje a situação praticamente se inverteu. temos acesso a uma quantidade absurda de dados, quase instantaneamente, mas isso não significa que conseguimos compreender melhor o mundo. na verdade, quanto mais informações produzimos e quanto mais conectados estamos, mais difícil parece ser entender o comportamento dos sistemas ao nosso redor.</p>
+<p>a tecnologia tornou possível acompanhar vendas, inflação, deslocamentos e inúmeras outras atividades em tempo real. empresas e governos conseguem observar e responder a mudanças com uma velocidade antes impensável. só que essa mesma interconectividade também torna os acontecimentos menos previsíveis. pequenas alterações podem se espalhar por redes inteiras, enquanto fenômenos importantes continuam passando despercebidos até acontecerem.</p>
+<p>a primavera árabe de 2011 e o colapso do mercado imobiliário são exemplos dessa dificuldade. mesmo com especialistas, teorias e uma quantidade enorme de informações disponíveis, esses acontecimentos não foram antecipados adequadamente.</p>
+<p>duncan watts resume bem essa tendência humana de interpretar o passado como se ele sempre tivesse sido previsível: <em>&quot;tudo é óbvio, uma vez que você sabe a resposta&quot;</em>.</p>
+<p>é fácil construir uma explicação convincente depois que algo aconteceu. o difícil é saber, antes, quais informações realmente importam e quais mecanismos vão determinar o resultado.</p>
+<h2>2. dados, informação, conhecimento e sabedoria</h2>
+<p>uma maneira de entender esse problema é pela hierarquia DIKW (<em>data, information, knowledge, wisdom</em>), que distingue quatro níveis de compreensão.</p>
+<p><strong>dados</strong> são registros brutos, observações que ainda não foram organizadas. sentir a chuva cair na cabeça, por exemplo, é uma experiência que fornece dados sobre o ambiente.</p>
+<p>quando reunimos essas observações e organizamos os registros, produzimos <strong>informação</strong>. um gráfico mostrando a quantidade de chuva ao longo do mês já permite identificar padrões, comparar períodos e reconhecer variações.</p>
+<p>o <strong>conhecimento</strong> aparece quando começamos a compreender as relações entre essas informações, especialmente os mecanismos que explicam por que algo acontece. saber que a energia se conserva durante uma descida de bicicleta, ou compreender por que ligações metálicas apresentam propriedades diferentes das pontes de hidrogênio, exige mais do que observar dados isolados.</p>
+<p>por fim, existe a <strong>sabedoria</strong>, entendida como a capacidade de discernir qual conhecimento deve ser aplicado em determinada situação.</p>
+<p>uma pessoa pode conhecer detalhadamente a anatomia e o funcionamento do corpo humano, mas tratar um paciente exige reconhecer quais conhecimentos são relevantes para aquele caso específico. existem inúmeras variáveis envolvidas, e conhecer cada uma delas separadamente não garante que a decisão tomada será adequada.</p>
+<p>essa distinção ajuda a perceber por que acumular informações não é suficiente. precisamos de maneiras de organizar o que sabemos, compreender relações e avaliar quando determinada explicação faz sentido.</p>
+<h3>os limites da educação pelos grandes livros</h3>
+<p>a tradição dos <em>great books</em>, associada à educação liberal e à leitura das grandes obras clássicas, oferece ferramentas importantes para pensar sobre liberdade, justiça, conhecimento e natureza humana.</p>
+<p>mas existe uma limitação nessa abordagem quando tentamos compreender problemas contemporâneos. as obras clássicas, por si só, não ensinam a processar grandes volumes de dados, identificar equilíbrios em sistemas complexos, compreender o aprendizado em redes ou avaliar problemas de ação coletiva, como o uso de recursos comuns.</p>
+<p>isso não diminui seu valor. apenas mostra que a formação intelectual precisa incorporar outras ferramentas, especialmente quando queremos passar da reflexão para a análise de fenômenos concretos.</p>
+<h2>3. por que precisamos de modelos</h2>
+<p>modelos são representações simplificadas da realidade. selecionamos determinados elementos de um problema, estabelecemos relações entre eles e tentamos compreender como o sistema funciona.</p>
+<p>a principal vantagem é que um modelo nos obriga a explicitar nossas suposições. uma explicação puramente intuitiva pode parecer convincente mesmo quando contém contradições. ao construir um modelo, precisamos definir quais são as variáveis, como elas se relacionam e quais regras determinam o comportamento do sistema.</p>
+<p>existe uma frase bastante conhecida na estatística, atribuída a george box: <em>&quot;todos os modelos estão errados, mas alguns são úteis&quot;</em>.</p>
+<p>nenhum modelo consegue representar a realidade em sua totalidade. toda modelagem envolve simplificações, e isso significa deixar alguma coisa de fora. o importante é compreender quais aspectos foram preservados, quais foram ignorados e em quais condições aquela representação continua sendo útil.</p>
+<p>quando um modelo falha, também aprendemos alguma coisa. podemos identificar uma premissa equivocada, uma variável importante que não foi considerada ou uma condição na qual a explicação deixa de funcionar.</p>
+<h3>o problema de enxergar tudo pela mesma lente</h3>
+<p>uma das ideias centrais de scott page é que precisamos de uma coleção de modelos, e não de uma única teoria capaz de explicar tudo.</p>
+<p>existe uma analogia conhecida: quando alguém só tem um martelo, todos os problemas começam a parecer pregos. o mesmo acontece com quem conhece apenas uma abordagem teórica. a tendência é tentar encaixar qualquer situação nas explicações que já domina.</p>
+<p>charlie munger defendia uma espécie de <em>treliça de modelos mentais</em>, na qual diferentes conhecimentos são organizados e relacionados à experiência concreta. em vez de depender de uma única explicação, podemos combinar modelos de áreas distintas para compreender um problema.</p>
+<p>um exemplo apresentado é o da crise da moeda islandesa em 2009. diante do pânico financeiro, um investidor considerou simultaneamente um modelo de contágio em redes, um modelo de oferta e demanda e uma informação concreta sobre a escala da economia islandesa, menor que a da cidade de fresno.</p>
+<p>cada elemento contribuía com uma parte da explicação. juntos, permitiam avaliar a situação de maneira menos dependente do medo predominante no mercado.</p>
+<h3>raposas e ouriços</h3>
+<p>essa diferença aparece também nos estudos de philip tetlock sobre a capacidade de previsão de especialistas.</p>
+<p>os <strong>ouriços</strong> organizam seu pensamento em torno de uma grande teoria. procuram interpretar acontecimentos diferentes a partir de um mesmo princípio explicativo.</p>
+<p>as <strong>raposas</strong>, por outro lado, recorrem a diversas perspectivas, inclusive quando elas entram em conflito. aceitam que uma explicação pode funcionar em determinado contexto e falhar em outro, e estão mais dispostas a revisar suas conclusões.</p>
+<p>nos estudos discutidos, os especialistas classificados como ouriços apresentaram previsões particularmente ruins, em alguns casos comparadas desfavoravelmente ao acaso. as raposas tiveram desempenho superior.</p>
+<p>a conclusão é interessante porque contraria a ideia de que uma pessoa se torna necessariamente melhor em compreender o mundo à medida que desenvolve convicções mais fortes sobre uma única teoria.</p>
+<p>ter vários modelos disponíveis significa conseguir olhar para o mesmo problema por ângulos diferentes, sem precisar assumir que uma dessas perspectivas é universalmente correta.</p>
+<h2>4. por que os sistemas sociais são tão difíceis de prever</h2>
+<p>na física e na engenharia, determinados fenômenos podem ser descritos com enorme precisão por modelos relativamente simples, como a segunda lei de newton ou a lei de boyle.</p>
+<p>isso acontece, em parte, porque muitos desses sistemas apresentam três características favoráveis à modelagem: componentes relativamente simples, um número muito grande de interações e regras físicas estáveis.</p>
+<p>os sistemas sociais funcionam de outra maneira.</p>
+<p>seres humanos aprendem, mudam de opinião, respondem a incentivos e modificam seu comportamento com base no que observam nos outros. além disso, as próprias regras e instituições que organizam a sociedade podem mudar.</p>
+<p>uma teoria que explica um comportamento hoje pode deixar de funcionar amanhã, justamente porque as pessoas passaram a agir de maneira diferente.</p>
+<h3>o exemplo da desigualdade de renda</h3>
+<p>podemos tentar explicar a renda de uma pessoa considerando sua escolaridade ou seu QI. essas variáveis podem contribuir para a explicação, mas dificilmente serão suficientes.</p>
+<p>também importam o patrimônio herdado, a região onde a pessoa vive, suas conexões sociais, as oportunidades disponíveis e a maneira como indivíduos diferentes respondem às mesmas condições.</p>
+<p>seria possível tentar incluir todas essas variáveis em uma única equação. o problema é que, conforme adicionamos fatores e interações, o modelo se torna cada vez mais difícil de interpretar.</p>
+<p>chega um ponto em que a representação pode ficar quase tão complicada quanto a realidade que deveria ajudar a compreender.</p>
+<p>a proposta de utilizar múltiplos modelos surge justamente desse limite. um modelo pode explicar os efeitos da escolaridade, outro pode investigar redes sociais e outro pode analisar a transmissão intergeracional de patrimônio. cada um permite observar um mecanismo específico.</p>
+<p>nenhum deles oferece sozinho uma explicação completa, mas a combinação pode produzir uma compreensão mais consistente.</p>
+<h2>5. o que os modelos formais oferecem que as narrativas não conseguem</h2>
+<p>mortimer adler participou da organização do <em>syntopicon</em>, um índice que reuniu 102 grandes ideias presentes na coleção dos <em>great books</em>, associada a 431 volumes. entre essas ideias estavam liberdade, destino e imaginação.</p>
+<p>essas categorias ajudam a organizar tradições intelectuais inteiras. o problema é que conceitos narrativos nem sempre estabelecem relações suficientemente precisas para explicar ou prever acontecimentos.</p>
+<p>a linguagem cotidiana permite ambiguidades e até argumentos contraditórios que parecem igualmente razoáveis. podemos dizer que <em>quem não arrisca não petisca</em>, mas também que <em>cautela nunca é demais</em>.</p>
+<p>ambas as frases podem fazer sentido dependendo das circunstâncias. nenhuma delas, porém, determina exatamente quando vale a pena assumir determinado risco.</p>
+<p>um modelo formal exige que essas circunstâncias sejam especificadas. precisamos estabelecer o que está sendo considerado, quais variáveis podem mudar e como essas mudanças afetam o resultado.</p>
+<h3>quando a intuição erra: um problema de geometria</h3>
+<p>imagine quatro pontos posicionados nos vértices de um quadrado de lado 1.</p>
+<p>se conectarmos esses pontos utilizando três lados do quadrado, teremos uma rede com comprimento total igual a 3.</p>
+<p>agora imagine que adicionamos um quinto ponto exatamente no centro do quadrado.</p>
+<p>a intuição pode sugerir que acrescentar um ponto aumentaria a quantidade necessária de cabos ou estradas. mas, se conectarmos cada vértice diretamente ao centro, o comprimento total será aproximadamente:</p>
+<p><strong>4 × 0,71 = 2,84</strong></p>
+<p>ou seja, nessa configuração, adicionar um ponto permite construir uma rede menor.</p>
+<p>o exemplo mostra como uma conclusão aparentemente óbvia pode estar errada. a modelagem geométrica torna visível uma possibilidade que talvez não fosse percebida apenas pela intuição.</p>
+<h3>fenômenos de limiar</h3>
+<p>outro exemplo são os fenômenos de limiar (<em>threshold phenomena</em>).</p>
+<p>em modelos simplificados de transmissão de doenças, a propagação depende de fatores como a transmissibilidade da infecção e a probabilidade de contato entre indivíduos.</p>
+<p>a dinâmica muda quando determinada combinação de parâmetros ultrapassa um valor crítico. abaixo desse limiar, a transmissão tende a desaparecer; acima dele, a infecção pode continuar se espalhando.</p>
+<p>uma descrição narrativa pode reconhecer que contatos frequentes facilitam a transmissão. já o modelo formal permite investigar em quais condições ocorre a mudança de comportamento do sistema.</p>
+<p>essa é uma diferença importante: os modelos tornam possível identificar relações e limites que não são imediatamente evidentes em uma explicação verbal.</p>
+<h2>6. para que servem os modelos, afinal?</h2>
+<p>tradicionalmente, os modelos científicos eram utilizados para três finalidades principais, conforme a classificação de lave e march.</p>
+<p>a primeira é explicar e prever fenômenos conhecidos. a segunda é produzir previsões sobre fenômenos novos ou relacionados. a terceira é auxiliar no projeto de sistemas físicos e políticas, como dimensionar uma ponte sem comprometer sua segurança ou desperdiçar materiais.</p>
+<p>scott page amplia essa perspectiva. para ele, aprender a modelar também tem valor porque transforma a maneira como pensamos.</p>
+<p>a mente humana utiliza atalhos para interpretar informações e tomar decisões. essas heurísticas são úteis em muitas situações, mas também podem produzir vieses sistemáticos. modelos explícitos ajudam a confrontar nossas intuições com regras e consequências que podemos examinar.</p>
+<p>eles também orientam a coleta de evidências. quando temos uma hipótese sobre determinado fenômeno, podemos utilizar um modelo para identificar quais informações seriam necessárias para avaliá-la.</p>
+<p>outra contribuição é distinguir condições necessárias de condições suficientes. uma condição necessária precisa estar presente para que algo aconteça, mas pode não garantir o resultado. uma condição suficiente, por sua vez, garante o resultado dentro das premissas estabelecidas.</p>
+<p>também podemos explorar cenários contrafactuais: o que aconteceria se uma variável fosse alterada? como o sistema responderia a um incentivo diferente? em quais circunstâncias o resultado seria outro?</p>
+<p>por fim, modelos permitem investigar o comportamento de sistemas ao longo do tempo. algumas dinâmicas convergem para um equilíbrio, outras produzem ciclos, comportamentos aleatórios ou até caos.</p>
+<p>o objetivo é desenvolver uma maneira mais disciplinada de raciocinar, especialmente quando lidamos com problemas nos quais a intuição sozinha não oferece respostas confiáveis.</p>
+<h3>três equívocos comuns</h3>
+<p><strong>o primeiro é acreditar que existe um modelo perfeito.</strong> toda representação deixa alguma coisa de fora, e a complexidade dos fenômenos sociais torna especialmente improvável que uma única teoria seja suficiente.</p>
+<p><strong>o segundo é associar toda modelagem social à teoria da escolha racional.</strong> assumir que os indivíduos fazem escolhas perfeitamente racionais é apenas uma possibilidade metodológica. também podemos construir modelos com agentes que utilizam heurísticas, apresentam vieses, aprendem ou seguem objetivos sem necessariamente calcular a decisão economicamente ótima.</p>
+<p><strong>o terceiro é confundir modelos com matemática pura.</strong> equações são uma maneira de representar relações, mas não a única. existem modelos computacionais baseados em simulações, modelos físicos e até mecanismos hidráulicos.</p>
+<p>um exemplo curioso é o modelo hidráulico de phillips, que representava o funcionamento da economia britânica utilizando água circulando por tubos e reservatórios.</p>
+<p>o que define um modelo, portanto, não é necessariamente sua linguagem matemática, mas a construção de uma representação com componentes, relações e regras que possam ser examinados.</p>
+<h2>7. modelos de escala: quando o tamanho muda as regras</h2>
+<p>uma aplicação particularmente interessante da modelagem aparece nos problemas de escala.</p>
+<p>quando aumentamos o tamanho de um objeto, sua área e seu volume não crescem na mesma proporção. essa diferença aparentemente simples tem consequências importantes para engenharia, economia e biologia.</p>
+<h3>o caso dos superpetroleiros</h3>
+<p>stavros niarchos explorou economicamente uma propriedade geométrica simples: objetos maiores podem transportar proporcionalmente mais carga em relação à quantidade de material utilizada em sua estrutura.</p>
+<p>para compreender isso, podemos representar um navio como um bloco retangular de largura S, altura S e comprimento 8S.</p>
+<p>nesse modelo:</p>
+<ul><li>a área de superfície é igual a <strong>34S²</strong>, representando aproximadamente a quantidade de aço necessária;</li><li>o volume é igual a <strong>8S³</strong>, representando a capacidade de transporte.</li></ul>
+<p>a diferença está nos expoentes. a área aumenta com o quadrado da dimensão, enquanto o volume cresce com o cubo.</p>
+<p>se compararmos um navio com S = 30 pés a outro cinco vezes maior, com S = 150 pés, teremos:</p>
+<table><thead><tr><th>Propriedade</th><th>Crescimento</th></tr></thead><tbody><tr><td>Dimensões lineares</td><td>5 vezes</td></tr><tr><td>Área de superfície</td><td>25 vezes</td></tr><tr><td>Volume e capacidade de carga</td><td>125 vezes</td></tr></tbody></table>
+<p>a capacidade de transporte cresce muito mais rapidamente do que a área de superfície. assim, dentro dessa simplificação, o navio maior consegue transportar proporcionalmente mais petróleo por unidade de material utilizado.</p>
+<p>essa vantagem geométrica ajudou a tornar economicamente interessantes os superpetroleiros.</p>
+<p>mas existe um detalhe importante: modelos funcionam dentro de determinadas condições.</p>
+<p>um navio não pode aumentar indefinidamente apenas porque a geometria sugere vantagens. restrições físicas e de infraestrutura continuam existindo. o exemplo apresentado é o limite de aproximadamente 60 metros de largura associado ao ponto mais estreito do canal de suez, considerado no contexto histórico discutido.</p>
+<p>a lição é que uma relação matemática pode estar correta e, ainda assim, deixar de ser uma boa orientação prática quando outras restrições passam a dominar o problema.</p>
+<h3>por que os elefantes não explodem?</h3>
+<p>a mesma relação entre área e volume aparece nos organismos vivos.</p>
+<p>o metabolismo produz calor, enquanto a superfície corporal permite que parte desse calor seja dissipada para o ambiente.</p>
+<p>em um modelo geométrico simplificado, a produção de calor acompanha o volume do organismo, enquanto sua capacidade de dissipação está relacionada à área externa.</p>
+<p>como o volume cresce mais rapidamente do que a área, animais maiores possuem proporcionalmente menos superfície disponível em relação à massa corporal.</p>
+<p>um camundongo apresenta uma relação área-volume muito diferente da de um elefante. na representação utilizada, o primeiro possui aproximadamente 4⅔ faces expostas para cada cubo celular, enquanto o segundo apresenta apenas uma face exposta para cada quinze cubos celulares internos.</p>
+<p>se um elefante mantivesse a mesma taxa metabólica por célula de um camundongo, teria enorme dificuldade para dissipar o calor produzido. é daí que vem a imagem exagerada do elefante que acabaria explodindo.</p>
+<p>o modelo sugere por que organismos grandes precisam apresentar adaptações metabólicas e fisiológicas distintas. na simplificação discutida, a taxa metabólica teria de ser mais de vinte vezes menor para evitar o acúmulo excessivo de calor.</p>
+<p>isso ajuda a compreender por que grandes mamíferos consomem menos energia proporcionalmente à massa do que animais muito pequenos.</p>
+<p>vale lembrar que organismos reais possuem mecanismos de regulação muito mais complexos. a geometria explica uma parte importante do problema, mas não substitui toda a fisiologia envolvida.</p>
+<h2>8. considerações finais</h2>
+<p>a ideia que atravessa esses exemplos é que compreender um sistema exige reconhecer tanto os mecanismos que determinam seu comportamento quanto os limites das nossas explicações.</p>
+<p>um modelo geométrico pode mostrar por que navios maiores oferecem vantagens econômicas, mas não considera automaticamente as limitações dos canais por onde precisam passar. um modelo de transmissão de doenças pode identificar condições críticas de propagação, mas depende das características da população e das hipóteses utilizadas. modelos sociais podem explicar mecanismos específicos, mas precisam lidar com indivíduos que aprendem e mudam seu comportamento.</p>
+<p>quanto mais complexa a realidade, mais importante se torna reconhecer essas limitações.</p>
+<p>ter múltiplos modelos disponíveis permite comparar explicações, identificar contradições e perceber quando uma ferramenta deixa de ser adequada. também ajuda a evitar a tendência de interpretar qualquer acontecimento a partir da primeira teoria que parece fazer sentido.</p>
+<p>talvez a contribuição mais interessante dessa abordagem seja aprender a desconfiar um pouco das nossas próprias explicações. especialmente daquelas que parecem óbvias demais depois que já conhecemos o resultado.</p>
+    </div>
+  </article>
+</div>
+
 <script>
+  const postModelThinker = document.getElementById('postModelThinker');
+  const readingPanel = document.getElementById('model-thinker');
+  const readingClose = document.getElementById('readingClose');
+  const readingNote = readingPanel.querySelector('.reading-note');
+
+  function closeReading() {
+    readingPanel.hidden = true;
+    postModelThinker.focus();
+  }
+
+  postModelThinker.addEventListener('click', (event) => {
+    event.preventDefault();
+    readingPanel.hidden = false;
+    readingPanel.scrollTop = 0;
+    readingClose.focus();
+  });
+  readingClose.addEventListener('click', closeReading);
+  readingPanel.addEventListener('click', (event) => {
+    if (event.target === readingPanel) closeReading();
+  });
+  readingPanel.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeReading();
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      (document.activeElement === readingClose ? readingNote : readingClose).focus();
+    }
+  });
+
   const postsToggle = document.getElementById('postsToggle');
   const postsBack = document.getElementById('postsBack');
   const postsPanel = document.getElementById('postsPanel');
